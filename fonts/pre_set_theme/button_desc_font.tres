@@ -1,0 +1,11 @@
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://dkpllowskoe2q"]
+
+[ext_resource type="FontFile" uid="uid://3elerwfx7aom" path="res://fonts/HanSan/SimplifiedCN/SourceHanSansCN-Regular.otf" id="1_aitgw"]
+
+[resource]
+Label/colors/font_color = Color(0, 0, 0, 1)
+Label/font_sizes/font_size = 26
+Label/fonts/font = ExtResource("1_aitgw")
+RichTextLabel/colors/default_color = Color(0, 0, 0, 1)
+RichTextLabel/font_sizes/normal_font_size = 26
+RichTextLabel/fonts/normal_font = ExtResource("1_aitgw")

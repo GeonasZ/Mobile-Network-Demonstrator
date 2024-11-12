@@ -1,0 +1,11 @@
+[gd_resource type="Theme" load_steps=3 format=3 uid="uid://d2o83b6m0nt4l"]
+
+[ext_resource type="FontFile" uid="uid://mcshd5gym8b" path="res://fonts/HanSan/SimplifiedCN/SourceHanSansCN-Bold.otf" id="1_l0e13"]
+[ext_resource type="FontFile" uid="uid://3elerwfx7aom" path="res://fonts/HanSan/SimplifiedCN/SourceHanSansCN-Regular.otf" id="1_r24jd"]
+
+[resource]
+RichTextLabel/colors/default_color = Color(0, 0, 0, 1)
+RichTextLabel/font_sizes/bold_font_size = 35
+RichTextLabel/font_sizes/normal_font_size = 32
+RichTextLabel/fonts/bold_font = ExtResource("1_l0e13")
+RichTextLabel/fonts/normal_font = ExtResource("1_r24jd")

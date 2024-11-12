@@ -1,0 +1,25 @@
+[gd_scene load_steps=5 format=3 uid="uid://cbe2qia7qa1ti"]
+
+[ext_resource type="Script" path="res://scripts/UserPrefab.gd" id="1_eitbs"]
+[ext_resource type="Shader" uid="uid://ege4ywih83st" path="res://shader/mouse_panel.tres" id="2_k7pyv"]
+[ext_resource type="Script" path="res://scripts/user_boundary.gd" id="3_6qhdh"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_wb2p1"]
+shader = ExtResource("2_k7pyv")
+shader_parameter/alpha = null
+
+[node name="UserPrefab" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+mouse_filter = 2
+script = ExtResource("1_eitbs")
+
+[node name="Boundary" type="Control" parent="."]
+material = SubResource("ShaderMaterial_wb2p1")
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("3_6qhdh")
+
+[connection signal="mouse_entered" from="Boundary" to="Boundary" method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="Boundary" to="Boundary" method="_on_mouse_exited"]

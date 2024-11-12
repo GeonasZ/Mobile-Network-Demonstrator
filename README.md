@@ -1,0 +1,2 @@
+### Godot Implementation of UCL Project Mobile Network Demonstrator
+This is an implementaion of the project Mobile Network Demonstrator with godot 4.3. This program allows user to visually analyze the streucture and performance of a mobile network.
