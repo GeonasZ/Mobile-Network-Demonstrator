@@ -1,6 +1,6 @@
 extends LineEdit
 
-@onready var user_controller = $"../../../../../Controllers/UserController"
+@onready var mouse_panel = $"../../../../../MousePanel"
 @onready var father_node = $".."
 
 
@@ -15,19 +15,21 @@ func _ready() -> void:
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-	
 	var caret_location = self.caret_column
 	var processed_text = ""
+	var has_float = false
 	
 	for i in range(self.text.length()):
-		if text[i] in legal_characters:
+		if text[i] in legal_characters or 1:
+			processed_text += text[i]
+		elif i > 0 and text[i] == '.' and not has_float:
+			has_float = true
 			processed_text += text[i]
 			
 	if processed_text == "":
 		self.text = ""
 		return
 		
-	processed_text = int(processed_text)
 	self.text = str(processed_text)
 	if caret_location > self.text.length():
 		self.caret_column = self.text.length()
@@ -43,15 +45,18 @@ func _input(event: InputEvent) -> void:
 		focus_exited.emit()
 
 func initialize():
-	self.text = str(user_controller.user_height)
+	self.text = str(mouse_panel.decay)
+	
+	
 
 func _on_focus_exited() -> void:
-	var max_value = 100
-	var min_value = 5
+	var max_value = 5
+	var min_value = 2
 	father_node.grab_focus()
 	if self.text == "":
 		self.text = str(min_value)
-	var length = int(self.text)
+
+	var length = float(self.text)
 	if length > max_value:
 		self.text = str(max_value)
 	elif length < min_value:

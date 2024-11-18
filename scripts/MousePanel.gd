@@ -10,18 +10,22 @@ extends Control
 enum XMotion {MOVE_LEFT, MOVE_RIGHT}
 enum YMotion {MOVE_UP,MOVE_DOWN,MOVE_LEVEL}
 enum DisplayMode {STATION, USER}
-enum TrackingMode {MOUSE, USER}
+enum TrackingMode {MOUSE, USER, STATION}
 
 var x_motion_state = XMotion.MOVE_RIGHT
 var y_motion_state = YMotion.MOVE_LEVEL
 var display_mode = DisplayMode.STATION
 var tracking_mode = TrackingMode.MOUSE
+var style_code = 0
 var displayed_user = []
 var tracked_user = null
+var tracked_station = null
 var motion_speed_param = 0.3
-var length = 240
-var width = 180
+var length = 320
+var width = 220
 var slash_len = 20
+# decay rate of signal power with distance
+var decay = 2
 
 var out_of_window = false
 var set_to_visible = true
@@ -51,17 +55,29 @@ func _draw():
 					[Color8(255,255,255),Color8(255,255,255),Color8(255,255,255),Color8(255,255,255),
 					Color8(255,255,255),Color8(255,255,255),Color8(255,255,255),Color8(255,255,255)])
 
+# change the display style of panel in different states
 func label_change_style(display_mode, track_mode):
-	# default mode
 	if display_mode == DisplayMode.STATION and track_mode == TrackingMode.MOUSE:
-		# more negative, more right bottom
-		info_label.position = Vector2(-length*0.45,-width*0.47)
-		info_label.size = Vector2(length*0.9, width)
+		
+		if self.style_code == 1:
+			# value larger, more left top
+			info_label.position = Vector2(-length*0.44,-width*0.45)
+			info_label.size = Vector2(0.88*length, width)
+		else:
+			# more negative, more right bottom
+			info_label.position = Vector2(-length*0.4,-width*0.45)
+			info_label.size = Vector2(length, width)
+		# station mode
+	elif track_mode == TrackingMode.STATION:
+		# value larger, more left top
+		info_label.position = Vector2(-length*0.44,-width*0.45)
+		info_label.size = Vector2(length*0.88, width)
 	# user mode
 	elif display_mode == DisplayMode.USER or track_mode == TrackingMode.USER:
-		# more negative, more right bottom
-		info_label.position = Vector2(-length*0.4,-width*0.27)
+		# value larger, more left top
+		info_label.position = Vector2(-length*0.38,-width*0.35)
 		info_label.size = Vector2(length, width)
+
 	else:
 		print("MousePanel: label_change_style(): Unknown State.")
 
@@ -77,7 +93,7 @@ func _ready():
 	self.visible = true
 	self.scale = Vector2(0,0)
 	# set alpha to 0.5 (make the panel transparent)
-	(self.material as ShaderMaterial).set_shader_parameter("alpha",0.5)
+	(self.material as ShaderMaterial).set_shader_parameter("alpha",0.75)
 	# initialize info_label
 	info_label.text = "[center]Loading...[/center]"
 	keep_invisible = true
@@ -123,12 +139,18 @@ func process_y_motion(mouse_position, delta):
 	elif mouse_position.y <= 1080*0.07:
 		y_motion_state = YMotion.MOVE_DOWN
 
+func change_decay(value):
+	self.decay = value
+
 func appear_with_anime():
 	if self.tracking_mode == TrackingMode.USER:
 		return
 	self.scale = Vector2(0,0)
 	self.keep_invisible = false
 	anime_player.play("appear")
+
+func is_tracking_station():
+	return self.tracking_mode == TrackingMode.STATION
 
 func disappear_with_anime_at_speed(speed_scale):
 	if self.tracking_mode == TrackingMode.USER:
@@ -142,19 +164,39 @@ func disappear_with_anime_at_speed(speed_scale):
 func disappear_with_anime():
 	disappear_with_anime_at_speed(1)
 
+func track_station(station):
+	self.tracking_mode = TrackingMode.STATION
+	
+	# turn off the tracked_by_panel property of the station that beeen tracked before
+	if self.tracked_station != null and self.tracked_user != station:
+		self.tracked_station.end_tracked_by_panel()
+	if tracked_user != null:
+		self.tracked_user.end_tracked_by_panel()
+		self.tracked_user = null
+	self.tracked_station = station
+	self.tracked_station.begin_tracked_by_panel()
+
 func track_user():
 	self.tracking_mode = TrackingMode.USER
+
 	# turn off the tracked_by_panel property of the user that beeen tracked before
 	if self.tracked_user != null and self.tracked_user != self.displayed_user[-1]:
 		self.tracked_user.end_tracked_by_panel()
+	if tracked_station != null:
+		self.tracked_station.end_tracked_by_panel()
+		self.tracked_station = null
 	# turn on the tracked_by_panel property of the current user
 	self.tracked_user = self.displayed_user[-1]
 	self.tracked_user.begin_tracked_by_panel()
 	
 func track_mouse():
 	self.tracking_mode = TrackingMode.MOUSE
-	self.tracked_user.end_tracked_by_panel()
+	if tracked_user != null:
+		self.tracked_user.end_tracked_by_panel()
+	if tracked_station != null:
+		self.tracked_station.end_tracked_by_panel()
 	self.tracked_user = null
+	self.tracked_station = null
 
 func truncate_double(num, n_digits=3):
 	return int(num * pow(10,n_digits))/pow(10,n_digits)
@@ -167,13 +209,21 @@ func eval_sir(signal_power, interference_power, f_digits=3):
 
 func list2str(input_list, seperator=", "):
 	var output = ""
-	if input_list.size() == 0:
+	var input_size = input_list.size()
+	if input_size == 0:
 		return "None"
 	else:
-		for element in input_list:
-			output += str(element) + seperator
+		if input_size <= 7:
+			for i in range(min(input_size,7)):
+				output += str(input_list[i]) + seperator
+			output = output.rstrip(seperator)
+		else:
+			for i in range(min(input_size,6)):
+				output += str(input_list[i]) + seperator
+			output = output.rstrip(seperator)
+			output += "  < " + str(input_size-6) + " more >"
 			
-		output = output.rstrip(seperator)
+		
 		return output
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -184,8 +234,10 @@ func _process(delta):
 	if self.tracking_mode == TrackingMode.MOUSE:
 		# get mouse position
 		tracking_position = get_viewport().get_mouse_position()
-	else:
+	elif self.tracking_mode == TrackingMode.USER:
 		tracking_position = tracked_user.get_global_transform()*Vector2(0,0)
+	else:
+		tracking_position = tracked_station.get_global_transform()*Vector2(0,0)
 	process_x_motion(tracking_position, delta)
 	process_y_motion(tracking_position, delta)
 	
@@ -197,70 +249,107 @@ func _process(delta):
 		out_of_window = false 
 		if not keep_invisible:
 			self.visible = true
+	# display station and user info
 	if display_mode == DisplayMode.STATION and tracking_mode == TrackingMode.MOUSE:
 		var distance = mouse_controller.current_distance/zoom_scale
 		var current_hex = mouse_controller.current_hex
-		var signal_power = current_hex.ref_signal_power/pow(distance,2)
-		var interference_power = 0
-		# sum interference power up
-		for station in tile_controller.hex_frequency_dict[current_hex.frequency_group]:
-			var station_dis = (station.get_global_transform()*Vector2(0,0)).distance_to(self.get_global_mouse_position())/zoom_scale
-			interference_power += station.ref_signal_power/pow(station_dis,2)
-		interference_power -= signal_power
 		var available_channels_in_hex = current_hex.get_available_channels()
-		
-		info_label.text = "Nearest Station ID:\t"+ str(current_hex.id) +"\n" +\
-					"Distance:\t"+str(truncate_double(distance))+"\n"+\
-					"Network Type:\t"+mouse_controller.current_hex.network_type+"\n"+\
-					"Frequency Group:\t"+mouse_controller.current_hex.frequency_group+"\n"+\
-					"Users Under Station:\t"+str(user_controller.user_list[mouse_controller.current_hex_i][mouse_controller.current_hex_j].size())+\
-					"[center][b]Channels Available[/b][/center][center]" + str(list2str(available_channels_in_hex)) + "[/center]"
+		# if the mouse position is far away from the center of hex tile
+		if  not mouse_controller.current_hex.is_center_on_focus():
+			info_label.text = "Nearest Station ID:  "+ str(current_hex.id) +"\n" +\
+						"Distance:  "+str(truncate_double(distance))+"\n"+\
+						"Network Type:  "+mouse_controller.current_hex.network_type+"\n"+\
+						"Antenna Type:  "+ current_hex.get_antenna_type()+'\n' +\
+						"Frequency Group:  "+mouse_controller.current_hex.frequency_group+"\n"+\
+						"Number of Channels:  "+str(current_hex.n_available_channel)+"\n"+\
+						"Users Under Station:  "+str(
+							user_controller.user_list[mouse_controller.current_hex_i][mouse_controller.current_hex_j]["connected"].size()+\
+							user_controller.user_list[mouse_controller.current_hex_i][mouse_controller.current_hex_j]["disconnected"].size())+"\n"+\
+						"Number of Available Channels: " + str(current_hex.n_available_channel-\
+						user_controller.user_list[mouse_controller.current_hex_i][mouse_controller.current_hex_j]["connected"].size())
+			self.style_code = 0
+		# display more information about station if at the center of area
+		else:
+			info_label.text = "Station ID:  "+ str(current_hex.id) +"\n" +\
+			"Network Type:  "+mouse_controller.current_hex.network_type+"\n"+\
+			"Frequency Group:  "+mouse_controller.current_hex.frequency_group+"\n"+\
+			"Number of Channels:  "+str(current_hex.n_available_channel)+"\n"+\
+			"Users Under Station: "+\
+			str(user_controller.user_list[mouse_controller.current_hex_i][mouse_controller.current_hex_j]["connected"].size()+\
+			user_controller.user_list[mouse_controller.current_hex_i][mouse_controller.current_hex_j]["disconnected"].size())+"\n"+\
+			"Antenna Type:  "+ current_hex.get_antenna_type() +\
+			"[center][b]Channels Available[/b][/center][center]" + str(list2str(available_channels_in_hex)) + "[/center]"
+			self.style_code = 1
+	
+	# display station information with foucs at station
+	elif tracking_mode == TrackingMode.STATION:
+		var distance = mouse_controller.current_distance/zoom_scale
+		var available_channels_in_hex = tracked_station.get_available_channels()
+		info_label.text = "Station ID:  "+ str(tracked_station.id) +"\n" +\
+		"Network Type:  "+tracked_station.network_type+"\n"+\
+		"Frequency Group:  "+tracked_station.frequency_group+"\n"+\
+		"Number of Channels:  "+str(tracked_station.n_available_channel)+"\n"+\
+		"Users Under Station: "+\
+		str(user_controller.user_list[tracked_station.index_i][tracked_station.index_j]["connected"].size()+\
+		user_controller.user_list[tracked_station.index_i][tracked_station.index_j]["disconnected"].size())+"\n"+\
+		"Antenna Type:  "+ tracked_station.get_antenna_type() +\
+		"[center][b]Channels Available[/b][/center][center]" + str(list2str(available_channels_in_hex)) + "[/center]"
+		self.style_code = 0
+	# display user information with foucs at mouse
 	elif display_mode == DisplayMode.USER and tracking_mode == TrackingMode.MOUSE:
 		var i = displayed_user[-1].index_i_in_user_list
 		var j = displayed_user[-1].index_j_in_user_list
 		var user_hex = tile_controller.hex_list[i][j]
 		var distance = user_hex.position.distance_to(displayed_user[-1].position)
-		var signal_power = user_hex.ref_signal_power/pow(distance,2)
+		var signal_power = user_hex.eval_signal_pow_to_user(displayed_user[-1], self.decay)
 		var interference_power = 0
 		# sum interference power up
 		if displayed_user[-1].connected_channel != null:
 			for station in tile_controller.hex_frequency_dict[user_hex.frequency_group]:
-				var station_dis = station.position.distance_to(displayed_user[-1].position)
 				if station.channel_allocation_list[displayed_user[-1].connected_channel] != null:
-					interference_power += station.ref_signal_power/pow(station_dis,2)
+					interference_power += station.eval_signal_pow_to_user(displayed_user[-1], decay)
 		interference_power -= signal_power
-		info_label.text = "User ID:\t" + str(displayed_user[-1].id) + "\n" +\
-			"Distance to Station:\t"+str(truncate_double(distance,1))+"\n"+\
-			"Connected to Channel:\t "+str(displayed_user[-1].connection_status())
+		info_label.text = "User ID:  " + str(displayed_user[-1].id) + "\n" +\
+			"Nearest Station ID: " + str(user_hex.id) +'\n'+\
+			"Distance to Nearest Station:  "+str(truncate_double(distance,1))+"\n"+\
+			"Connected to Channel:  "+str(displayed_user[-1].connection_status())
 		# if user is connected to station, show sir
 		if displayed_user[-1].connected_channel != null:
-			info_label.text += "\nSIR:\t"+str(eval_sir(signal_power,interference_power))
+			info_label.text += "\nSignal Power: " + str(truncate_double(10*log(signal_power/1e-3)/log(10))) + " dBm"
+			info_label.text += "\nSIR:  "+str(eval_sir(signal_power,interference_power))
 		else:
-			info_label.text += "\nSIR:\tN/A"
+			info_label.text += "\nSignal Power: Not Connected"
+			info_label.text += "\nSIR:  N/A"
+		self.style_code = 0
+		
+	# display user information with foucs at user
 	elif tracking_mode == TrackingMode.USER:
 		var index_i = tracked_user.index_i_in_user_list
 		var index_j = tracked_user.index_j_in_user_list
 		var user_hex = tile_controller.hex_list[index_i][index_j]
 		var distance = user_hex.position.distance_to(tracked_user.position)
-		var signal_power = user_hex.ref_signal_power/pow(distance,2)
+		var signal_power = user_hex.eval_signal_pow_to_user(tracked_user, self.decay)
 		var interference_power = 0
 		# sum interference power up
 		if tracked_user.connected_channel != null:
 			for station in tile_controller.hex_frequency_dict[user_hex.frequency_group]:
-				var station_dis = station.position.distance_to(tracked_user.position)
 				if station.channel_allocation_list[tracked_user.connected_channel] != null:
-					interference_power += station.ref_signal_power/pow(station_dis,2)
+										interference_power += station.eval_signal_pow_to_user(tracked_user, decay)
 		interference_power -= signal_power
-		info_label.text = "User ID:\t" + str(tracked_user.id) + "\n" +\
-			"Distance to Station:\t"+str(truncate_double(distance,1))+"\n"+\
-			"Connected to Channel:\t "+str(tracked_user.connection_status())
+		info_label.text = "User ID:  " + str(tracked_user.id) + "\n" +\
+			"Nearest Station ID: " + str(user_hex.id) + "\n" +\
+			"Distance to Nearest Station:  "+str(truncate_double(distance,1))+"\n"+\
+			"Connected to Channel:  "+str(tracked_user.connection_status())
 			
 		# if user is connected to station, show sir
 		if tracked_user.connected_channel != null:
-			info_label.text += "\nSIR:\t"+str(eval_sir(signal_power,interference_power))
+			info_label.text += "\nSignal Power: " + str(truncate_double(10*log(signal_power/1e-3)/log(10))) + " dBm"
+			info_label.text += "\nSIR:  "+str(eval_sir(signal_power,interference_power))
 		else:
-			info_label.text += "\nSIR:\tN/A"
-		# change the display style of label
+			info_label.text += "\nSignal Power: Not Connected"
+			info_label.text += "\nSIR:  N/A"
+		self.style_code = 0
+	# change the display style of label
 	label_change_style(self.display_mode, self.tracking_mode)
 
 func _on_mouse_enter_user(user):
@@ -276,7 +365,6 @@ func _on_mouse_enter_user(user):
 	user.scale = Vector2(1.1,1.1)
 	user.show_boundary()
 		
-	
 func _on_mouse_leave_user(user):
 	# remove focus
 	for i in range(displayed_user.size()-1,-1,-1):

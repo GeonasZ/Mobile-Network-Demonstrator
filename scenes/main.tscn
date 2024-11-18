@@ -1,4 +1,4 @@
-[gd_scene load_steps=62 format=3 uid="uid://dp7br0wc03w8r"]
+[gd_scene load_steps=65 format=3 uid="uid://dp7br0wc03w8r"]
 
 [ext_resource type="Script" path="res://scripts/UserController.gd" id="1_18gww"]
 [ext_resource type="Script" path="res://scripts/TileController.gd" id="1_fg5v7"]
@@ -32,7 +32,10 @@
 [ext_resource type="Script" path="res://scripts/freq_reuse_button.gd" id="15_r6418"]
 [ext_resource type="Script" path="res://scripts/user_height_line_edit.gd" id="16_i0h6j"]
 [ext_resource type="Script" path="res://scripts/config_button.gd" id="19_kgern"]
+[ext_resource type="Script" path="res://scripts/decay_line_edit.gd" id="19_qoxea"]
+[ext_resource type="Script" path="res://scripts/frequency_number_edit.gd" id="20_sn5w8"]
 [ext_resource type="Script" path="res://scripts/config_panel.gd" id="24_ok7yp"]
+[ext_resource type="Script" path="res://scripts/over_layer.gd" id="30_f735c"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_h4n7r"]
 shader = ExtResource("6_ihk23")
@@ -547,6 +550,7 @@ offset_right = 1920.0
 offset_bottom = 1080.0
 
 [node name="Controllers" type="Control" parent="."]
+visible = false
 anchors_preset = 0
 
 [node name="UserController" type="Control" parent="Controllers"]
@@ -572,6 +576,13 @@ script = ExtResource("4_6s6fj")
 [node name="Users" type="Control" parent="."]
 anchors_preset = 0
 script = ExtResource("5_hn52i")
+
+[node name="OverLayer" type="Control" parent="."]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 2
+script = ExtResource("30_f735c")
 
 [node name="MousePanel" type="Control" parent="."]
 material = SubResource("ShaderMaterial_h4n7r")
@@ -678,14 +689,18 @@ size_flags_horizontal = 2
 
 [node name="Label" type="Label" parent="ConfigPanel/ContentFrame/GridContainer/TileLengthEdit"]
 layout_mode = 2
-size_flags_horizontal = 2
+size_flags_horizontal = 0
 theme = SubResource("Theme_7tp5v")
 text = "Tile Length    "
+
+[node name="PlaceHolder" type="Control" parent="ConfigPanel/ContentFrame/GridContainer/TileLengthEdit"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
 
 [node name="LineEdit" type="LineEdit" parent="ConfigPanel/ContentFrame/GridContainer/TileLengthEdit"]
 custom_minimum_size = Vector2(70, 60)
 layout_mode = 2
-size_flags_horizontal = 8
+size_flags_horizontal = 0
 size_flags_vertical = 4
 theme = SubResource("Theme_lcted")
 max_length = 4
@@ -697,11 +712,6 @@ select_all_on_focus = true
 caret_blink = true
 script = ExtResource("15_kcj7q")
 
-[node name="Label2" type="Label" parent="ConfigPanel/ContentFrame/GridContainer/TileLengthEdit"]
-layout_mode = 2
-size_flags_horizontal = 2
-theme = SubResource("Theme_7tp5v")
-
 [node name="UserHeightEdit" type="HBoxContainer" parent="ConfigPanel/ContentFrame/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 8
@@ -712,6 +722,10 @@ layout_mode = 2
 size_flags_horizontal = 2
 theme = SubResource("Theme_7tp5v")
 text = "User Height"
+
+[node name="PlaceHolder" type="Control" parent="ConfigPanel/ContentFrame/GridContainer/UserHeightEdit"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
 
 [node name="LineEdit" type="LineEdit" parent="ConfigPanel/ContentFrame/GridContainer/UserHeightEdit"]
 custom_minimum_size = Vector2(70, 60)
@@ -728,24 +742,22 @@ select_all_on_focus = true
 caret_blink = true
 script = ExtResource("16_i0h6j")
 
-[node name="Label2" type="Label" parent="ConfigPanel/ContentFrame/GridContainer/UserHeightEdit"]
-layout_mode = 2
-size_flags_horizontal = 2
-theme = SubResource("Theme_7tp5v")
-
-[node name="TileLengthEdit3" type="HBoxContainer" parent="ConfigPanel/ContentFrame/GridContainer"]
-visible = false
+[node name="DecayEdit" type="HBoxContainer" parent="ConfigPanel/ContentFrame/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 3
 
-[node name="Label" type="Label" parent="ConfigPanel/ContentFrame/GridContainer/TileLengthEdit3"]
+[node name="Label" type="Label" parent="ConfigPanel/ContentFrame/GridContainer/DecayEdit"]
 layout_mode = 2
 size_flags_horizontal = 2
 theme = SubResource("Theme_7tp5v")
-text = "Tile Length    "
+text = "Decay Constant"
 
-[node name="LineEdit" type="LineEdit" parent="ConfigPanel/ContentFrame/GridContainer/TileLengthEdit3"]
+[node name="PlaceHolder" type="Control" parent="ConfigPanel/ContentFrame/GridContainer/DecayEdit"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="LineEdit" type="LineEdit" parent="ConfigPanel/ContentFrame/GridContainer/DecayEdit"]
 custom_minimum_size = Vector2(70, 60)
 layout_mode = 2
 size_flags_horizontal = 8
@@ -758,12 +770,37 @@ virtual_keyboard_enabled = false
 shortcut_keys_enabled = false
 select_all_on_focus = true
 caret_blink = true
-script = ExtResource("15_kcj7q")
+script = ExtResource("19_qoxea")
 
-[node name="Label2" type="Label" parent="ConfigPanel/ContentFrame/GridContainer/TileLengthEdit3"]
+[node name="NFrequencyEdit" type="HBoxContainer" parent="ConfigPanel/ContentFrame/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="ConfigPanel/ContentFrame/GridContainer/NFrequencyEdit"]
 layout_mode = 2
 size_flags_horizontal = 2
 theme = SubResource("Theme_7tp5v")
+text = "Total Channel Number"
+
+[node name="PlaceHolder" type="Control" parent="ConfigPanel/ContentFrame/GridContainer/NFrequencyEdit"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="LineEdit" type="LineEdit" parent="ConfigPanel/ContentFrame/GridContainer/NFrequencyEdit"]
+custom_minimum_size = Vector2(70, 60)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 4
+theme = SubResource("Theme_lcted")
+max_length = 4
+expand_to_text_length = true
+context_menu_enabled = false
+virtual_keyboard_enabled = false
+shortcut_keys_enabled = false
+select_all_on_focus = true
+caret_blink = true
+script = ExtResource("20_sn5w8")
 
 [node name="FunctionPanel" type="Control" parent="."]
 anchors_preset = 0
@@ -1033,7 +1070,7 @@ offset_top = -600.0
 offset_right = 1000.0
 offset_bottom = 480.0
 
-[connection signal="mouse_left_press_on_background" from="GatheredTiles" to="Controllers/UserController" method="on_mouse_left_click_on_background"]
 [connection signal="focus_exited" from="ConfigPanel/ContentFrame/GridContainer/TileLengthEdit/LineEdit" to="ConfigPanel/ContentFrame/GridContainer/TileLengthEdit/LineEdit" method="_on_focus_exited"]
 [connection signal="focus_exited" from="ConfigPanel/ContentFrame/GridContainer/UserHeightEdit/LineEdit" to="ConfigPanel/ContentFrame/GridContainer/UserHeightEdit/LineEdit" method="_on_focus_exited"]
-[connection signal="focus_exited" from="ConfigPanel/ContentFrame/GridContainer/TileLengthEdit3/LineEdit" to="ConfigPanel/ContentFrame/GridContainer/TileLengthEdit3/LineEdit" method="_on_focus_exited"]
+[connection signal="focus_exited" from="ConfigPanel/ContentFrame/GridContainer/DecayEdit/LineEdit" to="ConfigPanel/ContentFrame/GridContainer/DecayEdit/LineEdit" method="_on_focus_exited"]
+[connection signal="focus_exited" from="ConfigPanel/ContentFrame/GridContainer/NFrequencyEdit/LineEdit" to="ConfigPanel/ContentFrame/GridContainer/NFrequencyEdit/LineEdit" method="_on_focus_exited"]

@@ -8,13 +8,13 @@ extends Control
 @onready var freq_button = $"../FreqReuseButton"
 @onready var config_button = $"../ConfigButton"
 @onready var user_controller = $"../../Controllers/UserController"
-
+@onready var over_layer = $"../../OverLayer"
 
 var button_radius = 45
 var on_work = true
 var is_mouse_in_box = false
 var original_rect
-var instr_panel_can_be_controlled_by_key = true
+var can_be_controlled_by_key = true
 
 func _draw():
 	draw_circle(Vector2(button_radius,button_radius), button_radius, Color8(255,255,255))
@@ -44,22 +44,27 @@ func _ready():
 		is_mouse_in_box = false
 		
 func appear_with_disappearing_instr_panel():
+	self.over_layer.make_visible()
 	self.visible = true
 	instr_panel.on_work = false
 	self.animator.play("button_appear")
 	instr_panel.animator.play("panel_disappear")
 	await self.animator.animation_finished
 	self.on_work = true
-	await instr_panel.animator.animation_finished
-	instr_panel.visible = false
-	user_controller.resume_all_user()
 	
 	# show mouse_panel
 	if not self.is_mouse_in_box and not obs_button.is_mouse_in_box:
 		mouse_panel.appear_with_anime()
 	
+	await instr_panel.animator.animation_finished
+	instr_panel.visible = false
+	user_controller.resume_all_user()
+	
+
+	
 
 func disappear_with_appearing_instr_panel():
+	self.over_layer.make_invisible()
 	self.on_work = false
 	instr_panel.visible = true
 	self.animator.play("button_disappear")
@@ -91,21 +96,21 @@ func func_buttons_disappear():
 # handel key input
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.keycode == KEY_I and event.pressed:
-		if instr_panel.visible and instr_panel_can_be_controlled_by_key:
-			instr_panel_can_be_controlled_by_key = false
+		if instr_panel.visible and can_be_controlled_by_key:
+			can_be_controlled_by_key = false
 			func_buttons_appear()
 			await get_tree().create_timer(0.2).timeout
-			instr_panel_can_be_controlled_by_key = true
-		elif not instr_panel.visible and instr_panel_can_be_controlled_by_key:
-			instr_panel_can_be_controlled_by_key = false
+			can_be_controlled_by_key = true
+		elif not instr_panel.visible and can_be_controlled_by_key:
+			can_be_controlled_by_key = false
 			func_buttons_disappear()
 			await get_tree().create_timer(0.2).timeout
-			instr_panel_can_be_controlled_by_key = true
+			can_be_controlled_by_key = true
 			
 
 # handel mouse input
 func _gui_input(event):
-	if not instr_panel_can_be_controlled_by_key:
+	if not can_be_controlled_by_key:
 		return
 	if event is InputEventMouseButton and event.button_mask == MOUSE_BUTTON_MASK_LEFT and event.pressed and not instr_panel.visible:
 		if event.position.distance_to(Vector2(button_radius,button_radius)) <= button_radius and self.on_work:
@@ -116,7 +121,8 @@ func _process(delta):
 	if self.is_mouse_in_original_rect():
 		# trigger only at the frame cursor enters button
 		if not is_mouse_in_box and self.visible:
-			mouse_panel.disappear_with_anime()
+			if not mouse_panel.is_tracking_station():
+				mouse_panel.disappear_with_anime()
 			is_mouse_in_box = true
 		if label.visible == false and self.visible:
 			self.scale = Vector2(1.05,1.05)
@@ -125,7 +131,8 @@ func _process(delta):
 	else:
 		# trigger only at the frame cursor leaves button
 		if is_mouse_in_box and self.visible:
-			mouse_panel.appear_with_anime()
+			if not mouse_panel.is_tracking_station():
+				mouse_panel.appear_with_anime()
 			is_mouse_in_box = false
 		if label.visible == true:
 			label.disappear_with_anime()

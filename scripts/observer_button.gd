@@ -14,7 +14,7 @@ var slash_len = 3
 var on_work = true
 var is_mouse_in_box = false
 var original_rect
-var obs_mode_can_be_controlled_by_key = true
+var can_be_controlled_by_key = true
 
 func _draw():
 	draw_circle(Vector2(button_radius,button_radius), button_radius, Color8(255,255,255))
@@ -46,8 +46,8 @@ func _ready():
 		is_mouse_in_box = false
 
 func _input(event: InputEvent) -> void:
-	if event is InputEventKey and event.keycode == KEY_O and event.is_pressed() and obs_mode_can_be_controlled_by_key:
-		obs_mode_can_be_controlled_by_key = false
+	if event is InputEventKey and event.keycode == KEY_O and event.is_pressed() and can_be_controlled_by_key:
+		can_be_controlled_by_key = false
 		if observer_mode_on:
 			observer_mode_on = false
 			cross.appear_with_anime()
@@ -57,11 +57,11 @@ func _input(event: InputEvent) -> void:
 			cross.disappear_with_anime()
 			user_controller.all_user_enter_observer_mode()
 		await get_tree().create_timer(0.2).timeout
-		obs_mode_can_be_controlled_by_key = true
+		can_be_controlled_by_key = true
 	
 func _gui_input(event: InputEvent) -> void:
 	
-	if not obs_mode_can_be_controlled_by_key:
+	if not can_be_controlled_by_key:
 		return
 	
 	if event is InputEventMouseButton and event.button_mask == MOUSE_BUTTON_MASK_LEFT:
@@ -76,7 +76,6 @@ func _gui_input(event: InputEvent) -> void:
 			
 
 func appear_with_disappearing_instr_panel():
-
 	self.visible = true
 	self.animator.play("button_appear")
 	await self.animator.animation_finished
@@ -96,7 +95,8 @@ func _process(delta):
 	if self.is_mouse_in_original_rect():
 		# trigger only at the frame cursor enters button
 		if not is_mouse_in_box and self.visible:
-			mouse_panel.disappear_with_anime()
+			if not mouse_panel.is_tracking_station():
+				mouse_panel.disappear_with_anime()
 			is_mouse_in_box = true
 		if label.visible == false and self.visible:
 			self.scale = Vector2(1.05,1.05)
@@ -105,8 +105,9 @@ func _process(delta):
 	else:
 		# trigger only at the frame cursor leaves button
 		if is_mouse_in_box and self.visible:
-			mouse_panel.appear_with_anime()
+			if not mouse_panel.is_tracking_station():
+				mouse_panel.appear_with_anime()
 			is_mouse_in_box = false
-		if label.visible == true and self.visible:
+		if label.visible == true:
 			label.disappear_with_anime()
 			self.scale = Vector2(1,1)

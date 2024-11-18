@@ -16,7 +16,10 @@ func _ready():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	var temp = tile_controller.get_current_hex(self.get_global_mouse_position())
+	if current_hex != null:
+		self.current_hex.reset_focus()
 	self.current_hex = temp[0]
+	self.current_hex.set_focus()
 	self.current_distance = temp[1]
 	self.current_hex_i = temp[2]
 	self.current_hex_j = temp[3]

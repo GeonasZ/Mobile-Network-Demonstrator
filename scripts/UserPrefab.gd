@@ -31,6 +31,7 @@ var max_ini_velocity = 10
 var max_velocity = 50
 var velocity = Vector2(0,0)
 var is_mouse_in = false
+var direction_to_station = 0
 
 func _draw():
 	# draw body
@@ -48,15 +49,15 @@ func _draw():
 func _ready():
 	# take a random initial velocity
 	self.velocity = Vector2(randi_range(0,2*max_ini_velocity) - max_ini_velocity,randi_range(0,2*max_ini_velocity) - max_ini_velocity)
-	self.position = Vector2(1920/2,1080/2)
+	self.position = Vector2(1920./2,1080./2)
 
-func redraw_with_height(height):
+func redraw_with_height(people_height):
 	self.visible = false
-	self.height = height
-	self.width = 0.375 * height
-	self.radius = 0.5 * height
-	self.feet_height = 0.5 * height
-	self.arm_height = 0.875 * height
+	self.height = people_height
+	self.width = 0.375 * people_height
+	self.radius = 0.5 * people_height
+	self.feet_height = 0.5 * people_height
+	self.arm_height = 0.875 * people_height
 	self.queue_redraw()
 	await get_tree().process_frame
 	self.visible = true
@@ -65,11 +66,11 @@ func redraw_with_height(height):
 func mouse_track_user():
 	mouse_panel.track_user()
 
-func initialize(mouse_panel, gathered_tiles):
-	self.gathered_tiles = gathered_tiles
-	self.mouse_panel = mouse_panel
-	self.mouse_enter_user.connect(mouse_panel._on_mouse_enter_user)
-	self.mouse_leave_user.connect(mouse_panel._on_mouse_leave_user)
+func initialize(input_mouse_panel, input_gathered_tiles):
+	self.gathered_tiles = input_gathered_tiles
+	self.mouse_panel = input_mouse_panel
+	self.mouse_enter_user.connect(input_mouse_panel._on_mouse_enter_user)
+	self.mouse_leave_user.connect(input_mouse_panel._on_mouse_leave_user)
 	self.is_initialized = true
 
 func show_boundary():
@@ -87,10 +88,14 @@ func connection_status():
 
 func begin_tracked_by_panel():
 	self.tracked_by_panel = true
+	boundary.rect_color = Color8(0,0,0)
+	boundary.queue_redraw()
 
 func end_tracked_by_panel():
 	self.tracked_by_panel = false
 	self.hide_boundary()
+	boundary.rect_color = Color8(100,100,100)
+	boundary.queue_redraw()
 	
 func enter_observer_mode():
 	self.observer_mode = true

@@ -13,7 +13,7 @@ var on_work = true
 var is_mouse_in_box = false
 var original_rect
 var current_pattern = -1
-var config_button_at_work = true
+var can_be_controlled_by_key = true
 
 var small_font
 var large_font
@@ -46,17 +46,16 @@ func _ready():
 		is_mouse_in_box = true
 	else:
 		is_mouse_in_box = false
-
-func next_frequency_pattern():
-	tile_controller.next_freq_pattern()
-	self.current_pattern = tile_controller.get_current_freq_pattern()
-
+		
 func _input(event: InputEvent) -> void:
-	if event is InputEventKey and event.keycode == KEY_C and event.is_pressed() and config_button_at_work:
-		config_panel.close_config_with_anime()
+	if event is InputEventKey and event.keycode == KEY_C and event.is_pressed() and self.can_be_controlled_by_key:
+		config_panel.open_config_with_anime()
+		self.can_be_controlled_by_key = false
+		await get_tree().create_timer(1).timeout
+		self.can_be_controlled_by_key = true
 	
 func _gui_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.button_mask == MOUSE_BUTTON_MASK_LEFT and config_button_at_work:
+	if event is InputEventMouseButton and event.button_mask == MOUSE_BUTTON_MASK_LEFT:
 		config_panel.open_config_with_anime()
 			
 
@@ -76,20 +75,22 @@ func disappear_with_appearing_instr_panel():
 	mouse_panel.disappear_with_anime()
 
 func _process(delta):
-		if self.is_mouse_in_original_rect():
-			# trigger only at the frame cursor enters button
-			if not is_mouse_in_box and self.visible:
+	if self.is_mouse_in_original_rect():
+		# trigger only at the frame cursor enters button
+		if not is_mouse_in_box and self.visible:
+			if not mouse_panel.is_tracking_station():
 				mouse_panel.disappear_with_anime()
-				is_mouse_in_box = true
-			if label.visible == false and self.visible:
-				self.scale = Vector2(1.05,1.05)
-				label.visible == true
-				label.appear_with_anime()
-		else:
-			# trigger only at the frame cursor leaves button
-			if is_mouse_in_box and self.visible:
+			is_mouse_in_box = true
+		if label.visible == false and self.visible:
+			self.scale = Vector2(1.05,1.05)
+			label.visible = true
+			label.appear_with_anime()
+	else:
+		# trigger only at the frame cursor leaves button
+		if is_mouse_in_box and self.visible:
+			if not mouse_panel.is_tracking_station():
 				mouse_panel.appear_with_anime()
-				is_mouse_in_box = false
-			if label.visible == true and self.visible:
-				label.disappear_with_anime()
-				self.scale = Vector2(1,1)
+			is_mouse_in_box = false
+		if label.visible == true:
+			label.disappear_with_anime()
+			self.scale = Vector2(1,1)

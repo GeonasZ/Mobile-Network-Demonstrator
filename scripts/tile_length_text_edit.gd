@@ -48,11 +48,13 @@ func initialize():
 	
 
 func _on_focus_exited() -> void:
+	var max_value = 500
+	var min_value = 30
 	father_node.grab_focus()
 	if self.text == "":
-		self.text = str(30)
+		self.text = str(min_value)
 	var length = int(self.text)
-	if length > 500:
-		self.text = str(500)
-	elif length < 30:
-		self.text = str(30)
+	if length > max_value:
+		self.text = str(max_value)
+	elif length < min_value:
+		self.text = str(min_value)

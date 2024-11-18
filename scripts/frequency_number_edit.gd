@@ -1,6 +1,6 @@
 extends LineEdit
 
-@onready var user_controller = $"../../../../../Controllers/UserController"
+@onready var tile_controller = $"../../../../../Controllers/TileController"
 @onready var father_node = $".."
 
 
@@ -43,11 +43,11 @@ func _input(event: InputEvent) -> void:
 		focus_exited.emit()
 
 func initialize():
-	self.text = str(user_controller.user_height)
+	self.text = str(tile_controller.total_channel_number)
 
 func _on_focus_exited() -> void:
 	var max_value = 100
-	var min_value = 5
+	var min_value = 1
 	father_node.grab_focus()
 	if self.text == "":
 		self.text = str(min_value)

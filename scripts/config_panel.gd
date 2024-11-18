@@ -6,6 +6,10 @@ extends Polygon2D
 @onready var title_label = $TitleLabel
 @onready var tile_length_edit = $ContentFrame/GridContainer/TileLengthEdit/LineEdit
 @onready var user_height_edit = $ContentFrame/GridContainer/UserHeightEdit/LineEdit
+@onready var decay_edit = $ContentFrame/GridContainer/DecayEdit/LineEdit
+@onready var freq_n_edit = $ContentFrame/GridContainer/NFrequencyEdit/LineEdit
+@onready var over_layer = $"../OverLayer"
+@onready var function_panel = $"../FunctionPanel"
 
 signal config_panel_opened
 
@@ -27,11 +31,14 @@ func _process(delta: float) -> void:
 func initialize():
 	tile_length_edit.initialize()
 	user_height_edit.initialize()
+	decay_edit.initialize()
+	freq_n_edit.initialize()
 
 func open_config_with_anime():
+	function_panel.disable_all_keyboard_input()
 	self.initialize()
 	if self.on_work:
-		config_button.config_button_at_work = false
+		over_layer.make_invisible()
 		on_work = false
 		self.visible = true
 		user_controller.pause_all_user()
@@ -39,17 +46,16 @@ func open_config_with_anime():
 		await anime_player.animation_finished
 		on_work = true
 		is_panel_open = true
-		config_button.config_button_at_work = true
 	
 func close_config_with_anime():
 	if self.on_work:
-		config_button.config_button_at_work = false
 		is_panel_open = false
 		on_work = false
 		user_controller.resume_all_user()
 		anime_player.play("config_disappear")
 		await anime_player.animation_finished
+		over_layer.make_visible()
 		self.visible = false
 		on_work = true
-		config_button.config_button_at_work = true
+		function_panel.enable_all_keyboard_input()
 	

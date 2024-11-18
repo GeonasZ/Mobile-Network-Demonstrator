@@ -15,6 +15,7 @@ var current_pattern = -1
 
 var small_font
 var large_font
+var can_be_controlled_by_key = true
 
 func _draw():
 	draw_circle(Vector2(button_radius,button_radius), button_radius, Color8(255,255,255))
@@ -51,7 +52,7 @@ func next_frequency_pattern():
 	self.current_pattern = tile_controller.get_current_freq_pattern()
 
 func _input(event: InputEvent) -> void:
-	if event is InputEventKey and event.keycode == KEY_F and event.is_pressed():
+	if event is InputEventKey and event.keycode == KEY_F and event.is_pressed() and self.can_be_controlled_by_key:
 		next_frequency_pattern()
 		await get_tree().create_timer(0.2).timeout
 	
@@ -79,25 +80,27 @@ func _process(delta):
 	if self.is_mouse_in_original_rect():
 		# trigger only at the frame cursor enters button
 		if not is_mouse_in_box and self.visible:
-			mouse_panel.disappear_with_anime()
+			if not mouse_panel.is_tracking_station():
+				mouse_panel.disappear_with_anime()
 			is_mouse_in_box = true
 		if label.visible == false and self.visible:
 			self.scale = Vector2(1.05,1.05)
-			label.visible == true
+			label.visible = true
 			label.appear_with_anime()
 	else:
 		# trigger only at the frame cursor leaves button
 		if is_mouse_in_box and self.visible:
-			mouse_panel.appear_with_anime()
+			if not mouse_panel.is_tracking_station():
+				mouse_panel.appear_with_anime()
 			is_mouse_in_box = false
-		if label.visible == true and self.visible:
+		if label.visible == true:
 			label.disappear_with_anime()
 			self.scale = Vector2(1,1)
 	# change the content displayed on the button when mouse in
 	if self.visible and self.is_mouse_in_original_rect():
 		if self.current_pattern == -1:
 			self.current_pattern = tile_controller.get_current_freq_pattern()
-		self.button_char.text = "K = " + str(self.current_pattern)
+		self.button_char.text = "N = " + str(self.current_pattern)
 		self.button_char.theme = self.small_font
 	else:
 		self.button_char.text = "F"
