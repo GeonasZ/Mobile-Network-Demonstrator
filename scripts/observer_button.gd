@@ -5,8 +5,11 @@ extends Control
 @onready var mouse_panel = $"../../MousePanel"
 @onready var cross = $Cross
 @onready var label = $FunctionLabel
+@onready var function_panel = $".."
 
-var observer_mode_on = false
+enum Mode {NONE, OBSERVER, ENGINEER}
+var button_mode = Mode.NONE
+
 var button_radius = 45
 var length = 25
 var width = 44
@@ -15,6 +18,9 @@ var on_work = true
 var is_mouse_in_box = false
 var original_rect
 var can_be_controlled_by_key = true
+
+var _engineer_mode = false
+var _analyzer_mode = false
 
 func _draw():
 	draw_circle(Vector2(button_radius,button_radius), button_radius, Color8(255,255,255))
@@ -25,6 +31,14 @@ func is_mouse_in_rect():
 
 func is_mouse_in_original_rect():
 	return self.original_rect.has_point(get_viewport().get_mouse_position())
+
+func set_button_mode(mode):
+	var previous_mode = self.button_mode
+	self.button_mode = mode
+	if self.button_mode == Mode.OBSERVER and previous_mode != Mode.OBSERVER:
+		cross.disappear_with_anime()
+	elif self.button_mode != Mode.OBSERVER and previous_mode == Mode.OBSERVER:
+		cross.appear_with_anime()
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -48,13 +62,11 @@ func _ready():
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.keycode == KEY_O and event.is_pressed() and can_be_controlled_by_key:
 		can_be_controlled_by_key = false
-		if observer_mode_on:
-			observer_mode_on = false
-			cross.appear_with_anime()
+		if self.button_mode == Mode.OBSERVER:
+			self.set_button_mode(Mode.NONE)
 			user_controller.all_user_leave_observer_mode()
 		else:
-			observer_mode_on = true
-			cross.disappear_with_anime()
+			self.set_button_mode(Mode.OBSERVER)
 			user_controller.all_user_enter_observer_mode()
 		await get_tree().create_timer(0.2).timeout
 		can_be_controlled_by_key = true
@@ -65,31 +77,28 @@ func _gui_input(event: InputEvent) -> void:
 		return
 	
 	if event is InputEventMouseButton and event.button_mask == MOUSE_BUTTON_MASK_LEFT:
-		if observer_mode_on:
-			observer_mode_on = false
-			cross.appear_with_anime()
-			user_controller.all_user_leave_observer_mode()
-		else:
-			observer_mode_on = true
-			cross.disappear_with_anime()
+		if self.button_mode != Mode.OBSERVER:
+			function_panel.set_all_button_mode(Mode.OBSERVER)
 			user_controller.all_user_enter_observer_mode()
 			
+		else:
+			function_panel.set_all_button_mode(Mode.NONE)
+			user_controller.all_user_leave_observer_mode()
+			
 
-func appear_with_disappearing_instr_panel():
+func appear():
 	self.visible = true
+	self.on_work = false
 	self.animator.play("button_appear")
 	await self.animator.animation_finished
 	self.on_work = true
 
-	
-
-func disappear_with_appearing_instr_panel():
+func disappear():
 	self.on_work = false
 	self.animator.play("button_disappear")
 	await self.animator.animation_finished
 	self.visible = false
-	# label.disappear_with_anime()
-	# hide mouse_panel
+
 
 func _process(delta):
 	if self.is_mouse_in_original_rect():

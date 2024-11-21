@@ -7,6 +7,9 @@ extends Control
 @onready var tile_controller = $"../../Controllers/TileController"
 @onready var button_char = $Char
 
+enum Mode {NONE, OBSERVER, ENGINEER}
+var button_mode = Mode.NONE
+
 var button_radius = 45
 var on_work = true
 var is_mouse_in_box = false
@@ -17,16 +20,35 @@ var small_font
 var large_font
 var can_be_controlled_by_key = true
 
+var _engineer_mode = false
+var _analyzer_mode = false
+
 func _draw():
 	draw_circle(Vector2(button_radius,button_radius), button_radius, Color8(255,255,255))
 	draw_arc(Vector2(button_radius,button_radius), button_radius, 0, TAU, 50, Color8(50,50,50), 7, true)
-	
+
+func appear():
+	self.on_work = false
+	self.visible = true
+	self.animator.play("button_appear")
+	await self.animator.animation_finished
+	self.on_work = true
+
+func disappear():
+	self.on_work = false
+	self.animator.play("button_disappear")
+	await self.animator.animation_finished
+	self.visible = false
 
 func is_mouse_in_rect():
 	return self.get_global_rect().has_point(get_viewport().get_mouse_position())
 
 func is_mouse_in_original_rect():
 	return self.original_rect.has_point(get_viewport().get_mouse_position())
+
+
+func set_button_mode(mode):
+	self.button_mode = mode
 
 # Called when the node enters the scene tree for the first time.
 func _ready():

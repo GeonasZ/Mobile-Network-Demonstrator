@@ -1,13 +1,11 @@
 extends Polygon2D
 
 @onready var animator = $AnimationPlayer
-@onready var instr_button = $"../FunctionPanel/InstructionButton"
-@onready var obs_button = $"../FunctionPanel/ObserverButton"
+@onready var function_panel = $"../FunctionPanel"
 @onready var title_label = $TitleLabel
 @onready var content_label = $ContentLabel
 @onready var mouse_panel = $"../MousePanel"
-@onready var freq_button = $"../FunctionPanel/FreqReuseButton"
-@onready var config_button = $"../FunctionPanel/ConfigButton"
+
 
 var length = 1480
 var width = 840
@@ -54,31 +52,15 @@ Here are some basic instructions to help you get familiar with this program.
 by move the cursor to them. Also, you can left click on any user to contineously illustrate the user's information "
 "even out of this mode. Right click anywhere to quit this function."
 
-
-	
-
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	pass
 
-#func disappear():
-	#self.on_work = false
-	#animator.play("disappear")
-	#await animator.animation_finished
-	#self.visible = false
-	#
-#func appear():
-	#self.visible = true
-	#animator.play("appear")
-	#await animator.animation_finished
-	#self.on_work = true
+
 	
 
 func _input(event):
 	if event is InputEventMouseButton and event.button_mask == MOUSE_BUTTON_MASK_LEFT and event.pressed and self.on_work:
 		if self.visible:
-			obs_button.appear_with_disappearing_instr_panel()
-			instr_button.appear_with_disappearing_instr_panel()
-			freq_button.appear_with_disappearing_instr_panel()
-			config_button.appear_with_disappearing_instr_panel()
+			function_panel.all_button_appear_with_instr_panel_disappear()
 			

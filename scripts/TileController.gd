@@ -287,6 +287,7 @@ func initialize_tile_background(ref_point:Vector2, tile_length:int=0):
 		y += sqrt(3)/2 * arc_len
 		y_index += 1
 	
+## return [least_distance_hex, least_distance, i_with_least_distance, j_with_least_distance]
 func get_current_hex(pos):
 	var least_distance = -1
 	var least_distance_hex = null
@@ -308,7 +309,7 @@ func tile_restore_channel(i, j, channel_index):
 
 func tile_allocate_channel(i, j, user):
 	var channel = hex_list[i][j].allocate_channel(user)
-	user.connected_channel = channel
+	user.connect_to_channel(channel)
 	return channel
 
 func initialize_map(tile_length:int=0,total_channel:int=24):

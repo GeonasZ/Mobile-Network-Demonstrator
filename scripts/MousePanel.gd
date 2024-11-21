@@ -148,6 +148,7 @@ func appear_with_anime():
 	self.scale = Vector2(0,0)
 	self.keep_invisible = false
 	anime_player.play("appear")
+	await anime_player.animation_finished
 
 func is_tracking_station():
 	return self.tracking_mode == TrackingMode.STATION

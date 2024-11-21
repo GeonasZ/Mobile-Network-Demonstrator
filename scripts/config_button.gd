@@ -8,12 +8,18 @@ extends Control
 @onready var button_char = $Char
 @onready var config_panel = $"../../ConfigPanel"
 
+enum Mode {NONE, OBSERVER, ENGINEER}
+var button_mode = Mode.NONE
+
 var button_radius = 45
 var on_work = true
 var is_mouse_in_box = false
 var original_rect
 var current_pattern = -1
 var can_be_controlled_by_key = true
+
+var _engineer_mode = false
+var _analyzer_mode = false
 
 var small_font
 var large_font
@@ -28,6 +34,19 @@ func is_mouse_in_rect():
 
 func is_mouse_in_original_rect():
 	return self.original_rect.has_point(get_viewport().get_mouse_position())
+
+func appear():
+	self.visible = true
+	self.on_work = false
+	self.animator.play("button_appear")
+	await self.animator.animation_finished
+	self.on_work = true
+
+func disappear():
+	self.on_work = false
+	self.animator.play("button_disappear")
+	await self.animator.animation_finished
+	self.visible = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -58,6 +77,9 @@ func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_mask == MOUSE_BUTTON_MASK_LEFT:
 		config_panel.open_config_with_anime()
 			
+
+func set_button_mode(mode):
+	self.button_mode = mode
 
 func appear_with_disappearing_instr_panel():
 	self.visible = true

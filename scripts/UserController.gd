@@ -4,13 +4,14 @@ extends Control
 @onready var obs_button = $"../../FunctionPanel/ObserverButton"
 @onready var mouse_pamel = $"../../MousePanel"
 @onready var gathered_tiles = $"../../GatheredTiles"
+@onready var engineer_button = $"../../FunctionPanel/EngineerButton"
 const sqrt3 = 1.732
 var user_prefab = null
 # initialize in tile controller when hex_list gets initialized
 var user_list = []
-var user_need_relocate = [] # [current_user, i, j]
 var total_user_number = 0
 var current_available_user_id = 0
+var show_popup = false
 
 var user_height = 16
 
@@ -28,10 +29,15 @@ func initialize_user_system(user_height):
 				user.queue_free()
 	# clear user list
 	user_list = []
-	user_need_relocate = []
 	total_user_number = 0
 	current_available_user_id = 0
 	self.user_height = user_height
+	
+func random_init_user(n_user):
+	var user_pos
+	for i in range(n_user):
+		user_pos = Vector2(randi_range(0.05*1920,0.95*1920),randi_range(0.05*1080,0.95*1080))
+		self.add_user(user_pos)
 
 func add_user(pos):
 	var current_user = user_prefab.instantiate()
@@ -46,7 +52,7 @@ func add_user(pos):
 	var j = temp[3]
 	current_user.index_i_in_user_list = i
 	current_user.index_j_in_user_list = j
-	
+	current_user.set_station(temp[0])
 	var channel = tile_controller.tile_allocate_channel(i,j, current_user)
 	if channel != null:
 		user_list[i][j]["connected"].append(current_user)
@@ -58,8 +64,10 @@ func add_user(pos):
 		
 	total_user_number += 1
 	current_user.initialize(mouse_pamel, gathered_tiles)
-	if obs_button.observer_mode_on:
+	if obs_button.button_mode == obs_button.Mode.OBSERVER:
 		current_user.enter_observer_mode()
+	if engineer_button.button_mode == engineer_button.Mode.ENGINEER:
+		current_user.enter_engineer_mode()
 	current_user.redraw_with_height(self.user_height)
 	return current_user
 
@@ -77,13 +85,16 @@ func try_connect_user(i, j):
 			break
 					
 # move users need to be moved to a new tile
-func relocate_user():
+func relocate_user(user_need_relocate):
 	for info in user_need_relocate:
+		if info == []:
+			continue
 		var i = info[1]
 		var j = info[2]
 		var user = info[0]
 		user.index_i_in_user_list = i
 		user.index_j_in_user_list = j
+		user.set_station(tile_controller.hex_list[i][j])
 		var channel = tile_controller.tile_allocate_channel(i,j, user)
 		if channel != null:
 			user_list[i][j]["connected"].append(user)
@@ -91,17 +102,15 @@ func relocate_user():
 		else:
 			user_list[i][j]["disconnected"].append(user)
 			user.index_k_in_user_list = user_list[i][j]["disconnected"].size()
-			
-		
-	user_need_relocate = []
 
 # decide whether the user should be allocate to a new tile or be removed
-func redirect_user(current_user, station_i, station_j, user_k):
+func redirect_user(current_user, station_i, station_j, user_k) -> Array:
 	# current_user: the current user
 	# station_i: the index i of the original station the user is in
 	# station_j: the index j of the original station the user is in
 	var station = user_list[station_i][station_j]
 	var connection_stat = "connected"
+	var user_need_relocate = [] # [current_user, i, j]
 	if current_user.connected_channel == null:
 		connection_stat = "disconnected"
 	# delete the user if they reach the boundary
@@ -118,7 +127,7 @@ func redirect_user(current_user, station_i, station_j, user_k):
 		station[connection_stat].remove_at(user_k)
 		current_user.queue_free()
 		total_user_number -= 1
-		return
+		return user_need_relocate
 	
 	# decide whether current station is cloest to the user
 	var least_distance = -1
@@ -155,8 +164,9 @@ func redirect_user(current_user, station_i, station_j, user_k):
 		# remove user from user list
 		station[connection_stat].remove_at(user_k)
 		# append to list for relocate later
-		user_need_relocate.append([current_user, i_with_least_distance, j_with_least_distance])
-		
+		user_need_relocate = [current_user, i_with_least_distance, j_with_least_distance]
+	return user_need_relocate
+
 func all_user_enter_observer_mode():
 		for row in user_list:
 			for tile in row:
@@ -172,7 +182,23 @@ func all_user_leave_observer_mode():
 					user.leave_observer_mode()
 				for user in tile["disconnected"]:
 					user.leave_observer_mode()
-		
+
+func all_user_enter_engineer_mode():
+		for row in user_list:
+			for tile in row:
+				for user in tile["connected"]:
+					user.enter_engineer_mode()
+				for user in tile["disconnected"]:
+					user.enter_engineer_mode()
+
+func all_user_leave_engineer_mode():
+		for row in user_list:
+			for tile in row:
+				for user in tile["connected"]:
+					user.leave_engineer_mode()
+				for user in tile["disconnected"]:
+					user.leave_engineer_mode()
+
 func pause_all_user():
 	for row in user_list:
 		for tile in row:
@@ -191,14 +217,25 @@ func resume_all_user():
 					
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	
+	var users_need_relocate = {"connected":[],"disconnected":[]}
+	var displacement
 	for i in range(user_list.size()):
 		for j in range(user_list[i].size()):
 			for k in range(user_list[i][j]["connected"].size()-1,-1, -1):
+				# set the displacement of user from station
+				displacement = (user_list[i][j]["connected"][k].position) - tile_controller.hex_list[i][j].position
+				user_list[i][j]["connected"][k].set_displacement_from_station(displacement)
 				if tile_controller.hex_list[i][j].position.distance_to(user_list[i][j]["connected"][k].position)>sqrt3/2.*tile_controller.arc_len:
-					redirect_user(user_list[i][j]["connected"][k],i,j,k)
+					users_need_relocate["connected"].append(redirect_user(user_list[i][j]["connected"][k],i,j,k))
 			for k in range(user_list[i][j]["disconnected"].size()-1,-1, -1):
+				# set the displacement of user from station
+				displacement = (user_list[i][j]["disconnected"][k].position) - tile_controller.hex_list[i][j].position
+				user_list[i][j]["disconnected"][k].set_displacement_from_station(displacement)
 				if tile_controller.hex_list[i][j].position.distance_to(user_list[i][j]["disconnected"][k].position)>sqrt3/2.*tile_controller.arc_len:
-					redirect_user(user_list[i][j]["disconnected"][k],i,j,k)
+					users_need_relocate["disconnected"].append(redirect_user(user_list[i][j]["disconnected"][k],i,j,k))
 			try_connect_user(i,j)
-	relocate_user()
+			relocate_user(users_need_relocate["connected"])
+			relocate_user(users_need_relocate["disconnected"])
+			users_need_relocate = {"connected":[],"disconnected":[]}
+			
+			

@@ -1,14 +1,12 @@
 extends Control
 
-@onready var instr_panel = $"../../InstructionPanel"
+@onready var user_controller = $"../../Controllers/UserController"
 @onready var animator = $AnimationPlayer
 @onready var mouse_panel = $"../../MousePanel"
 @onready var label = $FunctionLabel
-@onready var obs_button = $"../ObserverButton"
-@onready var freq_button = $"../FreqReuseButton"
-@onready var config_button = $"../ConfigButton"
-@onready var user_controller = $"../../Controllers/UserController"
-@onready var over_layer = $"../../OverLayer"
+@onready var tile_controller = $"../../Controllers/TileController"
+@onready var button_char = $Char
+@onready var config_panel = $"../../ConfigPanel"
 @onready var function_panel = $".."
 
 enum Mode {NONE, OBSERVER, ENGINEER}
@@ -18,12 +16,18 @@ var button_radius = 45
 var on_work = true
 var is_mouse_in_box = false
 var original_rect
+var current_pattern = -1
 var can_be_controlled_by_key = true
 
+var _engineer_mode = false
+var _analyzer_mode = false
+
+var small_font
+var large_font
 
 func _draw():
 	draw_circle(Vector2(button_radius,button_radius), button_radius, Color8(255,255,255))
-	draw_arc(Vector2(button_radius,button_radius), button_radius, 0, TAU, 50, Color8(50,50,50), 5, true)
+	draw_arc(Vector2(button_radius,button_radius), button_radius, 0, TAU, 50, Color8(50,50,50), 7, true)
 	
 
 func is_mouse_in_rect():
@@ -32,27 +36,9 @@ func is_mouse_in_rect():
 func is_mouse_in_original_rect():
 	return self.original_rect.has_point(get_viewport().get_mouse_position())
 
-func set_button_mode(mode):
-	self.button_mode = mode
-
-# Called when the node enters the scene tree for the first time.
-func _ready():
-	self.visible = false
-	self.on_work = true
-	self.scale = Vector2(1,1)
-	self.position = Vector2(1820 - button_radius, 100 - button_radius)
-	self.size = Vector2(2*button_radius, 2*button_radius)
-	self.pivot_offset = self.size/2
-	self.original_rect = self.get_global_rect()
-	# update for the first time whether mouse is in the button
-	if self.is_mouse_in_original_rect():
-		is_mouse_in_box = true
-	else:
-		is_mouse_in_box = false
-
 func appear():
-	self.on_work = false
 	self.visible = true
+	self.on_work = false
 	self.animator.play("button_appear")
 	await self.animator.animation_finished
 	self.on_work = true
@@ -63,43 +49,54 @@ func disappear():
 	await self.animator.animation_finished
 	self.visible = false
 
-func func_buttons_appear():
-	self.appear()
-	obs_button.appear()
-	freq_button.appear()
-	config_button.appear()
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	self.visible = false
+	self.scale = Vector2(1,1)
+	self.label.visible = false
+	self.on_work = true
+	self.position = Vector2(1820 - button_radius, 580 - button_radius)
+	self.size = Vector2(2*button_radius, 2*button_radius)
+	self.pivot_offset = self.size/2
+	self.original_rect = self.get_global_rect()
+	button_char.position = Vector2(-2,-2)
+	
+	# update for the first time whether mouse is in the button
+	if self.is_mouse_in_original_rect():
+		is_mouse_in_box = true
+	else:
+		is_mouse_in_box = false
 
-func func_buttons_disappear():
-	self.disappear()
-	obs_button.disappear()
-	freq_button.disappear()
-	config_button.disappear()
+func set_button_mode(mode):
+	self.button_mode = mode
 
-
-# handel key input
 func _input(event: InputEvent) -> void:
-	if event is InputEventKey and event.keycode == KEY_I and event.pressed:
-		if instr_panel.visible and can_be_controlled_by_key:
-			can_be_controlled_by_key = false
-			func_buttons_appear()
-			await get_tree().create_timer(0.2).timeout
-			can_be_controlled_by_key = true
-		elif not instr_panel.visible and can_be_controlled_by_key:
-			can_be_controlled_by_key = false
-			func_buttons_disappear()
-			await get_tree().create_timer(0.2).timeout
-			can_be_controlled_by_key = true
+	if event is InputEventKey and event.keycode == KEY_C and event.is_pressed() and self.can_be_controlled_by_key:
+		config_panel.open_config_with_anime()
+		self.can_be_controlled_by_key = false
+		await get_tree().create_timer(1).timeout
+		self.can_be_controlled_by_key = true
+	
+func _gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_mask == MOUSE_BUTTON_MASK_LEFT:
+		function_panel.set_all_button_mode(Mode.ENGINEER)
 			
 
-# handel mouse input
-func _gui_input(event):
-	if not can_be_controlled_by_key:
-		return
-	if event is InputEventMouseButton and event.button_mask == MOUSE_BUTTON_MASK_LEFT and event.pressed and not instr_panel.visible:
-		if event.position.distance_to(Vector2(button_radius,button_radius)) <= button_radius and self.on_work:
-			function_panel.all_button_disappear_with_instr_panel_appear()
+func appear_with_disappearing_instr_panel():
+	self.visible = true
+	self.animator.play("button_appear")
+	await self.animator.animation_finished
+	self.on_work = true
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
+func disappear_with_appearing_instr_panel():
+	self.on_work = false
+	self.animator.play("button_disappear")
+	await self.animator.animation_finished
+	self.visible = false
+	# label.disappear_with_anime()
+	# hide mouse_panel
+	mouse_panel.disappear_with_anime()
+
 func _process(delta):
 	if self.is_mouse_in_original_rect():
 		# trigger only at the frame cursor enters button
@@ -109,7 +106,7 @@ func _process(delta):
 			is_mouse_in_box = true
 		if label.visible == false and self.visible:
 			self.scale = Vector2(1.05,1.05)
-			label.visible == true
+			label.visible = true
 			label.appear_with_anime()
 	else:
 		# trigger only at the frame cursor leaves button

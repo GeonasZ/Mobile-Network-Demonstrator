@@ -4,15 +4,19 @@ extends Polygon2D
 @onready var anime_player = $AnimationPlayer
 @onready var user_controller = $"../Controllers/UserController"
 @onready var title_label = $TitleLabel
+@onready var over_layer = $"../OverLayer"
+@onready var function_panel = $"../FunctionPanel"
+
 @onready var tile_length_edit = $ContentFrame/GridContainer/TileLengthEdit/LineEdit
 @onready var user_height_edit = $ContentFrame/GridContainer/UserHeightEdit/LineEdit
 @onready var decay_edit = $ContentFrame/GridContainer/DecayEdit/LineEdit
 @onready var freq_n_edit = $ContentFrame/GridContainer/NFrequencyEdit/LineEdit
-@onready var over_layer = $"../OverLayer"
-@onready var function_panel = $"../FunctionPanel"
+@onready var n_user_edit = $ContentFrame/GridContainer/NUserEdit/LineEdit
 
 signal config_panel_opened
 
+var edit_list = [tile_length_edit, user_height_edit, decay_edit, freq_n_edit, 
+				 n_user_edit]
 var on_work = true
 var is_panel_open = false
 
@@ -24,15 +28,16 @@ func _ready() -> void:
 	self.color = Color8(230,230,255)
 	title_label.position = Vector2(0,0)
 	title_label.size = Vector2(1920,200)
+	edit_list = [tile_length_edit, user_height_edit, decay_edit, freq_n_edit, 
+				 n_user_edit]
+	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	pass
 
 func initialize():
-	tile_length_edit.initialize()
-	user_height_edit.initialize()
-	decay_edit.initialize()
-	freq_n_edit.initialize()
+	for edit in edit_list:
+		edit.initialize()
 
 func open_config_with_anime():
 	function_panel.disable_all_keyboard_input()
