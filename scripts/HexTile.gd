@@ -130,7 +130,6 @@ func get_antenna_type():
 	elif self.antenna_type == "ARRAY4":
 		return "Antenna Array <N=4>"
 
-
 func eval_signal_pow(angle_from_center, distance, decay):
 	if self.antenna_type == "DIPOLE":
 		return self.ref_signal_power/pow(distance,decay)
@@ -194,8 +193,15 @@ func end_tracked_by_panel():
 func redraw_tile():
 	self.queue_redraw()
 
+func init_channel_number(n_channel:int):
+	self.channel_allocation_list = []
+	for i in range(n_available_channel):
+		# true for available
+		self.channel_allocation_list.append(null)
+		
 func set_channel_number(n_channel:int):
 	# add or delete channel until channel number is as expected
+	var user
 	while n_available_channel != n_channel:
 		# add a channel if smaller
 		if n_available_channel < n_channel:
@@ -203,7 +209,9 @@ func set_channel_number(n_channel:int):
 			n_available_channel += 1
 		# delete a channel if larger
 		else:
-			channel_allocation_list.pop_back()
+			user = channel_allocation_list.pop_back()
+			if user != null:
+				user.connect_to_channel(null)
 			n_available_channel -= 1
 
 	
@@ -253,9 +261,7 @@ func is_center_on_focus():
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	self.focus_radius = self.arc_len/8
-	for i in range(n_available_channel):
-		# true for available
-		channel_allocation_list.append(null)
+	init_channel_number(n_available_channel)
 	self.set_arc_len(arc_len)
 	#self.noise_distr_deviation = randf_range(0.7,1.3)
 

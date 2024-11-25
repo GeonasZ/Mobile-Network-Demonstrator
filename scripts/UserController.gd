@@ -71,6 +71,20 @@ func add_user(pos):
 	current_user.redraw_with_height(self.user_height)
 	return current_user
 
+func reallocate_channel_for_user_under_station(i,j):
+	var user = null
+	var channel_num = tile_controller.hex_list[i][j].n_available_channel
+	
+	for k in range(self.user_list[i][j]["connected"].size()-1,-1,-1):
+			user = self.user_list[i][j]["connected"][k]
+			user.connect_to_channel(null)
+			self.user_list[i][j]["disconnected"].append(user)
+	
+	tile_controller.hex_list[i][j].init_channel_number(channel_num)
+	user_list[i][j]["connected"] = []
+	
+	try_connect_user(i,j)
+	
 # try to allocate channels for those who does not have a connection before
 func try_connect_user(i, j):
 	var channel = null

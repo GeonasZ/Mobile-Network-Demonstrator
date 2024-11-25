@@ -231,6 +231,10 @@ func initialize_freq_pattern(tile_list ,n_freq):
 		print("Frequency allocation not allowed.")
 		
 	freq_reuse_button.current_pattern = n_freq
+	
+	for i in range(self.hex_list.size()):
+		for j in range(self.hex_list[i].size()):
+			user_controller.reallocate_channel_for_user_under_station(i,j)
 
 func next_freq_pattern():
 	current_freq_pattern_idnex += 1

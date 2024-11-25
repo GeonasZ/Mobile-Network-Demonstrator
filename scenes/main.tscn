@@ -806,7 +806,7 @@ script = ExtResource("20_sn5w8")
 
 [node name="NUserEdit" type="HBoxContainer" parent="ConfigPanel/ContentFrame/GridContainer"]
 layout_mode = 2
-size_flags_horizontal = 8
+size_flags_horizontal = 0
 size_flags_vertical = 3
 
 [node name="Label" type="Label" parent="ConfigPanel/ContentFrame/GridContainer/NUserEdit"]

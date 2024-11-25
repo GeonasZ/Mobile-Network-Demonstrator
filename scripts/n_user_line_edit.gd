@@ -40,7 +40,13 @@ func _input(event: InputEvent) -> void:
 		focus_exited.emit()
 
 func initialize():
-	self.text = str(user_controller.current_available_user_id)
+	var user_num = 0
+	for row in user_controller.user_list:
+		for station in row:
+			user_num += station["connected"].size()
+			user_num += station["disconnected"].size()
+	
+	self.text = str(user_num)
 
 func _on_focus_exited() -> void:
 	var max_value = 200
