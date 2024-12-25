@@ -34,11 +34,19 @@ func appear():
 	await self.animator.animation_finished
 	self.on_work = true
 
+## future use for logical appear of button
+func smart_appear():
+	self.appear()
+
 func disappear():
 	self.on_work = false
 	self.animator.play("button_disappear")
 	await self.animator.animation_finished
 	self.visible = false
+
+## future use for logical disappear of button
+func smart_disappear():
+	self.disappear()
 
 func is_mouse_in_rect():
 	return self.get_global_rect().has_point(get_viewport().get_mouse_position())
@@ -56,7 +64,7 @@ func _ready():
 	self.scale = Vector2(1,1)
 	self.label.visible = false
 	self.on_work = true
-	self.position = Vector2(1820 - button_radius, 340 - button_radius)
+	self.position = Vector2(1820 - button_radius, 460 - button_radius)
 	self.size = Vector2(2*button_radius, 2*button_radius)
 	self.pivot_offset = self.size/2
 	self.large_font = preload("res://fonts/pre_set_theme/button_large_font.tres")

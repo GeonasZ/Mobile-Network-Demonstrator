@@ -32,12 +32,6 @@ func initialize_user_system(user_height):
 	total_user_number = 0
 	current_available_user_id = 0
 	self.user_height = user_height
-	
-func random_init_user(n_user):
-	var user_pos
-	for i in range(n_user):
-		user_pos = Vector2(randi_range(0.05*1920,0.95*1920),randi_range(0.05*1080,0.95*1080))
-		self.add_user(user_pos)
 
 func add_user(pos):
 	var current_user = user_prefab.instantiate()
@@ -71,6 +65,12 @@ func add_user(pos):
 	current_user.redraw_with_height(self.user_height)
 	return current_user
 
+func random_add_user(n_user:int):
+	var user_pos
+	for i in range(n_user):
+		user_pos = Vector2(randi_range(0.05*1920,0.95*1920),randi_range(0.05*1080,0.95*1080))
+		self.add_user(user_pos)
+	
 func reallocate_channel_for_user_under_station(i,j):
 	var user = null
 	var channel_num = tile_controller.hex_list[i][j].n_available_channel

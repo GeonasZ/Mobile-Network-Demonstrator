@@ -26,7 +26,7 @@ func restart_program(tile_length,user_height,n_channel,n_user):
 	user_controller.initialize_user_system(user_height)
 	tile_controller.initialize_map(tile_length,n_channel)
 	mouse_panel.initialize_mouse_panel()
-	user_controller.random_init_user(n_user)
+	user_controller.random_add_user(n_user)
 	
 func _gui_input(event):
 	if event is InputEventMouseButton and event.button_mask == MOUSE_BUTTON_MASK_LEFT and event.pressed:

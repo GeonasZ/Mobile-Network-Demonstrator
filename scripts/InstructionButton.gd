@@ -57,23 +57,19 @@ func appear():
 	await self.animator.animation_finished
 	self.on_work = true
 
+## future use for logical appear of button
+func smart_appear():
+	self.appear()
+
 func disappear():
 	self.on_work = false
 	self.animator.play("button_disappear")
 	await self.animator.animation_finished
 	self.visible = false
 
-func func_buttons_appear():
-	self.appear()
-	obs_button.appear()
-	freq_button.appear()
-	config_button.appear()
-
-func func_buttons_disappear():
+## future use for logical disappear of button
+func smart_disappear():
 	self.disappear()
-	obs_button.disappear()
-	freq_button.disappear()
-	config_button.disappear()
 
 
 # handel key input
@@ -81,12 +77,12 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.keycode == KEY_I and event.pressed:
 		if instr_panel.visible and can_be_controlled_by_key:
 			can_be_controlled_by_key = false
-			func_buttons_appear()
+			function_panel.all_button_appear_with_instr_panel_disappear()
 			await get_tree().create_timer(0.2).timeout
 			can_be_controlled_by_key = true
 		elif not instr_panel.visible and can_be_controlled_by_key:
 			can_be_controlled_by_key = false
-			func_buttons_disappear()
+			function_panel.all_button_disappear_with_instr_panel_appear()
 			await get_tree().create_timer(0.2).timeout
 			can_be_controlled_by_key = true
 			

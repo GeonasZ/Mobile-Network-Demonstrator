@@ -6,6 +6,7 @@ extends Control
 @onready var label = $FunctionLabel
 @onready var tile_controller = $"../../Controllers/TileController"
 @onready var button_char = $Char
+@onready var cross = $Cross
 @onready var config_panel = $"../../ConfigPanel"
 @onready var function_panel = $".."
 
@@ -36,18 +37,6 @@ func is_mouse_in_rect():
 func is_mouse_in_original_rect():
 	return self.original_rect.has_point(get_viewport().get_mouse_position())
 
-func appear():
-	self.visible = true
-	self.on_work = false
-	self.animator.play("button_appear")
-	await self.animator.animation_finished
-	self.on_work = true
-
-func disappear():
-	self.on_work = false
-	self.animator.play("button_disappear")
-	await self.animator.animation_finished
-	self.visible = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -55,7 +44,7 @@ func _ready():
 	self.scale = Vector2(1,1)
 	self.label.visible = false
 	self.on_work = true
-	self.position = Vector2(1820 - button_radius, 580 - button_radius)
+	self.position = Vector2(1820 - button_radius, 340 - button_radius)
 	self.size = Vector2(2*button_radius, 2*button_radius)
 	self.pivot_offset = self.size/2
 	self.original_rect = self.get_global_rect()
@@ -68,18 +57,87 @@ func _ready():
 		is_mouse_in_box = false
 
 func set_button_mode(mode):
+	var previous_mode = self.button_mode
 	self.button_mode = mode
+	
+	# determine whether the cross on the button should be visible
+	if previous_mode != self.Mode.ENGINEER and self.button_mode == self.Mode.ENGINEER:
+		self.cross.disappear_with_anime()
+	elif previous_mode == self.Mode.ENGINEER and self.button_mode != self.Mode.ENGINEER:
+		self.cross.appear_with_anime()
+		
+	# determine whether the button itself should be visible
+	if previous_mode != self.Mode.OBSERVER and self.button_mode == self.Mode.OBSERVER:
+		self.smart_disappear()
+	elif previous_mode == self.Mode.OBSERVER and self.button_mode != self.Mode.OBSERVER:
+		self.smart_appear()
+
+
+func appear():
+	self.visible = true
+	self.on_work = false
+	self.animator.play("button_appear")
+	await self.animator.animation_finished
+	self.on_work = true
+
+## future use for logical appear of button
+func smart_appear():
+		self.appear()
+
+func disappear():
+	self.on_work = false
+	self.animator.play("button_disappear")
+	await self.animator.animation_finished
+	self.visible = false
+
+## future use for logical disappear of button
+func smart_disappear():
+	self.disappear()
+	#if function_panel.is_instruction_panel_visible() and self.visible:
+		#self.disappear()
+	#if not function_panel.is_instruction_panel_visible() and self.visible and self.button_mode == Mode.OBSERVER:
+		#self.disappear()
+
 
 func _input(event: InputEvent) -> void:
-	if event is InputEventKey and event.keycode == KEY_C and event.is_pressed() and self.can_be_controlled_by_key:
-		config_panel.open_config_with_anime()
+	
+	if self.button_mode == Mode.OBSERVER:
+		return
+		
+	if not can_be_controlled_by_key or not on_work:
+		return
+	
+	if event is InputEventKey and event.keycode == KEY_E and event.is_pressed() and self.can_be_controlled_by_key:
 		self.can_be_controlled_by_key = false
-		await get_tree().create_timer(1).timeout
+		if self.button_mode != Mode.ENGINEER:
+			function_panel.set_all_button_mode(Mode.ENGINEER)
+			user_controller.all_user_enter_engineer_mode()
+			
+		else:
+			function_panel.set_all_button_mode(Mode.NONE)
+			user_controller.all_user_leave_engineer_mode()
+		await get_tree().create_timer(0.25).timeout
 		self.can_be_controlled_by_key = true
 	
 func _gui_input(event: InputEvent) -> void:
+	
+	if self.button_mode == Mode.OBSERVER:
+		return
+		
+	if not can_be_controlled_by_key or not on_work:
+		return
+	
 	if event is InputEventMouseButton and event.button_mask == MOUSE_BUTTON_MASK_LEFT:
-		function_panel.set_all_button_mode(Mode.ENGINEER)
+		self.can_be_controlled_by_key = false
+		if self.button_mode != Mode.ENGINEER:
+			function_panel.set_all_button_mode(Mode.ENGINEER)
+			user_controller.all_user_enter_engineer_mode()
+			
+		else:
+			function_panel.set_all_button_mode(Mode.NONE)
+			user_controller.all_user_leave_engineer_mode()
+		await get_tree().create_timer(0.25).timeout
+		self.can_be_controlled_by_key = true
 			
 
 func appear_with_disappearing_instr_panel():

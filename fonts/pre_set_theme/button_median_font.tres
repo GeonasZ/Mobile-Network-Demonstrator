@@ -1,0 +1,8 @@
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://gsrgqfr8u6nt"]
+
+[ext_resource type="FontFile" uid="uid://7dkt42d7jbcm" path="res://fonts/HanSan/SimplifiedCN/SourceHanSansCN-Heavy.otf" id="1_qef8k"]
+
+[resource]
+Label/colors/font_color = Color(0, 0, 0, 1)
+Label/font_sizes/font_size = 32
+Label/fonts/font = ExtResource("1_qef8k")

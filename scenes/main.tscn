@@ -1,4 +1,4 @@
-[gd_scene load_steps=67 format=3 uid="uid://dp7br0wc03w8r"]
+[gd_scene load_steps=69 format=3 uid="uid://dp7br0wc03w8r"]
 
 [ext_resource type="Script" path="res://scripts/UserController.gd" id="1_18gww"]
 [ext_resource type="Script" path="res://scripts/TileController.gd" id="1_fg5v7"]
@@ -35,7 +35,9 @@
 [ext_resource type="Script" path="res://scripts/decay_line_edit.gd" id="19_qoxea"]
 [ext_resource type="Script" path="res://scripts/frequency_number_edit.gd" id="20_sn5w8"]
 [ext_resource type="Script" path="res://scripts/n_user_line_edit.gd" id="22_0pki8"]
+[ext_resource type="Script" path="res://scripts/add_user_button.gd" id="24_037pr"]
 [ext_resource type="Script" path="res://scripts/config_panel.gd" id="24_ok7yp"]
+[ext_resource type="Theme" uid="uid://gsrgqfr8u6nt" path="res://fonts/pre_set_theme/button_median_font.tres" id="25_x1dja"]
 [ext_resource type="Script" path="res://scripts/over_layer.gd" id="30_f735c"]
 [ext_resource type="Script" path="res://scripts/engineer_button.gd" id="33_c02q0"]
 
@@ -838,6 +840,54 @@ script = ExtResource("22_0pki8")
 anchors_preset = 0
 script = ExtResource("8_weq5s")
 
+[node name="AddUserButton" type="Control" parent="FunctionPanel"]
+visible = false
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+scale = Vector2(1e-05, 1e-05)
+script = ExtResource("24_037pr")
+
+[node name="Char" type="Label" parent="FunctionPanel/AddUserButton"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+theme = ExtResource("25_x1dja")
+text = "+ 10"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("13_wkp48")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="FunctionPanel/AddUserButton"]
+libraries = {
+"": SubResource("AnimationLibrary_it6wr")
+}
+
+[node name="FunctionLabel" type="Control" parent="FunctionPanel/AddUserButton"]
+anchors_preset = 0
+offset_left = -20.0
+offset_top = 48.0
+offset_right = 20.0
+offset_bottom = 88.0
+scale = Vector2(1e-05, 1e-05)
+script = ExtResource("12_mq0m8")
+
+[node name="Label" type="Label" parent="FunctionPanel/AddUserButton/FunctionLabel"]
+layout_mode = 0
+offset_left = 1.696e+08
+offset_top = 1.43e+07
+offset_right = 1.696e+08
+offset_bottom = 1.43001e+07
+theme = ExtResource("11_8l076")
+text = "Add 10 Users"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="FunctionPanel/AddUserButton/FunctionLabel"]
+libraries = {
+"": SubResource("AnimationLibrary_i6iwl")
+}
+
 [node name="InstructionButton" type="Control" parent="FunctionPanel"]
 layout_mode = 1
 anchors_preset = 0
@@ -960,7 +1010,7 @@ offset_right = 36.0
 offset_bottom = 88.0
 pivot_offset = Vector2(0, 40)
 theme = ExtResource("13_22qid")
-text = "C"
+text = "E"
 horizontal_alignment = 1
 vertical_alignment = 1
 script = ExtResource("13_wkp48")
@@ -968,6 +1018,19 @@ script = ExtResource("13_wkp48")
 [node name="AnimationPlayer" type="AnimationPlayer" parent="FunctionPanel/EngineerButton"]
 libraries = {
 "": SubResource("AnimationLibrary_it6wr")
+}
+
+[node name="Cross" type="Control" parent="FunctionPanel/EngineerButton"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 2
+script = ExtResource("13_lr6k5")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="FunctionPanel/EngineerButton/Cross"]
+libraries = {
+"": SubResource("AnimationLibrary_2sklo")
 }
 
 [node name="FunctionLabel" type="Control" parent="FunctionPanel/EngineerButton"]
@@ -987,7 +1050,7 @@ offset_right = 1.696e+08
 offset_bottom = 1.43001e+07
 theme = ExtResource("11_8l076")
 theme_override_font_sizes/font_size = 26
-text = "Configuration"
+text = "Engineer Mode"
 horizontal_alignment = 1
 vertical_alignment = 1
 

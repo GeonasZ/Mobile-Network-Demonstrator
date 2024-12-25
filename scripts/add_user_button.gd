@@ -3,7 +3,6 @@ extends Control
 @onready var user_controller = $"../../Controllers/UserController"
 @onready var animator = $AnimationPlayer
 @onready var mouse_panel = $"../../MousePanel"
-@onready var cross = $Cross
 @onready var label = $FunctionLabel
 @onready var function_panel = $".."
 
@@ -35,26 +34,18 @@ func is_mouse_in_original_rect():
 func set_button_mode(mode):
 	var previous_mode = self.button_mode
 	self.button_mode = mode
-	# determine whether the cross on the button should be visible
-	if previous_mode != self.Mode.OBSERVER and self.button_mode == self.Mode.OBSERVER:
-		self.cross.disappear_with_anime()
-	elif previous_mode == self.Mode.OBSERVER and self.button_mode != self.Mode.OBSERVER:
-		self.cross.appear_with_anime()
-		
-	# determine whether the button itself should be visible
-	if previous_mode != self.Mode.ENGINEER and self.button_mode == self.Mode.ENGINEER:
-		self.smart_disappear()
-	elif previous_mode == self.Mode.ENGINEER and self.button_mode != self.Mode.ENGINEER:
+	if self.button_mode != previous_mode and self.button_mode == self.Mode.OBSERVER:
 		self.smart_appear()
-
+	elif self.button_mode != previous_mode and self.button_mode != self.Mode.OBSERVER:
+		self.smart_disappear()
+		
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	self.visible = false
 	self.label.visible = false
-	cross.visible = true
 	self.scale = Vector2(1,1)
 	self.on_work = true
-	self.position = Vector2(1820 - button_radius, 220 - button_radius)
+	self.position = Vector2(1700 - button_radius, 220 - button_radius)
 	self.size = Vector2(2*button_radius, 2*button_radius)
 	self.pivot_offset = self.size/2
 	
@@ -67,45 +58,22 @@ func _ready():
 		is_mouse_in_box = false
 
 func _input(event: InputEvent) -> void:
-		
-	if self.button_mode == Mode.ENGINEER:
+	
+	if not can_be_controlled_by_key:
 		return
-		
-	if not can_be_controlled_by_key or not on_work:
-		return
-		
-	if event is InputEventKey and event.keycode == KEY_O and event.is_pressed() and can_be_controlled_by_key:
-		self.can_be_controlled_by_key = false
-		if self.button_mode != Mode.OBSERVER:
-			function_panel.set_all_button_mode(Mode.OBSERVER)
-			user_controller.all_user_enter_observer_mode()
-			
-		else:
-			function_panel.set_all_button_mode(Mode.NONE)
-			user_controller.all_user_leave_observer_mode()
-		await self.get_tree().create_timer(0.25).timeout
-		self.can_be_controlled_by_key = true
+	
+	if event is InputEventKey and event.keycode == KEY_KP_ADD and event.is_pressed() and can_be_controlled_by_key:
+		can_be_controlled_by_key = false
+		user_controller.random_add_user(10)
+		await get_tree().create_timer(0.2).timeout
+		can_be_controlled_by_key = true
 	
 func _gui_input(event: InputEvent) -> void:
 	
-	if self.button_mode == Mode.ENGINEER:
-		return
-			
-	if not can_be_controlled_by_key or not on_work:
-		return
-	
 	if event is InputEventMouseButton and event.button_mask == MOUSE_BUTTON_MASK_LEFT:
-		self.can_be_controlled_by_key = false
-		if self.button_mode != Mode.OBSERVER:
-			function_panel.set_all_button_mode(Mode.OBSERVER)
-			user_controller.all_user_enter_observer_mode()
+		user_controller.random_add_user(10)
 			
-		else:
-			function_panel.set_all_button_mode(Mode.NONE)
-			user_controller.all_user_leave_observer_mode()
-		await self.get_tree().create_timer(0.25).timeout
-		self.can_be_controlled_by_key = true
-		
+
 func appear():
 	self.visible = true
 	self.on_work = false
@@ -115,7 +83,8 @@ func appear():
 
 ## future use for logical appear of button
 func smart_appear():
-	self.appear()
+	if not function_panel.is_instruction_panel_visible() and not self.visible and self.button_mode == Mode.OBSERVER:
+		self.appear()
 
 func disappear():
 	self.on_work = false
@@ -125,14 +94,13 @@ func disappear():
 
 ## future use for logical disappear of button
 func smart_disappear():
-	self.disappear()
-	#if function_panel.is_instruction_panel_visible() and not self.visible:
-		#self.disappear()
-	#elif not function_panel.is_instruction_panel_visible() and self.visible and self.button_mode == Mode.ENGINEER:
-		#self.disappear()
+	if function_panel.is_instruction_panel_visible() and self.visible:
+		self.disappear()
+	elif not function_panel.is_instruction_panel_visible() and self.visible and self.button_mode != Mode.OBSERVER:
+		self.disappear()
+
 
 func _process(delta):
-	
 	if self.is_mouse_in_original_rect():
 		# trigger only at the frame cursor enters button
 		if not is_mouse_in_box and self.visible:

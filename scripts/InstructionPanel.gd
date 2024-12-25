@@ -56,11 +56,8 @@ by move the cursor to them. Also, you can left click on any user to contineously
 func _process(delta):
 	pass
 
-
-	
-
 func _input(event):
 	if event is InputEventMouseButton and event.button_mask == MOUSE_BUTTON_MASK_LEFT and event.pressed and self.on_work:
 		if self.visible:
 			function_panel.all_button_appear_with_instr_panel_disappear()
-			
+			function_panel.instruction_panel_visibility = false
