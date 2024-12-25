@@ -48,7 +48,6 @@ func all_button_disappear_with_instr_panel_appear():
 	user_controller.pause_all_user()
 
 func all_button_appear_with_instr_panel_disappear():
-
 	self.all_button_smart_appear()
 	self.instruction_panel_visibility = false
 	self.over_layer.make_visible()
@@ -66,6 +65,7 @@ func all_button_appear_with_instr_panel_disappear():
 	else:
 		await self.instr_button.animator.animation_finished
 	instr_panel.visible = false
+
 
 func on_mouse_right_click_on_background(pos):
 	for button in self.registered_buttons:

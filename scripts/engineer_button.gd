@@ -66,6 +66,12 @@ func set_button_mode(mode):
 	elif previous_mode == self.Mode.ENGINEER and self.button_mode != self.Mode.ENGINEER:
 		self.cross.appear_with_anime()
 		
+	# determine whether the cross on the button should be visible
+	if previous_mode != self.Mode.ENGINEER and self.button_mode == self.Mode.ENGINEER:
+		self.label.disappear_with_anime()
+	elif previous_mode == self.Mode.ENGINEER and self.button_mode != self.Mode.ENGINEER:
+		self.label.appear_with_anime()
+		
 	# determine whether the button itself should be visible
 	if previous_mode != self.Mode.OBSERVER and self.button_mode == self.Mode.OBSERVER:
 		self.smart_disappear()
@@ -164,8 +170,9 @@ func _process(delta):
 			is_mouse_in_box = true
 		if label.visible == false and self.visible:
 			self.scale = Vector2(1.05,1.05)
-			label.visible = true
-			label.appear_with_anime()
+			if self.button_mode != self.Mode.ENGINEER:
+				label.visible == true
+				label.appear_with_anime()
 	else:
 		# trigger only at the frame cursor leaves button
 		if is_mouse_in_box and self.visible:
@@ -174,4 +181,4 @@ func _process(delta):
 			is_mouse_in_box = false
 		if label.visible == true:
 			label.disappear_with_anime()
-			self.scale = Vector2(1,1)
+		self.scale = Vector2(1,1)

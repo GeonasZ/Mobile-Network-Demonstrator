@@ -82,11 +82,18 @@ func next_frequency_pattern():
 	self.current_pattern = tile_controller.get_current_freq_pattern()
 
 func _input(event: InputEvent) -> void:
+				
+	if not on_work:
+		return
+		
 	if event is InputEventKey and event.keycode == KEY_F and event.is_pressed() and self.can_be_controlled_by_key:
 		next_frequency_pattern()
-		await get_tree().create_timer(0.2).timeout
 	
 func _gui_input(event: InputEvent) -> void:
+	
+	if not on_work:
+		return
+	
 	if event is InputEventMouseButton and event.button_mask == MOUSE_BUTTON_MASK_LEFT:
 		next_frequency_pattern()
 			

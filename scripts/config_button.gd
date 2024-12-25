@@ -75,6 +75,10 @@ func _ready():
 		is_mouse_in_box = false
 		
 func _input(event: InputEvent) -> void:
+	
+	if not on_work:
+		return
+	
 	if event is InputEventKey and event.keycode == KEY_C and event.is_pressed() and self.can_be_controlled_by_key:
 		config_panel.open_config_with_anime()
 		self.can_be_controlled_by_key = false
@@ -82,6 +86,10 @@ func _input(event: InputEvent) -> void:
 		self.can_be_controlled_by_key = true
 	
 func _gui_input(event: InputEvent) -> void:
+	
+	if not on_work:
+		return
+	
 	if event is InputEventMouseButton and event.button_mask == MOUSE_BUTTON_MASK_LEFT:
 		config_panel.open_config_with_anime()
 			

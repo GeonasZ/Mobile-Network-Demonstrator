@@ -74,13 +74,17 @@ func smart_disappear():
 
 # handel key input
 func _input(event: InputEvent) -> void:
+				
+	if not can_be_controlled_by_key or not on_work and not function_panel.is_instruction_panel_visible():
+		return
+		
 	if event is InputEventKey and event.keycode == KEY_I and event.pressed:
-		if instr_panel.visible and can_be_controlled_by_key:
+		if instr_panel.visible:
 			can_be_controlled_by_key = false
 			function_panel.all_button_appear_with_instr_panel_disappear()
 			await get_tree().create_timer(0.2).timeout
 			can_be_controlled_by_key = true
-		elif not instr_panel.visible and can_be_controlled_by_key:
+		elif not instr_panel.visible:
 			can_be_controlled_by_key = false
 			function_panel.all_button_disappear_with_instr_panel_appear()
 			await get_tree().create_timer(0.2).timeout
@@ -89,11 +93,11 @@ func _input(event: InputEvent) -> void:
 
 # handel mouse input
 func _gui_input(event):
-	if not can_be_controlled_by_key:
+	if not can_be_controlled_by_key or not on_work:
 		return
-	if event is InputEventMouseButton and event.button_mask == MOUSE_BUTTON_MASK_LEFT and event.pressed and not instr_panel.visible:
-		if event.position.distance_to(Vector2(button_radius,button_radius)) <= button_radius and self.on_work:
-			function_panel.all_button_disappear_with_instr_panel_appear()
+		
+	if event is InputEventMouseButton and event.button_mask == MOUSE_BUTTON_MASK_LEFT and event.pressed:
+		function_panel.all_button_disappear_with_instr_panel_appear()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
