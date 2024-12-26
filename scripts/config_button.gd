@@ -10,7 +10,7 @@ extends Control
 
 enum Mode {NONE, OBSERVER, ENGINEER}
 var button_mode = Mode.NONE
-
+var anlysis_on = false
 var button_radius = 45
 var on_work = true
 var is_mouse_in_box = false

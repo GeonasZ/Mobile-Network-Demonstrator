@@ -7,6 +7,7 @@ extends Control
 @onready var config_button = $ConfigButton
 @onready var engineer_button = $EngineerButton
 @onready var add_user_button = $AddUserButton
+@onready var remove_user_button = $RemoveUserButton
 
 # other nodes
 @onready var user_controller = $"../Controllers/UserController"
@@ -21,7 +22,8 @@ var instruction_panel_visibility = true
 func _ready() -> void:
 	self.registered_buttons = [self.instr_button, self.obs_button,
 							  self.freq_button, self.config_button,
-							  self.engineer_button, self.add_user_button]
+							  self.engineer_button, self.add_user_button,
+							  self.remove_user_button]
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -66,6 +68,13 @@ func all_button_appear_with_instr_panel_disappear():
 		await self.instr_button.animator.animation_finished
 	instr_panel.visible = false
 
+func all_button_set_analysis_on():
+	for button in self.registered_buttons:
+		button.analysis_on = true
+		
+func all_button_reset_analysis_on():
+	for button in self.registered_buttons:
+		button.analysis_on = false
 
 func on_mouse_right_click_on_background(pos):
 	for button in self.registered_buttons:

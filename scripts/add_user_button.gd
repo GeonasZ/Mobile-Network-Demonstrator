@@ -8,7 +8,7 @@ extends Control
 
 enum Mode {NONE, OBSERVER, ENGINEER}
 var button_mode = Mode.NONE
-
+var anlysis_on = false
 var button_radius = 45
 var length = 25
 var width = 44

@@ -13,7 +13,7 @@ extends Control
 
 enum Mode {NONE, OBSERVER, ENGINEER}
 var button_mode = Mode.NONE
-
+var anlysis_on = false
 var button_radius = 45
 var on_work = true
 var is_mouse_in_box = false
@@ -23,7 +23,7 @@ var can_be_controlled_by_key = true
 
 func _draw():
 	draw_circle(Vector2(button_radius,button_radius), button_radius, Color8(255,255,255))
-	draw_arc(Vector2(button_radius,button_radius), button_radius, 0, TAU, 50, Color8(50,50,50), 5, true)
+	draw_arc(Vector2(button_radius,button_radius), button_radius, 0, TAU, 50, Color8(50,50,50), 7, true)
 	
 
 func is_mouse_in_rect():

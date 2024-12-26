@@ -296,8 +296,16 @@ func _process(delta):
 		"Antenna Type:  "+ tracked_station.get_antenna_type() +\
 		"[center][b]Channels Available[/b][/center][center]" + str(list2str(available_channels_in_hex)) + "[/center]"
 		self.style_code = 0
+		
 	# display user information with foucs at mouse
 	elif display_mode == DisplayMode.USER and tracking_mode == TrackingMode.MOUSE:
+		if displayed_user.size() == 0:
+			display_mode = DisplayMode.STATION
+			self._process(delta)
+			return
+			
+		displayed_user[-1]
+		
 		var i = displayed_user[-1].index_i_in_user_list
 		var j = displayed_user[-1].index_j_in_user_list
 		var user_hex = tile_controller.hex_list[i][j]

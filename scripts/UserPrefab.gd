@@ -178,6 +178,7 @@ func append_analyzed_data(signal_power:float, sir:float):
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
+	
 	# move a step if not paused
 	if not observer_mode and not engineer_mode and not motion_pause:
 		self.mouse_filter = Control.MOUSE_FILTER_IGNORE

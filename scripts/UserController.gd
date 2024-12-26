@@ -2,14 +2,14 @@ extends Control
 @onready var users = $"../../Users"
 @onready var tile_controller = $"../TileController"
 @onready var obs_button = $"../../FunctionPanel/ObserverButton"
-@onready var mouse_pamel = $"../../MousePanel"
+@onready var mouse_panel = $"../../MousePanel"
 @onready var gathered_tiles = $"../../GatheredTiles"
 @onready var engineer_button = $"../../FunctionPanel/EngineerButton"
 const sqrt3 = 1.732
 var user_prefab = null
 # initialize in tile controller when hex_list gets initialized
 var user_list = []
-var total_user_number = 0
+var linear_user_list = []
 var current_available_user_id = 0
 var show_popup = false
 
@@ -29,13 +29,14 @@ func initialize_user_system(user_height):
 				user.queue_free()
 	# clear user list
 	user_list = []
-	total_user_number = 0
+	linear_user_list = []
 	current_available_user_id = 0
 	self.user_height = user_height
 
 func add_user(pos):
 	var current_user = user_prefab.instantiate()
 	users.add_child(current_user)
+	linear_user_list.append(current_user)
 	current_user.position = pos
 	current_user.queue_redraw()
 	current_user.id = current_available_user_id
@@ -50,14 +51,12 @@ func add_user(pos):
 	var channel = tile_controller.tile_allocate_channel(i,j, current_user)
 	if channel != null:
 		user_list[i][j]["connected"].append(current_user)
-		current_user.index_k_in_user_list = user_list[i][j]["connected"].size()
+		current_user.index_k_in_user_list = user_list[i][j]["connected"].size() - 1
 		
 	else:
 		user_list[i][j]["disconnected"].append(current_user)
-		current_user.index_k_in_user_list = user_list[i][j]["connected"].size()
-		
-	total_user_number += 1
-	current_user.initialize(mouse_pamel, gathered_tiles)
+		current_user.index_k_in_user_list = user_list[i][j]["disconnected"].size() - 1
+	current_user.initialize(mouse_panel, gathered_tiles)
 	if obs_button.button_mode == obs_button.Mode.OBSERVER:
 		current_user.enter_observer_mode()
 	if engineer_button.button_mode == engineer_button.Mode.ENGINEER:
@@ -70,11 +69,49 @@ func random_add_user(n_user:int):
 	for i in range(n_user):
 		user_pos = Vector2(randi_range(0.05*1920,0.95*1920),randi_range(0.05*1080,0.95*1080))
 		self.add_user(user_pos)
+
+## remove a user from the linear user list by their id
+func remove_user_from_linear_user_list(user_id):
+	var index = binary_search_user_in_linear_user_list(user_id)
+	if index >= 0:
+		self.linear_user_list.remove_at(index)
+	else:
+		print("User Controller [remove_user_from_linear_user_list]: Invalid user_id (%s) to be removed."%user_id)
+
+func remove_user_from_linear_user_list_by_index(index):
+	self.linear_user_list.remove_at(index)
+
+func remove_user_from_user_list(index_i,index_j,connection_stat,index_k):
+	var station_connection_pool = user_list[index_i][index_j][connection_stat]
+	for i in range(len(station_connection_pool)-1,index_k,-1):
+		station_connection_pool[i].index_k_in_user_list -= 1
+	user_list[index_i][index_j][connection_stat].remove_at(index_k)
+	
+
+func binary_search_user_in_linear_user_list(user_id, start=0, end=-1):
+	if end == -1:
+		end = len(self.linear_user_list)
+	# perform binary search
+	var mid_index = int((end+start)/2)
+	if self.linear_user_list[mid_index].id < user_id:
+		start = mid_index
+		return binary_search_user_in_linear_user_list(user_id, start, end)
+	elif self.linear_user_list[mid_index].id > user_id:
+		end = mid_index
+		return binary_search_user_in_linear_user_list(user_id, start, end)
+	elif abs(start - end) <= 1:
+		if self.linear_user_list[start].id == user_id:
+			return start
+		elif self.linear_user_list[end].id == user_id:
+			return end
+		else:
+			return -1
+	else:
+		return mid_index
 	
 func reallocate_channel_for_user_under_station(i,j):
 	var user = null
 	var channel_num = tile_controller.hex_list[i][j].n_available_channel
-	
 	for k in range(self.user_list[i][j]["connected"].size()-1,-1,-1):
 			user = self.user_list[i][j]["connected"][k]
 			user.connect_to_channel(null)
@@ -95,6 +132,7 @@ func try_connect_user(i, j):
 		if channel != null:
 			self.user_list[i][j]["disconnected"].remove_at(k)
 			self.user_list[i][j]["connected"].append(user)
+			user.index_k_in_user_list = self.user_list[i][j]["connected"].size() - 1
 		else:
 			break
 					
@@ -112,10 +150,10 @@ func relocate_user(user_need_relocate):
 		var channel = tile_controller.tile_allocate_channel(i,j, user)
 		if channel != null:
 			user_list[i][j]["connected"].append(user)
-			user.index_k_in_user_list = user_list[i][j]["connected"].size()
+			user.index_k_in_user_list = user_list[i][j]["connected"].size() - 1
 		else:
 			user_list[i][j]["disconnected"].append(user)
-			user.index_k_in_user_list = user_list[i][j]["disconnected"].size()
+			user.index_k_in_user_list = user_list[i][j]["disconnected"].size() - 1
 
 # decide whether the user should be allocate to a new tile or be removed
 func redirect_user(current_user, station_i, station_j, user_k) -> Array:
@@ -135,12 +173,11 @@ func redirect_user(current_user, station_i, station_j, user_k) -> Array:
 		tile_controller.tile_restore_channel(station_i, station_j, user_channel)
 		# remove user from user list
 		
-		if mouse_pamel.tracked_user == station[connection_stat][user_k]:
-			mouse_pamel.track_mouse()
-		
-		station[connection_stat].remove_at(user_k)
+		if mouse_panel.tracked_user == station[connection_stat][user_k]:
+			mouse_panel.track_mouse()
+		self.remove_user_from_linear_user_list(current_user.id)
+		self.remove_user_from_user_list(station_i,station_j,connection_stat,user_k)
 		current_user.queue_free()
-		total_user_number -= 1
 		return user_need_relocate
 	
 	# decide whether current station is cloest to the user
@@ -176,7 +213,7 @@ func redirect_user(current_user, station_i, station_j, user_k) -> Array:
 		var user_channel = station[connection_stat][user_k].connected_channel
 		tile_controller.tile_restore_channel(station_i, station_j, user_channel)
 		# remove user from user list
-		station[connection_stat].remove_at(user_k)
+		self.remove_user_from_user_list(station_i,station_j,connection_stat,user_k)
 		# append to list for relocate later
 		user_need_relocate = [current_user, i_with_least_distance, j_with_least_distance]
 	return user_need_relocate

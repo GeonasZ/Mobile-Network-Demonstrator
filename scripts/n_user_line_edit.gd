@@ -40,16 +40,10 @@ func _input(event: InputEvent) -> void:
 		focus_exited.emit()
 
 func initialize():
-	var user_num = 0
-	for row in user_controller.user_list:
-		for station in row:
-			user_num += station["connected"].size()
-			user_num += station["disconnected"].size()
-	
-	self.text = str(user_num)
+	self.text = str(len(user_controller.linear_user_list))
 
 func _on_focus_exited() -> void:
-	var max_value = 200
+	var max_value = 1000
 	var min_value = 0
 	father_node.grab_focus()
 	if self.text == "":
