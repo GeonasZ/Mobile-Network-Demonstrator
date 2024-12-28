@@ -78,7 +78,6 @@ func set_button_mode(mode):
 	elif previous_mode == self.Mode.OBSERVER and self.button_mode != self.Mode.OBSERVER:
 		self.smart_appear()
 
-
 func appear():
 	self.visible = true
 	self.on_work = false
@@ -103,7 +102,6 @@ func smart_disappear():
 		#self.disappear()
 	#if not function_panel.is_instruction_panel_visible() and self.visible and self.button_mode == Mode.OBSERVER:
 		#self.disappear()
-
 
 func _input(event: InputEvent) -> void:
 	

@@ -1,4 +1,4 @@
-[gd_scene load_steps=70 format=3 uid="uid://dp7br0wc03w8r"]
+[gd_scene load_steps=95 format=3 uid="uid://dp7br0wc03w8r"]
 
 [ext_resource type="Script" path="res://scripts/UserController.gd" id="1_18gww"]
 [ext_resource type="Script" path="res://scripts/TileController.gd" id="1_fg5v7"]
@@ -16,21 +16,28 @@
 [ext_resource type="Shader" path="res://shader/mouse_panel.gdshader" id="6_ihk23"]
 [ext_resource type="Script" path="res://scripts/function_panel.gd" id="8_weq5s"]
 [ext_resource type="Script" path="res://scripts/confirm_button.gd" id="10_ejbur"]
+[ext_resource type="Script" path="res://scripts/antenna_config_panel.gd" id="10_mfn6q"]
 [ext_resource type="Theme" uid="uid://dkpllowskoe2q" path="res://fonts/pre_set_theme/button_desc_font.tres" id="11_8l076"]
 [ext_resource type="FontFile" uid="uid://3elerwfx7aom" path="res://fonts/HanSan/SimplifiedCN/SourceHanSansCN-Regular.otf" id="11_acrdp"]
 [ext_resource type="FontFile" uid="uid://mcshd5gym8b" path="res://fonts/HanSan/SimplifiedCN/SourceHanSansCN-Bold.otf" id="11_i26m1"]
 [ext_resource type="Script" path="res://scripts/observer_button.gd" id="11_k30ff"]
+[ext_resource type="Script" path="res://scripts/station_antenna_edit.gd" id="12_0j73e"]
 [ext_resource type="Script" path="res://scripts/ObsFunctionLabel.gd" id="12_mq0m8"]
 [ext_resource type="Script" path="res://scripts/square_button_label.gd" id="12_qnttv"]
 [ext_resource type="Theme" uid="uid://djeqnfbuv36k7" path="res://fonts/pre_set_theme/button_large_font.tres" id="13_22qid"]
 [ext_resource type="Script" path="res://scripts/ObsCross.gd" id="13_lr6k5"]
+[ext_resource type="FontFile" uid="uid://cvce1kwsny6ra" path="res://fonts/HanSan/SimplifiedCN/SourceHanSansCN-Medium.otf" id="13_n6sxm"]
 [ext_resource type="Script" path="res://scripts/content_frame.gd" id="13_tbf6g"]
 [ext_resource type="Script" path="res://scripts/button_char.gd" id="13_wkp48"]
+[ext_resource type="Script" path="res://scripts/option_list.gd" id="14_2ybup"]
 [ext_resource type="Script" path="res://scripts/cancel_button.gd" id="14_4jydq"]
 [ext_resource type="Script" path="res://scripts/cancel_button_label.gd" id="14_4kd25"]
+[ext_resource type="Shader" path="res://shader/fade_line.gdshader" id="14_uunwj"]
+[ext_resource type="Script" path="res://scripts/h_line.gd" id="15_56g8c"]
 [ext_resource type="Script" path="res://scripts/tile_length_text_edit.gd" id="15_kcj7q"]
 [ext_resource type="Script" path="res://scripts/freq_reuse_button.gd" id="15_r6418"]
 [ext_resource type="Script" path="res://scripts/user_height_line_edit.gd" id="16_i0h6j"]
+[ext_resource type="Script" path="res://scripts/antenna_option.gd" id="16_rv0b4"]
 [ext_resource type="Script" path="res://scripts/config_button.gd" id="19_kgern"]
 [ext_resource type="Script" path="res://scripts/decay_line_edit.gd" id="19_qoxea"]
 [ext_resource type="Script" path="res://scripts/frequency_number_edit.gd" id="20_sn5w8"]
@@ -38,8 +45,11 @@
 [ext_resource type="Script" path="res://scripts/add_user_button.gd" id="24_037pr"]
 [ext_resource type="Script" path="res://scripts/config_panel.gd" id="24_ok7yp"]
 [ext_resource type="Theme" uid="uid://gsrgqfr8u6nt" path="res://fonts/pre_set_theme/button_median_font.tres" id="25_x1dja"]
+[ext_resource type="Theme" uid="uid://bgebxa4euua15" path="res://fonts/pre_set_theme/button_desc_small_font.tres" id="28_1qo4p"]
 [ext_resource type="Script" path="res://scripts/remove_user_button.gd" id="29_21wgx"]
 [ext_resource type="Script" path="res://scripts/over_layer.gd" id="30_f735c"]
+[ext_resource type="Script" path="res://scripts/antenna_config_button.gd" id="30_pxa2l"]
+[ext_resource type="Script" path="res://scripts/antenna_config_function_label.gd" id="32_8by7n"]
 [ext_resource type="Script" path="res://scripts/engineer_button.gd" id="33_c02q0"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_h4n7r"]
@@ -82,6 +92,118 @@ tracks/0/keys = {
 _data = {
 "appear": SubResource("Animation_55j4g"),
 "disappear": SubResource("Animation_nivsp")
+}
+
+[sub_resource type="Theme" id="Theme_wo5vk"]
+
+[sub_resource type="Theme" id="Theme_h1vwm"]
+Label/colors/font_color = Color(0, 0, 0, 1)
+Label/font_sizes/font_size = 25
+Label/fonts/font = ExtResource("11_i26m1")
+
+[sub_resource type="Theme" id="Theme_ce5n4"]
+VBoxContainer/constants/separation = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h302h"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.677567, 0.677567, 0.677567, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+expand_margin_left = 20.0
+expand_margin_right = 20.0
+expand_margin_bottom = 8.0
+
+[sub_resource type="Theme" id="Theme_jon22"]
+Panel/styles/panel = SubResource("StyleBoxFlat_h302h")
+
+[sub_resource type="Theme" id="Theme_i8x3a"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8a70o"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 3
+border_width_top = 6
+border_width_right = 5
+border_width_bottom = 3
+border_color = Color(0.364084, 0.364084, 0.364084, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 5
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 5
+expand_margin_left = 7.0
+expand_margin_top = 5.0
+expand_margin_right = 7.0
+expand_margin_bottom = 5.0
+
+[sub_resource type="Theme" id="Theme_e58k8"]
+Label/colors/font_color = Color(0, 0, 0, 1)
+Label/font_sizes/font_size = 24
+Label/fonts/font = ExtResource("13_n6sxm")
+Label/styles/normal = SubResource("StyleBoxFlat_8a70o")
+
+[sub_resource type="Theme" id="Theme_6gi7u"]
+VBoxContainer/constants/separation = 3
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_kjjde"]
+shader = ExtResource("14_uunwj")
+
+[sub_resource type="Animation" id="Animation_5at55"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_t6svp"]
+resource_name = "appear"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(0.287175, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_nbxbl"]
+resource_name = "disappear"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(5.09824, 1),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(1e-05, 1e-05)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_m1fgk"]
+_data = {
+"RESET": SubResource("Animation_5at55"),
+"appear": SubResource("Animation_t6svp"),
+"disappear": SubResource("Animation_nbxbl")
 }
 
 [sub_resource type="Theme" id="Theme_rk3n6"]
@@ -408,6 +530,11 @@ _data = {
 "disappear": SubResource("Animation_xwm4b")
 }
 
+[sub_resource type="Theme" id="Theme_pxqg1"]
+Label/colors/font_color = Color(0, 0, 0, 1)
+Label/font_sizes/font_size = 18
+Label/fonts/font = ExtResource("11_acrdp")
+
 [sub_resource type="Animation" id="Animation_8gccw"]
 length = 0.001
 tracks/0/type = "value"
@@ -614,6 +741,123 @@ scroll_active = false
 root_node = NodePath("../..")
 libraries = {
 "": SubResource("AnimationLibrary_h8kt1")
+}
+
+[node name="StationConfigPanel" type="Control" parent="."]
+anchors_preset = 0
+offset_right = 640.0
+offset_bottom = 640.0
+theme = SubResource("Theme_wo5vk")
+script = ExtResource("10_mfn6q")
+
+[node name="Title" type="Label" parent="StationConfigPanel"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+theme = SubResource("Theme_h1vwm")
+text = "Station Properties Edit"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="StationConfigPanel"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="StationConfigPanel/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 4
+theme = SubResource("Theme_ce5n4")
+
+[node name="TopPlaceHolder" type="Control" parent="StationConfigPanel/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+
+[node name="AntennaEditPanel" type="Panel" parent="StationConfigPanel/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_jon22")
+
+[node name="AntennaEdit" type="VBoxContainer" parent="StationConfigPanel/ScrollContainer/VBoxContainer/AntennaEditPanel"]
+layout_mode = 2
+offset_top = 16.0
+offset_right = 234.0
+offset_bottom = 248.0
+theme = SubResource("Theme_i8x3a")
+script = ExtResource("12_0j73e")
+
+[node name="Title" type="Label" parent="StationConfigPanel/ScrollContainer/VBoxContainer/AntennaEditPanel/AntennaEdit"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+theme = SubResource("Theme_e58k8")
+text = "Antenna Type"
+horizontal_alignment = 1
+
+[node name="OptionList" type="VBoxContainer" parent="StationConfigPanel/ScrollContainer/VBoxContainer/AntennaEditPanel/AntennaEdit"]
+layout_mode = 2
+theme = SubResource("Theme_6gi7u")
+script = ExtResource("14_2ybup")
+
+[node name="Option" type="Label" parent="StationConfigPanel/ScrollContainer/VBoxContainer/AntennaEditPanel/AntennaEdit/OptionList"]
+layout_mode = 2
+mouse_filter = 0
+theme = ExtResource("28_1qo4p")
+text = "Dipole Antenna"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("16_rv0b4")
+
+[node name="HLine" type="ColorRect" parent="StationConfigPanel/ScrollContainer/VBoxContainer/AntennaEditPanel/AntennaEdit/OptionList"]
+material = SubResource("ShaderMaterial_kjjde")
+custom_minimum_size = Vector2(100, 2)
+layout_mode = 2
+script = ExtResource("15_56g8c")
+
+[node name="Option2" type="Label" parent="StationConfigPanel/ScrollContainer/VBoxContainer/AntennaEditPanel/AntennaEdit/OptionList"]
+layout_mode = 2
+mouse_filter = 0
+theme = ExtResource("28_1qo4p")
+text = "Antenna Array < N = 2 >"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("16_rv0b4")
+
+[node name="HLine2" type="ColorRect" parent="StationConfigPanel/ScrollContainer/VBoxContainer/AntennaEditPanel/AntennaEdit/OptionList"]
+material = SubResource("ShaderMaterial_kjjde")
+custom_minimum_size = Vector2(100, 2)
+layout_mode = 2
+script = ExtResource("15_56g8c")
+
+[node name="Option3" type="Label" parent="StationConfigPanel/ScrollContainer/VBoxContainer/AntennaEditPanel/AntennaEdit/OptionList"]
+layout_mode = 2
+mouse_filter = 0
+theme = ExtResource("28_1qo4p")
+text = "Antenna Array < N = 3 >"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("16_rv0b4")
+
+[node name="HLine3" type="ColorRect" parent="StationConfigPanel/ScrollContainer/VBoxContainer/AntennaEditPanel/AntennaEdit/OptionList"]
+material = SubResource("ShaderMaterial_kjjde")
+custom_minimum_size = Vector2(100, 2)
+layout_mode = 2
+script = ExtResource("15_56g8c")
+
+[node name="Option4" type="Label" parent="StationConfigPanel/ScrollContainer/VBoxContainer/AntennaEditPanel/AntennaEdit/OptionList"]
+layout_mode = 2
+mouse_filter = 0
+theme = ExtResource("28_1qo4p")
+text = "Antenna Array < N = 4 >"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("16_rv0b4")
+
+[node name="EditButton" type="Control" parent="StationConfigPanel/ScrollContainer/VBoxContainer/AntennaEditPanel/AntennaEdit"]
+layout_mode = 2
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="StationConfigPanel"]
+libraries = {
+"": SubResource("AnimationLibrary_m1fgk")
 }
 
 [node name="ConfigPanel" type="Polygon2D" parent="."]
@@ -935,6 +1179,62 @@ libraries = {
 "": SubResource("AnimationLibrary_i6iwl")
 }
 
+[node name="AntennaConfigButton" type="Control" parent="FunctionPanel"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+scale = Vector2(1e-05, 1e-05)
+script = ExtResource("30_pxa2l")
+
+[node name="Char" type="Label" parent="FunctionPanel/AntennaConfigButton"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+theme = ExtResource("13_22qid")
+text = "A"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("13_wkp48")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="FunctionPanel/AntennaConfigButton"]
+libraries = {
+"": SubResource("AnimationLibrary_it6wr")
+}
+
+[node name="FunctionLabel" type="Control" parent="FunctionPanel/AntennaConfigButton"]
+anchors_preset = 0
+offset_left = -20.0
+offset_top = 48.0
+offset_right = 20.0
+offset_bottom = 88.0
+scale = Vector2(1e-05, 1e-05)
+script = ExtResource("32_8by7n")
+
+[node name="Label" type="Label" parent="FunctionPanel/AntennaConfigButton/FunctionLabel"]
+layout_mode = 0
+offset_left = 1.696e+08
+offset_top = 1.43e+07
+offset_right = 1.696e+08
+offset_bottom = 1.43001e+07
+theme = ExtResource("28_1qo4p")
+text = "Antenna Configure"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Label2" type="Label" parent="FunctionPanel/AntennaConfigButton/FunctionLabel"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+theme = SubResource("Theme_pxqg1")
+text = "Current: Random"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="FunctionPanel/AntennaConfigButton/FunctionLabel"]
+libraries = {
+"": SubResource("AnimationLibrary_i6iwl")
+}
+
 [node name="InstructionButton" type="Control" parent="FunctionPanel"]
 layout_mode = 1
 anchors_preset = 0
@@ -971,10 +1271,8 @@ script = ExtResource("6_0kpw6")
 
 [node name="Label" type="Label" parent="FunctionPanel/InstructionButton/FunctionLabel"]
 layout_mode = 0
-offset_left = 1.696e+08
-offset_top = 1.43e+07
-offset_right = 1.696e+08
-offset_bottom = 1.43001e+07
+offset_right = 206.0
+offset_bottom = 100.0
 theme = ExtResource("11_8l076")
 text = "Instruction Panel"
 horizontal_alignment = 1
@@ -1264,6 +1562,12 @@ offset_top = -600.0
 offset_right = 1000.0
 offset_bottom = 480.0
 
+[connection signal="mouse_left_click_on_background" from="GatheredTiles" to="StationConfigPanel" method="_on_gathered_tiles_mouse_left_click_on_background"]
+[connection signal="mouse_right_click_on_background" from="GatheredTiles" to="StationConfigPanel" method="_on_gathered_tiles_mouse_right_click_on_background"]
+[connection signal="mouse_left_click" from="StationConfigPanel/ScrollContainer/VBoxContainer/AntennaEditPanel/AntennaEdit/OptionList/Option" to="StationConfigPanel/ScrollContainer/VBoxContainer/AntennaEditPanel/AntennaEdit" method="_on_option_mouse_left_click"]
+[connection signal="mouse_left_click" from="StationConfigPanel/ScrollContainer/VBoxContainer/AntennaEditPanel/AntennaEdit/OptionList/Option2" to="StationConfigPanel/ScrollContainer/VBoxContainer/AntennaEditPanel/AntennaEdit" method="_on_option_mouse_left_click"]
+[connection signal="mouse_left_click" from="StationConfigPanel/ScrollContainer/VBoxContainer/AntennaEditPanel/AntennaEdit/OptionList/Option3" to="StationConfigPanel/ScrollContainer/VBoxContainer/AntennaEditPanel/AntennaEdit" method="_on_option_mouse_left_click"]
+[connection signal="mouse_left_click" from="StationConfigPanel/ScrollContainer/VBoxContainer/AntennaEditPanel/AntennaEdit/OptionList/Option4" to="StationConfigPanel/ScrollContainer/VBoxContainer/AntennaEditPanel/AntennaEdit" method="_on_option_mouse_left_click"]
 [connection signal="focus_exited" from="ConfigPanel/ContentFrame/GridContainer/TileLengthEdit/LineEdit" to="ConfigPanel/ContentFrame/GridContainer/TileLengthEdit/LineEdit" method="_on_focus_exited"]
 [connection signal="focus_exited" from="ConfigPanel/ContentFrame/GridContainer/UserHeightEdit/LineEdit" to="ConfigPanel/ContentFrame/GridContainer/UserHeightEdit/LineEdit" method="_on_focus_exited"]
 [connection signal="focus_exited" from="ConfigPanel/ContentFrame/GridContainer/DecayEdit/LineEdit" to="ConfigPanel/ContentFrame/GridContainer/DecayEdit/LineEdit" method="_on_focus_exited"]

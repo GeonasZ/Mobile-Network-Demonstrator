@@ -7,6 +7,9 @@ extends Control
 @onready var users = $"../Users"
 @onready var config_panel = $"../ConfigPanel"
 
+signal mouse_left_click_on_background()
+signal mouse_right_click_on_background()
+
 var zoom_in_ratio = 1.05
 var zoom_out_ratio = 0.95
 var max_scale = 2
@@ -32,10 +35,19 @@ func zoom(zoom_ratio, zoom_to_mouse=false, subject=self):
 		subject.scale = subject.scale * zoom_ratio
 
 func on_mouse_left_click_on_background(event):
+	mouse_left_click_on_background.emit(event)
 	if mouse_controller.current_hex.is_center_on_focus():
 		mouse_panel.track_station(mouse_controller.current_hex)
 	elif user_controller.user_prefab != null and not user_controller.user_list.is_empty():
 		user_controller.add_user(event.position)
+
+func on_mouse_right_click_on_background(event):
+	self.mouse_right_click_on_background.emit(event)
+	if mouse_panel.tracking_mode == mouse_panel.TrackingMode.MOUSE:
+		mouse_panel.on_mouse_right_click_on_background(event)
+		function_panel.on_mouse_right_click_on_background(event)
+	else:
+		mouse_panel.track_mouse()
 
 func _gui_input(event):
 	if event is InputEventMouseButton:
@@ -81,11 +93,6 @@ func _gui_input(event):
 func _process(delta):
 	pass
 	
-func on_mouse_right_click_on_background(event):
-	if mouse_panel.tracking_mode == mouse_panel.TrackingMode.MOUSE:
-		mouse_panel.on_mouse_right_click_on_background(event)
-		function_panel.on_mouse_right_click_on_background(event)
-	else:
-		mouse_panel.track_mouse()
+
 	
 	

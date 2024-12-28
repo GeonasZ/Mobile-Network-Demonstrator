@@ -25,9 +25,11 @@ Color8(255,240,245)]
 var frequency_group = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"]
 var hex_frequency_dict = {}
 var hex_tile_prefab = null
+@onready var station_config = $"../../StationConfigPanel"
 @onready var gathered_tiles = $"../../GatheredTiles"
 @onready var user_controller = $"../UserController"
 @onready var mouse_panel = $"../../MousePanel"
+@onready var mouse_controller = $"../../Controllers/MouseController"
 @onready var freq_reuse_button = $"../../FunctionPanel/FreqReuseButton"
 var hex_list = []
 
@@ -95,6 +97,35 @@ func eval_station_direction(tile_list, user_list, index_i, index_j):
 		tile.signal_direction = station_direction
 		return station_direction
 
+func all_tile_set_antenna_type(mode:String):
+	## mode: Choose from "Dipole", "Array2", "Array3", "Array4", "Random" and "Custom"
+	for row in self.hex_list:
+		for station in row:
+			if mode == "Dipole":
+				station.set_antenna_type("DIPOLE")
+			elif mode == "Array2":
+				station.set_antenna_type("ARRAY2")
+			elif mode == "Array3":
+				station.set_antenna_type("ARRAY3")
+			elif mode == "Array4":
+				station.set_antenna_type("ARRAY4")
+			elif mode == "Random":
+				
+				var rand = randi_range(1,4)
+				if rand == 1:
+					station.set_antenna_type("DIPOLE")
+				elif rand == 2:
+					station.set_antenna_type("ARRAY2")
+				elif rand == 3:
+					station.set_antenna_type("ARRAY3")
+				elif rand == 4:
+					station.set_antenna_type("ARRAY4")
+			elif mode == "Custom":
+				break
+			else:
+				print("TileController <all_tile_set_antenna_type>: Invalid antenna mode.")
+				break
+	
 # create a hex tile
 func make_tile(pos:Vector2,arc_len:int=0,n_channel:int=7,antenna_type=null):
 	var tile_len = 0
@@ -110,7 +141,7 @@ func make_tile(pos:Vector2,arc_len:int=0,n_channel:int=7,antenna_type=null):
 	current_hex.set_arc_len(tile_len)
 	current_hex.set_id(station_number)
 	current_hex.set_channel_number(n_channel)
-	current_hex.mouse_panel = self.mouse_panel
+	current_hex.initialize(self.mouse_panel)
 	if antenna_type == null:
 		var rand_num = randi_range(0,3)
 		current_hex.set_antenna_type(current_hex.AntennaType[rand_num])
@@ -331,6 +362,7 @@ func _ready():
 	hex_tile_prefab = preload("res://scenes/hex_tile.tscn")
 	# randomly initialize a network map
 	initialize_map(arc_len)
+
 #func _input(event):
 	#print(event.position)
 

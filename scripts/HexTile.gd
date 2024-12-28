@@ -1,8 +1,7 @@
 extends Polygon2D
 
-var mouse_panel
+var mouse_panel = null
 @onready var parent_node = $".."
-
 var AntennaType = ["DIPOLE","ARRAY2","ARRAY3","ARRAY4"]
 
 var index_i
@@ -14,6 +13,7 @@ var n_available_channel = 7
 var station_scale = 1
 var id
 # used to decide the mouse position respect to the tile itself
+
 var mouse_position_in_tile = Vector2(0,0)
 # null for available, not null for not available
 var channel_allocation_list = []
@@ -113,7 +113,10 @@ func _draw():
 		draw_circle(Vector2(0,-station_total_height/2.), station_scale * focus_radius, Color8(50,50,50), false, width*4)
 	elif self.on_focus and self.center_on_focus and not mouse_panel.keep_invisible and empty_display_user_list:
 		draw_circle(Vector2(0,-station_total_height/2.), station_scale * focus_radius, Color8(150,150,150), false, width*4)
-		
+	
+func initialize(mouse_panel):
+	self.mouse_panel = mouse_panel
+	
 func set_focus():
 	self.on_focus = true
 
@@ -129,6 +132,9 @@ func get_antenna_type():
 		return "Antenna Array <N=3>"
 	elif self.antenna_type == "ARRAY4":
 		return "Antenna Array <N=4>"
+		
+func get_antenna_type_raw():
+	return self.antenna_type
 
 func eval_signal_pow(angle_from_center, distance, decay):
 	if self.antenna_type == "DIPOLE":
@@ -258,6 +264,7 @@ func is_center_on_focus():
 	var distance_to_mouse = (self.get_global_transform()*Vector2(0,0)+Vector2(0, -station_scale*station_total_height/2.)).distance_to(get_global_mouse_position())
 	return distance_to_mouse <= self.focus_radius * station_scale * parent_node.scale.x
 	
+	
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	self.focus_radius = self.arc_len/8
@@ -275,6 +282,7 @@ func _process(delta):
 		elif not self.is_center_on_focus() and self.center_on_focus:
 			self.center_on_focus = false
 			self.redraw_tile()
+		
 	# redraw when mouse_panel_redraws
 	if self.mouse_panel.keep_invisible and not self.mouse_panel_keep_invisible:
 		self.mouse_panel_keep_invisible = true

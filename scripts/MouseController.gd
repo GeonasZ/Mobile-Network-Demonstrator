@@ -12,7 +12,6 @@ var current_distance = -1
 func _ready():
 	pass # Replace with function body.
 
-				
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	var temp = tile_controller.get_current_hex(self.get_global_mouse_position())
