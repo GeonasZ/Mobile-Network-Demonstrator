@@ -24,8 +24,6 @@ var motion_speed_param = 0.3
 var length = 320
 var width = 220
 var slash_len = 20
-# decay rate of signal power with distance
-var decay = 2
 
 var out_of_window = false
 var set_to_visible = true
@@ -138,9 +136,6 @@ func process_y_motion(mouse_position, delta):
 		y_motion_state = YMotion.MOVE_LEVEL
 	elif mouse_position.y <= 1080*0.07:
 		y_motion_state = YMotion.MOVE_DOWN
-
-func change_decay(value):
-	self.decay = value
 
 func appear_with_anime():
 	if self.tracking_mode == TrackingMode.USER:
@@ -303,21 +298,21 @@ func _process(delta):
 			display_mode = DisplayMode.STATION
 			self._process(delta)
 			return
-			
-		displayed_user[-1]
 		
 		var i = displayed_user[-1].index_i_in_user_list
 		var j = displayed_user[-1].index_j_in_user_list
 		var user_hex = tile_controller.hex_list[i][j]
 		var distance = user_hex.position.distance_to(displayed_user[-1].position)
-		var signal_power = user_hex.eval_signal_pow_to_user(displayed_user[-1], self.decay)
-		var interference_power = 0
-		# sum interference power up
-		if displayed_user[-1].connected_channel != null:
-			for station in tile_controller.hex_frequency_dict[user_hex.frequency_group]:
-				if station.channel_allocation_list[displayed_user[-1].connected_channel] != null:
-					interference_power += station.eval_signal_pow_to_user(displayed_user[-1], decay)
-		interference_power -= signal_power
+		var signal_power
+		var interference_power
+		var sir
+		
+		# evaluate signal power, interference and sir
+		var temp = user_controller.eval_user_sir(displayed_user[-1])
+		signal_power = temp[0]
+		interference_power = temp[1]
+		sir = temp[2]
+		
 		info_label.text = "User ID:  " + str(displayed_user[-1].id) + "\n" +\
 			"Nearest Station ID: " + str(user_hex.id) +'\n'+\
 			"Distance to Nearest Station:  "+str(truncate_double(distance,1))+"\n"+\
@@ -337,14 +332,16 @@ func _process(delta):
 		var index_j = tracked_user.index_j_in_user_list
 		var user_hex = tile_controller.hex_list[index_i][index_j]
 		var distance = user_hex.position.distance_to(tracked_user.position)
-		var signal_power = user_hex.eval_signal_pow_to_user(tracked_user, self.decay)
-		var interference_power = 0
-		# sum interference power up
-		if tracked_user.connected_channel != null:
-			for station in tile_controller.hex_frequency_dict[user_hex.frequency_group]:
-				if station.channel_allocation_list[tracked_user.connected_channel] != null:
-										interference_power += station.eval_signal_pow_to_user(tracked_user, decay)
-		interference_power -= signal_power
+		var signal_power
+		var interference_power
+		var sir
+		
+		# evaluate signal power, interference and sir
+		var temp = user_controller.eval_user_sir(tracked_user)
+		signal_power = temp[0]
+		interference_power = temp[1]
+		sir = temp[2]
+		
 		info_label.text = "User ID:  " + str(tracked_user.id) + "\n" +\
 			"Nearest Station ID: " + str(user_hex.id) + "\n" +\
 			"Distance to Nearest Station:  "+str(truncate_double(distance,1))+"\n"+\

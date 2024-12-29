@@ -39,9 +39,6 @@ var station_deadzone_ratio = 0.1
 var deadzone_outskirt_multiple = 2
 var penalty_lr = 0.6
 
-var signal_power_hist = []
-var sir_hist = []
-
 var tracked_by_panel = false
 var motion_pause = false
 var max_acc = Vector2(3,3)
@@ -53,6 +50,11 @@ var direction_to_station = 0
 # applied when the user is too close to the center of station
 # to keep the user away from center by controlling its velocity
 var motion_penalty = Vector2(0,0)
+
+# analysis mode paramters
+var under_analysis = false
+var signal_power_hist = []
+var sir_hist = []
 
 func _draw():
 	# draw body
@@ -69,7 +71,6 @@ func _draw():
 		draw_line(Vector2(radius, -0.8*(height+2*radius)),Vector2(-radius, -0.1*(height+2*radius)), Color8(255,114,118,150), width)
 		draw_line(Vector2(radius, -0.1*(height+2*radius)),Vector2(-radius, -0.8*(height+2*radius)), Color8(255,114,118,150), width)
 		
-
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	# take a random initial velocity
@@ -104,6 +105,21 @@ func initialize(input_mouse_panel, input_gathered_tiles):
 	self.mouse_enter_user.connect(input_mouse_panel._on_mouse_enter_user)
 	self.mouse_leave_user.connect(input_mouse_panel._on_mouse_leave_user)
 	self.is_initialized = true
+
+func start_analysis():
+	self.under_analysis = true
+
+func end_analysis():
+	self.under_analysis = false
+
+func reset_analysis_data():
+	self.sir_hist = []
+	self.signal_power_hist = []
+
+## record a siganl power and SIR data
+func record_analysis_data(siganl_power:float,sir:float):
+	self.signal_power_hist.append(siganl_power)
+	self.sir_hist.append(sir)
 
 func eval_motion_penalty():
 	var deadzone_radius = station_deadzone_ratio * self.station.arc_len
@@ -168,13 +184,18 @@ func pause_motion():
 func resume_motion():
 	self.motion_pause = false
 
-func reset_analyzed_data():
-	self.sir_hist = []
-	self.signal_power_hist = []
-
-func append_analyzed_data(signal_power:float, sir:float):
-	self.signal_power_hist.append(signal_power)
-	self.sir_hist.append(sir)
+## protect the user from going beyond the screen
+func user_speed_protect():
+	# x speed check
+	if self.position.x < 0 and self.velocity.x < 0:
+		self.velocity.x = -self.velocity.x
+	elif self.position.x > 1920 and self.velocity.x > 0:
+		self.velocity.x = -self.velocity.x
+	# y speed check
+	if self.position.y < 0 and self.velocity.y < 0:
+		self.velocity.y = -self.velocity.y
+	elif self.position.y > 1080 and self.velocity.y > 0:
+		self.velocity.y = -self.velocity.y
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -197,6 +218,12 @@ func _process(delta):
 			self.velocity.y = self.max_velocity
 		elif self.velocity.y < -self.max_velocity:
 			self.velocity.y = -self.max_velocity
+		
+		# analysis speed check
+		# if the under is currently under analysis,
+		# then they should not move beyond the map
+		# use the analysis_user_speed_protect() function
+		self.user_speed_protect()
 		
 		# move a step
 		self.position += (self.velocity+self.eval_motion_penalty()) * delta

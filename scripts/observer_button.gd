@@ -18,6 +18,7 @@ var on_work = true
 var is_mouse_in_box = false
 var original_rect
 var can_be_controlled_by_key = true
+var analysis_in_progress = false
 
 #var _engineer_mode = false
 #var _analyzer_mode = false

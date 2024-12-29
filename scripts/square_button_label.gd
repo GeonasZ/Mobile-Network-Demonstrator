@@ -37,7 +37,7 @@ func _gui_input(event):
 		var n_freq = int(freq_n_edit.text)
 		var n_user = int(n_user_edit.text)
 		restart_program(tile_length, user_height,n_freq,n_user)
-		mouse_panel.change_decay(decay)
+		tile_controller.set_decay(decay)
 		config_panel.close_config_with_anime()
 		
 		await get_tree().create_timer(0.5).timeout

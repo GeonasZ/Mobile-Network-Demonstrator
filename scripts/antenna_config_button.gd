@@ -82,9 +82,9 @@ func next_antenna_mode():
 		tile_controlller.all_tile_set_antenna_type("Random")
 		self.label.set_label2_text("Current: Random")
 	elif self.antenna_mode == AntennaMode.RANDOM:
-		self.antenna_mode = AntennaMode.CUSTOM
-		tile_controlller.all_tile_set_antenna_type("Custom")
-		self.label.set_label2_text("Current: Customized")
+		self.antenna_mode = AntennaMode.DIPOLE
+		self.label.set_label2_text("Current: Dipole Antenna")
+		tile_controlller.all_tile_set_antenna_type("Dipole")
 	elif self.antenna_mode == AntennaMode.CUSTOM:
 		self.antenna_mode = AntennaMode.DIPOLE
 		self.label.set_label2_text("Current: Dipole Antenna")
@@ -100,7 +100,7 @@ func _input(event: InputEvent) -> void:
 	if not can_be_controlled_by_key:
 		return
 	
-	if event is InputEventKey and event.keycode == KEY_KP_SUBTRACT and event.is_pressed() and can_be_controlled_by_key:
+	if event is InputEventKey and event.keycode == KEY_A and event.is_pressed() and can_be_controlled_by_key:
 		can_be_controlled_by_key = false
 		self.button_click_function()
 		await get_tree().create_timer(0.2).timeout

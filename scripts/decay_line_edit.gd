@@ -1,6 +1,6 @@
 extends LineEdit
 
-@onready var mouse_panel = $"../../../../../MousePanel"
+@onready var tile_controller = $"../../../../../Controllers/TileController"
 @onready var father_node = $".."
 
 
@@ -45,7 +45,7 @@ func _input(event: InputEvent) -> void:
 		focus_exited.emit()
 
 func initialize():
-	self.text = str(mouse_panel.decay)
+	self.text = str(tile_controller.get_decay())
 	
 	
 

@@ -10,6 +10,9 @@ var current_freq_pattern_idnex = 0
 var total_channel_number = 24
 var station_number = 0
 
+# decay rate of signal power with distance
+var decay = 2
+
 var tile_color_dict = {"blue":Color8(173,216,230),"green":Color8(152,251,152), 
 "red":Color8(180,248,245), "yellow":Color8(255,255,224), "purple":Color8(230,230,250),
 "mint_mist":Color8(230,255,230),"gray":Color8(211,211,211), "cyan": Color8(224,255,255),
@@ -266,6 +269,12 @@ func initialize_freq_pattern(tile_list ,n_freq):
 	for i in range(self.hex_list.size()):
 		for j in range(self.hex_list[i].size()):
 			user_controller.reallocate_channel_for_user_under_station(i,j)
+
+func set_decay(value):
+	self.decay = value
+
+func get_decay():
+	return self.decay
 
 func next_freq_pattern():
 	current_freq_pattern_idnex += 1

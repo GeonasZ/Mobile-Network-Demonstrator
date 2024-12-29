@@ -1,9 +1,9 @@
 extends Control
 @onready var users = $"../../Users"
 @onready var tile_controller = $"../TileController"
-@onready var obs_button = $"../../FunctionPanel/ObserverButton"
 @onready var mouse_panel = $"../../MousePanel"
 @onready var gathered_tiles = $"../../GatheredTiles"
+@onready var obs_button = $"../../FunctionPanel/ObserverButton"
 @onready var engineer_button = $"../../FunctionPanel/EngineerButton"
 const sqrt3 = 1.732
 var user_prefab = null
@@ -70,6 +70,30 @@ func random_add_user(n_user:int):
 		user_pos = Vector2(randi_range(0.05*1920,0.95*1920),randi_range(0.05*1080,0.95*1080))
 		self.add_user(user_pos)
 
+func remove_user(user,index_in_linear_user_list=null):
+	var user_connection_stat = "connected" if user.connected_channel != null else "disconnected"
+	self.remove_user_from_user_list(user.index_i_in_user_list,user.index_j_in_user_list,user_connection_stat, user.index_k_in_user_list)
+	# if user index is provided, delete from linear_user_list directly
+	# rather than doing a binary search
+	if index_in_linear_user_list == null:
+		self.remove_user_from_linear_user_list(user.id)
+	else:
+		self.remove_user_from_linear_user_list_by_index(index_in_linear_user_list)
+	
+	if user_connection_stat == "connected":
+		tile_controller.tile_restore_channel(user.index_i_in_user_list,user.index_j_in_user_list,user.connected_channel)
+	# remove focus if the mouse panel is currently tracking the user
+	if mouse_panel.tracked_user == user:
+		mouse_panel.track_mouse()
+	# travel through all displayed users under mouse panel to see
+	# if current user is in it. Remove it if yes.
+	for j in range(len(mouse_panel.displayed_user)):
+		if mouse_panel.displayed_user[j] == user:
+			mouse_panel.displayed_user.remove_at(j)
+			mouse_panel._on_mouse_leave_user(user)
+			break
+	user.queue_free()
+
 ## remove a user from the linear user list by their id
 func remove_user_from_linear_user_list(user_id):
 	var index = binary_search_user_in_linear_user_list(user_id)
@@ -87,7 +111,6 @@ func remove_user_from_user_list(index_i,index_j,connection_stat,index_k):
 		station_connection_pool[i].index_k_in_user_list -= 1
 	user_list[index_i][index_j][connection_stat].remove_at(index_k)
 	
-
 func binary_search_user_in_linear_user_list(user_id, start=0, end=-1):
 	if end == -1:
 		end = len(self.linear_user_list)
@@ -173,11 +196,7 @@ func redirect_user(current_user, station_i, station_j, user_k) -> Array:
 		tile_controller.tile_restore_channel(station_i, station_j, user_channel)
 		# remove user from user list
 		
-		if mouse_panel.tracked_user == station[connection_stat][user_k]:
-			mouse_panel.track_mouse()
-		self.remove_user_from_linear_user_list(current_user.id)
-		self.remove_user_from_user_list(station_i,station_j,connection_stat,user_k)
-		current_user.queue_free()
+		self.remove_user(current_user)
 		return user_need_relocate
 	
 	# decide whether current station is cloest to the user
@@ -218,6 +237,22 @@ func redirect_user(current_user, station_i, station_j, user_k) -> Array:
 		user_need_relocate = [current_user, i_with_least_distance, j_with_least_distance]
 	return user_need_relocate
 
+## return a list consists of 
+## [signal power, interference power, sir]
+func eval_user_sir(user):
+	var index_i = user.index_i_in_user_list
+	var index_j = user.index_j_in_user_list
+	var user_hex = tile_controller.hex_list[index_i][index_j]
+	var signal_power = user_hex.eval_signal_pow_to_user(user, tile_controller.get_decay())
+	var interference_power = 0
+	# sum interference power up
+	if user.connected_channel != null:
+		for station in tile_controller.hex_frequency_dict[user_hex.frequency_group]:
+			if station.channel_allocation_list[user.connected_channel] != null:
+									interference_power += station.eval_signal_pow_to_user(user, tile_controller.get_decay())
+	interference_power -= signal_power
+	return [signal_power, interference_power, signal_power/interference_power]
+
 func all_user_enter_observer_mode():
 		for row in user_list:
 			for tile in row:
@@ -250,6 +285,22 @@ func all_user_leave_engineer_mode():
 				for user in tile["disconnected"]:
 					user.leave_engineer_mode()
 
+func all_user_start_analysis():
+	for row in user_list:
+		for tile in row:
+			for user in tile["connected"]:
+				user.start_analysis()
+			for user in tile["disconnected"]:
+				user.start_analysis()
+				
+func all_user_end_analysis():
+	for row in user_list:
+		for tile in row:
+			for user in tile["connected"]:
+				user.end_analysis()
+			for user in tile["disconnected"]:
+				user.end_analysis()
+				
 func pause_all_user():
 	for row in user_list:
 		for tile in row:
@@ -270,6 +321,7 @@ func resume_all_user():
 func _process(delta):
 	var users_need_relocate = {"connected":[],"disconnected":[]}
 	var displacement
+	# change where the user is in the user_list
 	for i in range(user_list.size()):
 		for j in range(user_list[i].size()):
 			for k in range(user_list[i][j]["connected"].size()-1,-1, -1):
@@ -289,4 +341,13 @@ func _process(delta):
 			relocate_user(users_need_relocate["disconnected"])
 			users_need_relocate = {"connected":[],"disconnected":[]}
 			
+	if obs_button.analysis_in_progress:
+		var data_list
+		for row in self.user_list:
+			for station in row:
+				for user in station["connected"]:
+					data_list = self.eval_user_sir(user)
+					user.record_analysis_data(data_list[0],data_list[2])
+				for user in station["disconnected"]:
+					user.record_analysis_data(0,"N/A")
 			

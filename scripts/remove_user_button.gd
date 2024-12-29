@@ -59,33 +59,26 @@ func _ready():
 		is_mouse_in_box = false
 
 func button_click_function():
-	var remove_index = range(10)
-	remove_index.sort()
+	var remove_index = range(len(user_controller.linear_user_list)-1,len(user_controller.linear_user_list)-11,-1)
+	# sort remove_index to make elements in it 
+	# order increasingly. 
+	# remove_index.sort()
 	for i in range(len(remove_index)):
-		remove_index[i] -= i
+		# uncomment when elements in remove_index 
+		# are in an increasing order.
+		# remove_index[i] -= i
 		if remove_index[i] < 0:
 			continue
 		if remove_index[i] < len(user_controller.linear_user_list):
 			var current_user = user_controller.linear_user_list[remove_index[i]]
-			var user_connection_stat = "connected" if current_user.connected_channel != null else "disconnected"
-			user_controller.remove_user_from_user_list(current_user.index_i_in_user_list,current_user.index_j_in_user_list,user_connection_stat, current_user.index_k_in_user_list)
-			user_controller.remove_user_from_linear_user_list_by_index(remove_index[i])
-			if user_connection_stat == "connected":
-				tile_controlller.tile_restore_channel(current_user.index_i_in_user_list,current_user.index_j_in_user_list,current_user.connected_channel)
-			# remove focus if the mouse panel is currently tracking the user
-			if mouse_panel.tracked_user == current_user:
-				mouse_panel.track_mouse()
-			# travel through all displayed users under mouse panel to see
-			# if current user is in it. Remove it if yes.
-			for j in range(len(mouse_panel.displayed_user)):
-				if mouse_panel.displayed_user[j] == current_user:
-					mouse_panel.displayed_user.remove_at(j)
-					mouse_panel._on_mouse_leave_user(current_user)
-					break
-			current_user.queue_free()
+			user_controller.remove_user(current_user)
 		else:
 			break
-
+	if self.is_mouse_in_original_rect():
+		if not mouse_panel.is_tracking_station():
+			mouse_panel.disappear_with_anime()
+			is_mouse_in_box = true
+			
 func _input(event: InputEvent) -> void:
 	
 	if not can_be_controlled_by_key:
@@ -127,7 +120,6 @@ func smart_disappear():
 		self.disappear()
 	elif not function_panel.is_instruction_panel_visible() and self.visible and self.button_mode != Mode.OBSERVER:
 		self.disappear()
-
 
 func _process(delta):
 	if self.is_mouse_in_original_rect():
