@@ -5,6 +5,7 @@ extends Control
 @onready var gathered_tiles = $"../../GatheredTiles"
 @onready var obs_button = $"../../FunctionPanel/ObserverButton"
 @onready var engineer_button = $"../../FunctionPanel/EngineerButton"
+@onready var sampling_timer = $AnalysisSamplingTimer
 const sqrt3 = 1.732
 var user_prefab = null
 # initialize in tile controller when hex_list gets initialized
@@ -285,7 +286,16 @@ func all_user_leave_engineer_mode():
 				for user in tile["disconnected"]:
 					user.leave_engineer_mode()
 
+func all_user_reset_data_list():
+	for row in user_list:
+		for tile in row:
+			for user in tile["connected"]:
+				user.reset_analysis_data()
+			for user in tile["disconnected"]:
+				user.reset_analysis_data()
+
 func all_user_start_analysis():
+	self.all_user_reset_data_list()
 	for row in user_list:
 		for tile in row:
 			for user in tile["connected"]:
@@ -340,14 +350,21 @@ func _process(delta):
 			relocate_user(users_need_relocate["connected"])
 			relocate_user(users_need_relocate["disconnected"])
 			users_need_relocate = {"connected":[],"disconnected":[]}
-			
-	if obs_button.analysis_in_progress:
-		var data_list
-		for row in self.user_list:
-			for station in row:
-				for user in station["connected"]:
-					data_list = self.eval_user_sir(user)
-					user.record_analysis_data(data_list[0],data_list[2])
-				for user in station["disconnected"]:
-					user.record_analysis_data(0,"N/A")
-			
+	# if analysis is on, start the timer
+	if obs_button.analysis_on:
+		if sampling_timer.is_stopped():
+			_on_analysis_sampling_timer_timeout()
+			sampling_timer.start(0.2)
+	elif not sampling_timer.is_stopped():
+		sampling_timer.stop()
+
+
+func _on_analysis_sampling_timer_timeout() -> void:
+	var data_list
+	for row in self.user_list:
+		for station in row:
+			for user in station["connected"]:
+				data_list = self.eval_user_sir(user)
+				user.record_analysis_data(data_list[0],data_list[2])
+			for user in station["disconnected"]:
+				user.record_analysis_data(0,"N/A")

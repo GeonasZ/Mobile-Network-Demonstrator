@@ -49,6 +49,7 @@ func move_to_station(station):
 		self.position.y = station.position.y -0.5* self.width - 0.5* (station.position.y-810.)/(1080.-810.) * self.width
 	else:
 		self.position.y = station.position.y -0.5* self.width
+
 func appear():
 	self.move_to_station(focused_hex)
 	self.visible = true

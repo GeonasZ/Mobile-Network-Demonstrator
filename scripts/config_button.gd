@@ -10,7 +10,7 @@ extends Control
 
 enum Mode {NONE, OBSERVER, ENGINEER}
 var button_mode = Mode.NONE
-var anlysis_on = false
+var analysis_on = false
 var button_radius = 45
 var on_work = true
 var is_mouse_in_box = false
@@ -18,8 +18,8 @@ var original_rect
 var current_pattern = -1
 var can_be_controlled_by_key = true
 
-var _engineer_mode = false
-var _analyzer_mode = false
+#var _engineer_mode = false
+#var _analyzer_mode = false
 
 var small_font
 var large_font
@@ -76,7 +76,7 @@ func _ready():
 		
 func _input(event: InputEvent) -> void:
 	
-	if not on_work:
+	if not on_work or self.analysis_on:
 		return
 	
 	if event is InputEventKey and event.keycode == KEY_C and event.is_pressed() and self.can_be_controlled_by_key:
@@ -113,6 +113,12 @@ func disappear_with_appearing_instr_panel():
 	mouse_panel.disappear_with_anime()
 
 func _process(delta):
+	# hide if analysis on, show if analysis off
+	if self.analysis_on and self.visible:
+		self.disappear()
+	elif self.button_mode == self.Mode.OBSERVER and not self.analysis_on and not self.visible:
+		self.appear()
+	# mouse in button animes
 	if self.is_mouse_in_original_rect():
 		# trigger only at the frame cursor enters button
 		if not is_mouse_in_box and self.visible:

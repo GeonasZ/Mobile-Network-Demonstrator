@@ -1,4 +1,4 @@
-[gd_scene load_steps=95 format=3 uid="uid://dp7br0wc03w8r"]
+[gd_scene load_steps=100 format=3 uid="uid://dp7br0wc03w8r"]
 
 [ext_resource type="Script" path="res://scripts/UserController.gd" id="1_18gww"]
 [ext_resource type="Script" path="res://scripts/TileController.gd" id="1_fg5v7"]
@@ -51,6 +51,10 @@
 [ext_resource type="Script" path="res://scripts/antenna_config_button.gd" id="30_pxa2l"]
 [ext_resource type="Script" path="res://scripts/antenna_config_function_label.gd" id="32_8by7n"]
 [ext_resource type="Script" path="res://scripts/engineer_button.gd" id="33_c02q0"]
+[ext_resource type="Script" path="res://scripts/analysis_mode_button.gd" id="41_hdmb4"]
+[ext_resource type="Script" path="res://scripts/analysis_panel.gd" id="49_07ke4"]
+[ext_resource type="Script" path="res://scripts/results_panel.gd" id="50_dmgx5"]
+[ext_resource type="Script" path="res://scripts/results_panel_element.gd" id="51_vsv66"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_h4n7r"]
 shader = ExtResource("6_ihk23")
@@ -93,8 +97,6 @@ _data = {
 "appear": SubResource("Animation_55j4g"),
 "disappear": SubResource("Animation_nivsp")
 }
-
-[sub_resource type="Theme" id="Theme_wo5vk"]
 
 [sub_resource type="Theme" id="Theme_h1vwm"]
 Label/colors/font_color = Color(0, 0, 0, 1)
@@ -589,6 +591,21 @@ _data = {
 "disappear": SubResource("Animation_s5vfg")
 }
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_axlkp"]
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 1)
+
+[sub_resource type="Theme" id="Theme_wvde4"]
+RichTextLabel/colors/default_color = Color(0, 0, 0, 1)
+RichTextLabel/font_sizes/bold_font_size = 18
+RichTextLabel/font_sizes/normal_font_size = 30
+RichTextLabel/fonts/bold_font = ExtResource("11_i26m1")
+RichTextLabel/fonts/bold_italics_font = ExtResource("11_acrdp")
+RichTextLabel/styles/normal = SubResource("StyleBoxFlat_axlkp")
+
 [sub_resource type="Animation" id="Animation_aubb7"]
 resource_name = "panel_appear"
 length = 0.2
@@ -689,6 +706,8 @@ anchors_preset = 0
 anchors_preset = 0
 script = ExtResource("1_18gww")
 
+[node name="AnalysisSamplingTimer" type="Timer" parent="Controllers/UserController"]
+
 [node name="TileController" type="Control" parent="Controllers"]
 custom_minimum_size = Vector2(400, 200)
 anchors_preset = 0
@@ -747,7 +766,6 @@ libraries = {
 anchors_preset = 0
 offset_right = 640.0
 offset_bottom = 640.0
-theme = SubResource("Theme_wo5vk")
 script = ExtResource("10_mfn6q")
 
 [node name="Title" type="Label" parent="StationConfigPanel"]
@@ -1235,6 +1253,53 @@ libraries = {
 "": SubResource("AnimationLibrary_i6iwl")
 }
 
+[node name="AnalysisModeButton" type="Control" parent="FunctionPanel"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+scale = Vector2(1e-05, 1e-05)
+script = ExtResource("41_hdmb4")
+
+[node name="Char" type="Label" parent="FunctionPanel/AnalysisModeButton"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+theme = ExtResource("13_22qid")
+text = "S"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("13_wkp48")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="FunctionPanel/AnalysisModeButton"]
+libraries = {
+"": SubResource("AnimationLibrary_it6wr")
+}
+
+[node name="FunctionLabel" type="Control" parent="FunctionPanel/AnalysisModeButton"]
+anchors_preset = 0
+offset_left = -20.0
+offset_top = 48.0
+offset_right = 20.0
+offset_bottom = 88.0
+scale = Vector2(1e-05, 1e-05)
+script = ExtResource("12_mq0m8")
+
+[node name="Label" type="Label" parent="FunctionPanel/AnalysisModeButton/FunctionLabel"]
+layout_mode = 0
+offset_left = 1.696e+08
+offset_top = 1.43e+07
+offset_right = 1.696e+08
+offset_bottom = 1.43001e+07
+theme = ExtResource("11_8l076")
+text = "Start Analysis"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="FunctionPanel/AnalysisModeButton/FunctionLabel"]
+libraries = {
+"": SubResource("AnimationLibrary_i6iwl")
+}
+
 [node name="InstructionButton" type="Control" parent="FunctionPanel"]
 layout_mode = 1
 anchors_preset = 0
@@ -1504,6 +1569,49 @@ libraries = {
 "": SubResource("AnimationLibrary_i6iwl")
 }
 
+[node name="AnalysisPanel" type="Control" parent="."]
+visible = false
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("49_07ke4")
+
+[node name="Title" type="Label" parent="AnalysisPanel"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+theme = ExtResource("13_22qid")
+text = "Analytical Results"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PlotFrame" type="Control" parent="AnalysisPanel"]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="UserSelectPanel" type="Control" parent="AnalysisPanel"]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="ResultsPanel" type="GridContainer" parent="AnalysisPanel"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+columns = 3
+script = ExtResource("50_dmgx5")
+
+[node name="AverageSignalPower" type="RichTextLabel" parent="AnalysisPanel/ResultsPanel"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme = SubResource("Theme_wvde4")
+bbcode_enabled = true
+text = "Average Signal Power:
+[center] N/A [/center]"
+script = ExtResource("51_vsv66")
+
 [node name="InstructionPanel" type="Polygon2D" parent="."]
 position = Vector2(1800, 100)
 rotation = -0.436332
@@ -1562,6 +1670,7 @@ offset_top = -600.0
 offset_right = 1000.0
 offset_bottom = 480.0
 
+[connection signal="timeout" from="Controllers/UserController/AnalysisSamplingTimer" to="Controllers/UserController" method="_on_analysis_sampling_timer_timeout"]
 [connection signal="mouse_left_click_on_background" from="GatheredTiles" to="StationConfigPanel" method="_on_gathered_tiles_mouse_left_click_on_background"]
 [connection signal="mouse_right_click_on_background" from="GatheredTiles" to="StationConfigPanel" method="_on_gathered_tiles_mouse_right_click_on_background"]
 [connection signal="mouse_left_click" from="StationConfigPanel/ScrollContainer/VBoxContainer/AntennaEditPanel/AntennaEdit/OptionList/Option" to="StationConfigPanel/ScrollContainer/VBoxContainer/AntennaEditPanel/AntennaEdit" method="_on_option_mouse_left_click"]

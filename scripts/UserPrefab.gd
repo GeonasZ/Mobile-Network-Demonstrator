@@ -117,7 +117,7 @@ func reset_analysis_data():
 	self.signal_power_hist = []
 
 ## record a siganl power and SIR data
-func record_analysis_data(siganl_power:float,sir:float):
+func record_analysis_data(siganl_power,sir):
 	self.signal_power_hist.append(siganl_power)
 	self.sir_hist.append(sir)
 
@@ -201,7 +201,7 @@ func user_speed_protect():
 func _process(delta):
 	
 	# move a step if not paused
-	if not observer_mode and not engineer_mode and not motion_pause:
+	if (not observer_mode or under_analysis) and not engineer_mode and not motion_pause:
 		self.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		# take a random acceleration from max_acc to -max_acc
 		var acc = Vector2(randi_range(0,2*max_acc.x) - max_acc.x,randi_range(0,2*max_acc.y) - max_acc.y)

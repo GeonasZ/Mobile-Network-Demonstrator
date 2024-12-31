@@ -10,7 +10,7 @@ extends Control
 enum Mode {NONE, OBSERVER, ENGINEER}
 enum AntennaMode {DIPOLE,ARRAY2,ARRAY3,ARRAY4,RANDOM,CUSTOM}
 var button_mode = Mode.NONE
-var anlysis_on = false
+var analysis_on = false
 var button_radius = 45
 var length = 25
 var width = 44
@@ -65,6 +65,12 @@ func set_antenna_mode_to_custom():
 		self.label.set_label2_text("Current: Customized")
 
 func next_antenna_mode():
+	# hide if analysis on, show if analysis off
+	if self.analysis_on and self.visible:
+		self.disappear()
+	elif self.button_mode == self.Mode.OBSERVER and not self.analysis_on and not self.visible:
+		self.appear()
+	# mouse in button animes
 	if self.antenna_mode == AntennaMode.DIPOLE:
 		self.antenna_mode = AntennaMode.ARRAY2
 		tile_controlller.all_tile_set_antenna_type("Array2")
@@ -98,6 +104,9 @@ func button_click_function():
 func _input(event: InputEvent) -> void:
 	
 	if not can_be_controlled_by_key:
+		return
+	
+	if self.analysis_on:
 		return
 	
 	if event is InputEventKey and event.keycode == KEY_A and event.is_pressed() and can_be_controlled_by_key:
