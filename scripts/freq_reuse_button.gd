@@ -6,6 +6,7 @@ extends Control
 @onready var label = $FunctionLabel
 @onready var tile_controller = $"../../Controllers/TileController"
 @onready var button_char = $Char
+@onready var function_panel = $".."
 
 enum Mode {NONE, OBSERVER, ENGINEER}
 var button_mode = Mode.NONE
@@ -82,7 +83,8 @@ func next_frequency_pattern():
 	self.current_pattern = tile_controller.get_current_freq_pattern()
 
 func _input(event: InputEvent) -> void:
-				
+	if not self.visible or not function_panel.visible:
+		return
 	if not on_work or self.analysis_on:
 		return
 		
@@ -117,7 +119,7 @@ func _process(delta):
 	# hide if analysis on, show if analysis off
 	if self.analysis_on and self.visible:
 		self.disappear()
-	elif self.button_mode == self.Mode.OBSERVER and not self.analysis_on and not self.visible:
+	elif self.button_mode == self.Mode.OBSERVER and not self.analysis_on and not self.visible and not function_panel.analysis_panel_open:
 		self.appear()
 	# mouse in button animes
 	if self.is_mouse_in_original_rect():

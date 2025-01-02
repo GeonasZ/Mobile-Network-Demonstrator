@@ -71,7 +71,8 @@ func button_click_function():
 			
 			
 func _input(event: InputEvent) -> void:
-	
+	if not self.visible or not function_panel.visible:
+		return
 	if not can_be_controlled_by_key or self.button_mode != self.Mode.OBSERVER:
 		return
 	
@@ -110,6 +111,8 @@ func smart_disappear():
 	if function_panel.is_instruction_panel_visible() and self.visible:
 		self.disappear()
 	elif not function_panel.is_instruction_panel_visible() and self.visible and self.button_mode != Mode.OBSERVER:
+		self.disappear()
+	elif function_panel.analysis_panel_open:
 		self.disappear()
 
 func _process(delta):

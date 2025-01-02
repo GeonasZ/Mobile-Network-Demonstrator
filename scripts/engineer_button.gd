@@ -87,6 +87,7 @@ func appear():
 
 ## future use for logical appear of button
 func smart_appear():
+	if not self.analysis_on and self.button_mode != self.Mode.OBSERVER:
 		self.appear()
 
 func disappear():
@@ -104,7 +105,8 @@ func smart_disappear():
 		#self.disappear()
 
 func _input(event: InputEvent) -> void:
-	
+	if not self.visible or not function_panel.visible:
+		return
 	if self.button_mode == Mode.OBSERVER:
 		return
 		

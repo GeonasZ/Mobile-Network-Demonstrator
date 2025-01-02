@@ -3,8 +3,9 @@ extends LineEdit
 @onready var user_controller = $"../../../../../Controllers/UserController"
 @onready var father_node = $".."
 
-
 var legal_characters = ["0","1","2","3","4","5","6","7","8","9"]
+
+var previous_text = ""
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -14,6 +15,9 @@ func _ready() -> void:
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	
+	if self.text == self.previous_text:
+		return
+		
 	var caret_location = self.caret_column
 	var processed_text = ""
 	
@@ -23,6 +27,7 @@ func _process(delta: float) -> void:
 			
 	if processed_text == "":
 		self.text = ""
+		self.previous_text = ""
 		return
 		
 	processed_text = int(processed_text)
@@ -31,6 +36,8 @@ func _process(delta: float) -> void:
 		self.caret_column = self.text.length()
 	else:
 		self.caret_column = caret_location
+		
+	self.previous_text = self.text
 
 func is_mouse_in_rect():
 	return self.get_global_rect().has_point(get_viewport().get_mouse_position())

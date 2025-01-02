@@ -1,4 +1,4 @@
-[gd_scene load_steps=100 format=3 uid="uid://dp7br0wc03w8r"]
+[gd_scene load_steps=109 format=3 uid="uid://dp7br0wc03w8r"]
 
 [ext_resource type="Script" path="res://scripts/UserController.gd" id="1_18gww"]
 [ext_resource type="Script" path="res://scripts/TileController.gd" id="1_fg5v7"]
@@ -45,6 +45,7 @@
 [ext_resource type="Script" path="res://scripts/add_user_button.gd" id="24_037pr"]
 [ext_resource type="Script" path="res://scripts/config_panel.gd" id="24_ok7yp"]
 [ext_resource type="Theme" uid="uid://gsrgqfr8u6nt" path="res://fonts/pre_set_theme/button_median_font.tres" id="25_x1dja"]
+[ext_resource type="Theme" uid="uid://d02m7xdisdkhi" path="res://themes/line_edit_regular_theme.tres" id="26_bgssn"]
 [ext_resource type="Theme" uid="uid://bgebxa4euua15" path="res://fonts/pre_set_theme/button_desc_small_font.tres" id="28_1qo4p"]
 [ext_resource type="Script" path="res://scripts/remove_user_button.gd" id="29_21wgx"]
 [ext_resource type="Script" path="res://scripts/over_layer.gd" id="30_f735c"]
@@ -52,9 +53,14 @@
 [ext_resource type="Script" path="res://scripts/antenna_config_function_label.gd" id="32_8by7n"]
 [ext_resource type="Script" path="res://scripts/engineer_button.gd" id="33_c02q0"]
 [ext_resource type="Script" path="res://scripts/analysis_mode_button.gd" id="41_hdmb4"]
+[ext_resource type="Script" path="res://scripts/analysis_panel_button.gd" id="42_ijebh"]
 [ext_resource type="Script" path="res://scripts/analysis_panel.gd" id="49_07ke4"]
 [ext_resource type="Script" path="res://scripts/results_panel.gd" id="50_dmgx5"]
+[ext_resource type="Script" path="res://scripts/user_select_panel.gd" id="51_qv08a"]
 [ext_resource type="Script" path="res://scripts/results_panel_element.gd" id="51_vsv66"]
+[ext_resource type="Script" path="res://scripts/plot_frame.gd" id="52_t6j7q"]
+[ext_resource type="Script" path="res://scripts/analysis_panelclose_button.gd" id="53_5krwa"]
+[ext_resource type="StyleBox" uid="uid://b36jdi83vmboa" path="res://themes/analysis_panel_close_button_style_box.tres" id="53_c5h3d"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_h4n7r"]
 shader = ExtResource("6_ihk23")
@@ -392,46 +398,6 @@ Label/colors/font_color = Color(0, 0, 0, 1)
 Label/font_sizes/font_size = 32
 Label/fonts/font = ExtResource("11_i26m1")
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5tryi"]
-bg_color = Color(1, 1, 1, 1)
-border_width_left = 4
-border_width_top = 4
-border_width_right = 4
-border_width_bottom = 4
-border_color = Color(0, 0, 0, 1)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
-expand_margin_left = 4.0
-expand_margin_top = 2.0
-expand_margin_bottom = 2.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vy4eu"]
-bg_color = Color(1, 1, 1, 1)
-border_width_left = 4
-border_width_top = 4
-border_width_right = 4
-border_width_bottom = 4
-border_color = Color(0, 0, 0, 1)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
-expand_margin_left = 4.0
-expand_margin_top = 2.0
-expand_margin_bottom = 2.0
-
-[sub_resource type="Theme" id="Theme_lcted"]
-LineEdit/colors/caret_color = Color(0, 0, 0, 1)
-LineEdit/colors/font_color = Color(0, 0, 0, 1)
-LineEdit/colors/selection_color = Color(1, 1, 1, 1)
-LineEdit/constants/caret_width = 4
-LineEdit/font_sizes/font_size = 32
-LineEdit/fonts/font = ExtResource("11_i26m1")
-LineEdit/styles/focus = SubResource("StyleBoxFlat_5tryi")
-LineEdit/styles/normal = SubResource("StyleBoxFlat_vy4eu")
-
 [sub_resource type="Animation" id="Animation_jvnch"]
 resource_name = "button_appear"
 length = 0.1
@@ -591,20 +557,93 @@ _data = {
 "disappear": SubResource("Animation_s5vfg")
 }
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_axlkp"]
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ghcyo"]
+bg_color = Color(0.772247, 0.772247, 0.772247, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
 border_color = Color(0, 0, 0, 1)
+
+[sub_resource type="Theme" id="Theme_rdy2j"]
+Panel/styles/panel = SubResource("StyleBoxFlat_ghcyo")
 
 [sub_resource type="Theme" id="Theme_wvde4"]
 RichTextLabel/colors/default_color = Color(0, 0, 0, 1)
-RichTextLabel/font_sizes/bold_font_size = 18
-RichTextLabel/font_sizes/normal_font_size = 30
+RichTextLabel/constants/line_separation = 3
+RichTextLabel/font_sizes/bold_font_size = 24
+RichTextLabel/font_sizes/normal_font_size = 28
 RichTextLabel/fonts/bold_font = ExtResource("11_i26m1")
 RichTextLabel/fonts/bold_italics_font = ExtResource("11_acrdp")
-RichTextLabel/styles/normal = SubResource("StyleBoxFlat_axlkp")
+
+[sub_resource type="Animation" id="Animation_g4ix7"]
+resource_name = "appear"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(0.203064, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_rr1mq"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_hojdu"]
+resource_name = "disappear"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(5.09825, 1),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(1e-05, 1e-05)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_lhp1y"]
+_data = {
+"RESET": SubResource("Animation_rr1mq"),
+"appear": SubResource("Animation_g4ix7"),
+"disappear": SubResource("Animation_hojdu")
+}
+
+[sub_resource type="Theme" id="Theme_w0hd6"]
+Button/colors/font_color = Color(0, 0, 0, 1)
+Button/colors/font_focus_color = Color(0, 0, 0, 1)
+Button/colors/font_hover_color = Color(0, 0, 0, 1)
+Button/colors/font_hover_pressed_color = Color(0, 0, 0, 1)
+Button/colors/font_pressed_color = Color(0, 0, 0, 1)
+Button/colors/icon_focus_color = Color(0, 0, 0, 1)
+Button/font_sizes/font_size = 32
+Button/fonts/font = ExtResource("11_i26m1")
+Button/styles/disabled = ExtResource("53_c5h3d")
+Button/styles/focus = ExtResource("53_c5h3d")
+Button/styles/hover = ExtResource("53_c5h3d")
+Button/styles/normal = ExtResource("53_c5h3d")
+Button/styles/pressed = ExtResource("53_c5h3d")
 
 [sub_resource type="Animation" id="Animation_aubb7"]
 resource_name = "panel_appear"
@@ -736,6 +775,7 @@ mouse_filter = 2
 script = ExtResource("30_f735c")
 
 [node name="MousePanel" type="Control" parent="."]
+z_index = 2
 material = SubResource("ShaderMaterial_h4n7r")
 anchors_preset = 0
 offset_left = 732.0
@@ -969,7 +1009,7 @@ custom_minimum_size = Vector2(70, 60)
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 4
-theme = SubResource("Theme_lcted")
+theme = ExtResource("26_bgssn")
 max_length = 4
 expand_to_text_length = true
 context_menu_enabled = false
@@ -999,7 +1039,7 @@ custom_minimum_size = Vector2(70, 60)
 layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 4
-theme = SubResource("Theme_lcted")
+theme = ExtResource("26_bgssn")
 max_length = 4
 expand_to_text_length = true
 context_menu_enabled = false
@@ -1029,7 +1069,7 @@ custom_minimum_size = Vector2(70, 60)
 layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 4
-theme = SubResource("Theme_lcted")
+theme = ExtResource("26_bgssn")
 max_length = 4
 expand_to_text_length = true
 context_menu_enabled = false
@@ -1059,7 +1099,7 @@ custom_minimum_size = Vector2(70, 60)
 layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 4
-theme = SubResource("Theme_lcted")
+theme = ExtResource("26_bgssn")
 max_length = 4
 expand_to_text_length = true
 context_menu_enabled = false
@@ -1089,7 +1129,7 @@ custom_minimum_size = Vector2(70, 60)
 layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 4
-theme = SubResource("Theme_lcted")
+theme = ExtResource("26_bgssn")
 max_length = 4
 expand_to_text_length = true
 context_menu_enabled = false
@@ -1100,6 +1140,7 @@ caret_blink = true
 script = ExtResource("22_0pki8")
 
 [node name="FunctionPanel" type="Control" parent="."]
+z_index = 1
 anchors_preset = 0
 script = ExtResource("8_weq5s")
 
@@ -1296,6 +1337,53 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="FunctionPanel/AnalysisModeButton/FunctionLabel"]
+libraries = {
+"": SubResource("AnimationLibrary_i6iwl")
+}
+
+[node name="AnalysisPanelButton" type="Control" parent="FunctionPanel"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+scale = Vector2(1e-05, 1e-05)
+script = ExtResource("42_ijebh")
+
+[node name="Char" type="Label" parent="FunctionPanel/AnalysisPanelButton"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+theme = ExtResource("13_22qid")
+text = "A"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("13_wkp48")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="FunctionPanel/AnalysisPanelButton"]
+libraries = {
+"": SubResource("AnimationLibrary_it6wr")
+}
+
+[node name="FunctionLabel" type="Control" parent="FunctionPanel/AnalysisPanelButton"]
+anchors_preset = 0
+offset_left = -20.0
+offset_top = 48.0
+offset_right = 20.0
+offset_bottom = 88.0
+scale = Vector2(1e-05, 1e-05)
+script = ExtResource("12_mq0m8")
+
+[node name="Label" type="Label" parent="FunctionPanel/AnalysisPanelButton/FunctionLabel"]
+layout_mode = 0
+offset_left = 1.696e+08
+offset_top = 1.43e+07
+offset_right = 1.696e+08
+offset_bottom = 1.43001e+07
+theme = ExtResource("11_8l076")
+text = "Analysis Panel"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="FunctionPanel/AnalysisPanelButton/FunctionLabel"]
 libraries = {
 "": SubResource("AnimationLibrary_i6iwl")
 }
@@ -1571,6 +1659,7 @@ libraries = {
 
 [node name="AnalysisPanel" type="Control" parent="."]
 visible = false
+z_index = 2
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
@@ -1585,22 +1674,49 @@ text = "Analytical Results"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="PlotFrame" type="Control" parent="AnalysisPanel"]
-anchors_preset = 0
+[node name="PlotFrame" type="Panel" parent="AnalysisPanel"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+theme = SubResource("Theme_rdy2j")
+script = ExtResource("52_t6j7q")
+
+[node name="UserSelectPanel" type="HBoxContainer" parent="AnalysisPanel"]
+layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="UserSelectPanel" type="Control" parent="AnalysisPanel"]
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+[node name="Title" type="Label" parent="AnalysisPanel/UserSelectPanel"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme = SubResource("Theme_7tp5v")
+text = "Analysed User ID:    "
+
+[node name="UserSelectEdit" type="LineEdit" parent="AnalysisPanel/UserSelectPanel"]
+layout_mode = 2
+theme = ExtResource("26_bgssn")
+expand_to_text_length = true
+context_menu_enabled = false
+virtual_keyboard_enabled = false
+caret_blink = true
+script = ExtResource("51_qv08a")
 
 [node name="ResultsPanel" type="GridContainer" parent="AnalysisPanel"]
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
-columns = 3
+columns = 4
 script = ExtResource("50_dmgx5")
+
+[node name="MinSignalPower" type="RichTextLabel" parent="AnalysisPanel/ResultsPanel"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme = SubResource("Theme_wvde4")
+bbcode_enabled = true
+text = "[center] Average Signal Power: [/center]
+[center] N/A [/center]"
+script = ExtResource("51_vsv66")
 
 [node name="AverageSignalPower" type="RichTextLabel" parent="AnalysisPanel/ResultsPanel"]
 layout_mode = 2
@@ -1608,11 +1724,81 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 theme = SubResource("Theme_wvde4")
 bbcode_enabled = true
-text = "Average Signal Power:
+text = "[center] Average Signal Power: [/center]
 [center] N/A [/center]"
 script = ExtResource("51_vsv66")
 
+[node name="MaxSignalPower" type="RichTextLabel" parent="AnalysisPanel/ResultsPanel"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme = SubResource("Theme_wvde4")
+bbcode_enabled = true
+text = "[center] Average Signal Power: [/center]
+[center] N/A [/center]"
+script = ExtResource("51_vsv66")
+
+[node name="CurrentSignalPower" type="RichTextLabel" parent="AnalysisPanel/ResultsPanel"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme = SubResource("Theme_wvde4")
+bbcode_enabled = true
+script = ExtResource("51_vsv66")
+
+[node name="MinSIR" type="RichTextLabel" parent="AnalysisPanel/ResultsPanel"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme = SubResource("Theme_wvde4")
+bbcode_enabled = true
+text = "[center] Average Signal Power: [/center]
+[center] N/A [/center]"
+script = ExtResource("51_vsv66")
+
+[node name="AverageSIR" type="RichTextLabel" parent="AnalysisPanel/ResultsPanel"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme = SubResource("Theme_wvde4")
+bbcode_enabled = true
+text = "[center] Average Signal Power: [/center]
+[center] N/A [/center]"
+script = ExtResource("51_vsv66")
+
+[node name="MaxSIR" type="RichTextLabel" parent="AnalysisPanel/ResultsPanel"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme = SubResource("Theme_wvde4")
+bbcode_enabled = true
+text = "[center] Average Signal Power: [/center]
+[center] N/A [/center]"
+script = ExtResource("51_vsv66")
+
+[node name="CurrentSIR" type="RichTextLabel" parent="AnalysisPanel/ResultsPanel"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme = SubResource("Theme_wvde4")
+bbcode_enabled = true
+script = ExtResource("51_vsv66")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="AnalysisPanel"]
+libraries = {
+"": SubResource("AnimationLibrary_lhp1y")
+}
+
+[node name="CloseButton" type="Button" parent="AnalysisPanel"]
+layout_mode = 0
+offset_right = 8.0
+offset_bottom = 8.0
+theme = SubResource("Theme_w0hd6")
+text = "Close Panel"
+script = ExtResource("53_5krwa")
+
 [node name="InstructionPanel" type="Polygon2D" parent="."]
+z_index = 2
 position = Vector2(1800, 100)
 rotation = -0.436332
 scale = Vector2(1e-05, 1e-05)

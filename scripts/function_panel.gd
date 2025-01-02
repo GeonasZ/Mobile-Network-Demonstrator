@@ -10,6 +10,7 @@ extends Control
 @onready var remove_user_button = $RemoveUserButton
 @onready var antenna_config_button = $AntennaConfigButton
 @onready var analysis_mode_button = $AnalysisModeButton
+@onready var analysis_panel_button = $AnalysisPanelButton
 
 # other nodes
 @onready var user_controller = $"../Controllers/UserController"
@@ -19,6 +20,7 @@ extends Control
 
 var registered_buttons
 var instruction_panel_visibility = true
+var analysis_panel_open = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -26,7 +28,7 @@ func _ready() -> void:
 							  self.freq_button, self.config_button,
 							  self.engineer_button, self.add_user_button,
 							  self.remove_user_button, self.antenna_config_button,
-							  self.analysis_mode_button]
+							  self.analysis_mode_button, self.analysis_panel_button]
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -96,3 +98,9 @@ func set_all_button_mode(mode):
 		
 func is_instruction_panel_visible():
 	return instruction_panel_visibility
+	
+func set_analysis_panel_open():
+	self.analysis_panel_open = true
+	
+func set_analysis_panel_close():
+	self.analysis_panel_open = false

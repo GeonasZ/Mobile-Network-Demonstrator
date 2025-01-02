@@ -6,6 +6,7 @@ extends Control
 @onready var obs_button = $"../../FunctionPanel/ObserverButton"
 @onready var engineer_button = $"../../FunctionPanel/EngineerButton"
 @onready var sampling_timer = $AnalysisSamplingTimer
+@onready var function_panel = $"../../FunctionPanel"
 const sqrt3 = 1.732
 var user_prefab = null
 # initialize in tile controller when hex_list gets initialized
@@ -35,6 +36,11 @@ func initialize_user_system(user_height):
 	self.user_height = user_height
 
 func add_user(pos):
+	if obs_button.analysis_on:
+		return
+	if function_panel.analysis_panel_open:
+		return
+	
 	var current_user = user_prefab.instantiate()
 	users.add_child(current_user)
 	linear_user_list.append(current_user)
@@ -112,7 +118,14 @@ func remove_user_from_user_list(index_i,index_j,connection_stat,index_k):
 		station_connection_pool[i].index_k_in_user_list -= 1
 	user_list[index_i][index_j][connection_stat].remove_at(index_k)
 	
-func binary_search_user_in_linear_user_list(user_id, start=0, end=-1):
+func binary_search_user_in_linear_user_list(user_id:int, start=0, end=-1):
+	if self.linear_user_list == []:
+		return -1
+	elif user_id > self.linear_user_list[-1].id:
+		return -1
+	elif user_id < self.linear_user_list[0].id:
+		return -1
+	
 	if end == -1:
 		end = len(self.linear_user_list)
 	# perform binary search

@@ -20,7 +20,6 @@ var is_mouse_in_box = false
 var original_rect
 var can_be_controlled_by_key = true
 var antenna_mode = AntennaMode.RANDOM
-
 #var _engineer_mode = false
 #var _analyzer_mode = false
 
@@ -96,16 +95,14 @@ func next_antenna_mode():
 		self.label.set_label2_text("Current: Dipole Antenna")
 		tile_controlller.all_tile_set_antenna_type("Dipole")
 		
-	
-
 func button_click_function():
 	self.next_antenna_mode()
 
 func _input(event: InputEvent) -> void:
-	
+	if not self.visible or not function_panel.visible:
+		return
 	if not can_be_controlled_by_key:
 		return
-	
 	if self.analysis_on:
 		return
 	
@@ -144,6 +141,8 @@ func smart_disappear():
 	if function_panel.is_instruction_panel_visible() and self.visible:
 		self.disappear()
 	elif not function_panel.is_instruction_panel_visible() and self.visible and self.button_mode != Mode.ENGINEER:
+		self.disappear()
+	elif function_panel.analysis_panel_open:
 		self.disappear()
 
 

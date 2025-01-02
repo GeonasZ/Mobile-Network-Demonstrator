@@ -31,6 +31,7 @@ var set_to_visible = true
 # just a indicative property
 # does not represent actual visibility of node
 var keep_invisible = false
+var analysis_panel_open = true
 
 
 func _draw():
@@ -98,7 +99,7 @@ func _ready():
 	
 func on_mouse_right_click_on_background(event):
 	if event is InputEventMouseButton and event.button_mask == MOUSE_BUTTON_MASK_RIGHT and event.pressed == true:
-		if self.keep_invisible == true:
+		if self.keep_invisible and not self.analysis_panel_open:
 			appear_with_anime()
 		else:
 			disappear_with_anime()
@@ -159,6 +160,14 @@ func disappear_with_anime_at_speed(speed_scale):
 	
 func disappear_with_anime():
 	disappear_with_anime_at_speed(1)
+
+func on_analysis_panel_open():
+	self.analysis_panel_open = true
+	self.disappear_with_anime()
+	
+func on_analysis_panel_close():
+	self.analysis_panel_open = false
+	self.appear_with_anime()
 
 func track_station(station):
 	self.tracking_mode = TrackingMode.STATION

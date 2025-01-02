@@ -1,10 +1,10 @@
 extends Control
 
 @onready var user_controller = $"../../Controllers/UserController"
-@onready var tile_controlller = $"../../Controllers/TileController"
 @onready var animator = $AnimationPlayer
 @onready var mouse_panel = $"../../MousePanel"
 @onready var label = $FunctionLabel
+@onready var analysis_panel = $"../../AnalysisPanel"
 @onready var function_panel = $".."
 
 enum Mode {NONE, OBSERVER, ENGINEER}
@@ -45,7 +45,7 @@ func _ready():
 	self.label.visible = false
 	self.scale = Vector2(1,1)
 	self.on_work = true
-	self.position = Vector2(1700 - button_radius, 340 - button_radius)
+	self.position = Vector2(1700 - button_radius, 580 - button_radius)
 	self.size = Vector2(2*button_radius, 2*button_radius)
 	self.pivot_offset = self.size/2
 	
@@ -58,36 +58,24 @@ func _ready():
 		is_mouse_in_box = false
 
 func button_click_function():
-	var remove_index = range(len(user_controller.linear_user_list)-1,len(user_controller.linear_user_list)-11,-1)
-	# sort remove_index to make elements in it 
-	# order increasingly. 
-	# remove_index.sort()
-	for i in range(len(remove_index)):
-		# uncomment when elements in remove_index 
-		# are in an increasing order.
-		# remove_index[i] -= i
-		if remove_index[i] < 0:
-			continue
-		if remove_index[i] < len(user_controller.linear_user_list):
-			var current_user = user_controller.linear_user_list[remove_index[i]]
-			user_controller.remove_user(current_user)
-		else:
-			break
-	if self.is_mouse_in_original_rect():
-		if not mouse_panel.is_tracking_station():
-			mouse_panel.disappear_with_anime()
-			is_mouse_in_box = true
-			
+	if analysis_panel.visible:
+		function_panel.set_analysis_panel_close()
+		analysis_panel.disappear()
+		function_panel.all_button_smart_appear()
+	else:
+		function_panel.set_analysis_panel_open()
+		analysis_panel.appear()
+		function_panel.all_button_smart_disappear()
+
 func _input(event: InputEvent) -> void:
 	if not self.visible or not function_panel.visible:
 		return
 	if self.analysis_on:
 		return
-	
 	if not can_be_controlled_by_key:
 		return
 	
-	if event is InputEventKey and event.keycode == KEY_KP_SUBTRACT and event.is_pressed() and can_be_controlled_by_key:
+	if event is InputEventKey and event.keycode == KEY_A and event.is_pressed() and can_be_controlled_by_key:
 		can_be_controlled_by_key = false
 		self.button_click_function()
 		await get_tree().create_timer(0.2).timeout
@@ -126,12 +114,8 @@ func smart_disappear():
 	elif function_panel.analysis_panel_open:
 		self.disappear()
 
+
 func _process(delta):
-	# hide if analysis on, show if analysis off
-	if self.analysis_on and self.visible:
-		self.disappear()
-	elif self.button_mode == self.Mode.OBSERVER and not self.analysis_on and not self.visible and not function_panel.analysis_panel_open:
-		self.appear()
 	# mouse in button animes
 	if self.is_mouse_in_original_rect():
 		# trigger only at the frame cursor enters button

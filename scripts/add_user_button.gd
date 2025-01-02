@@ -17,7 +17,6 @@ var on_work = true
 var is_mouse_in_box = false
 var original_rect
 var can_be_controlled_by_key = true
-
 #var _engineer_mode = false
 #var _analyzer_mode = false
 
@@ -58,6 +57,8 @@ func _ready():
 		is_mouse_in_box = false
 
 func _input(event: InputEvent) -> void:
+	if not self.visible or not function_panel.visible:
+		return
 	if self.analysis_on:
 		return
 	if not can_be_controlled_by_key:
@@ -99,13 +100,15 @@ func smart_disappear():
 		self.disappear()
 	elif not function_panel.is_instruction_panel_visible() and self.visible and self.button_mode != Mode.OBSERVER:
 		self.disappear()
+	elif function_panel.analysis_panel_open:
+		self.disappear()
 
 
 func _process(delta):
 	# hide if analysis on, show if analysis off
 	if self.analysis_on and self.visible:
 		self.disappear()
-	elif self.button_mode == self.Mode.OBSERVER and not self.analysis_on and not self.visible:
+	elif self.button_mode == self.Mode.OBSERVER and not self.analysis_on and not self.visible and not function_panel.analysis_panel_open:
 		self.appear()
 	# mouse in button animes
 	if self.is_mouse_in_original_rect():
