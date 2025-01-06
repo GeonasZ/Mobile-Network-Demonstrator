@@ -6,6 +6,7 @@ extends Control
 @onready var user_controller = $"../Controllers/UserController"
 @onready var anime_player = $AnimationPlayer
 @onready var gathered_tiles = $"../GatheredTiles"
+@onready var function_panel = $"../FunctionPanel"
 
 enum XMotion {MOVE_LEFT, MOVE_RIGHT}
 enum YMotion {MOVE_UP,MOVE_DOWN,MOVE_LEVEL}
@@ -31,7 +32,8 @@ var set_to_visible = true
 # just a indicative property
 # does not represent actual visibility of node
 var keep_invisible = false
-var analysis_panel_open = true
+var analysis_panel_open = false
+var station_config_panel_open = false
 
 
 func _draw():
@@ -99,7 +101,7 @@ func _ready():
 	
 func on_mouse_right_click_on_background(event):
 	if event is InputEventMouseButton and event.button_mask == MOUSE_BUTTON_MASK_RIGHT and event.pressed == true:
-		if self.keep_invisible and not self.analysis_panel_open:
+		if self.keep_invisible and not self.analysis_panel_open and not self.station_config_panel_open:
 			appear_with_anime()
 		else:
 			disappear_with_anime()
@@ -152,6 +154,7 @@ func is_tracking_station():
 func disappear_with_anime_at_speed(speed_scale):
 	if self.tracking_mode == TrackingMode.USER:
 		return
+
 	anime_player.speed_scale = speed_scale
 	anime_player.play("disappear")
 	self.keep_invisible = true
@@ -163,11 +166,22 @@ func disappear_with_anime():
 
 func on_analysis_panel_open():
 	self.analysis_panel_open = true
+	self.track_mouse()
+	self.disappear_with_anime_at_speed(0.2)
+
+func on_analysis_panel_close():
+	if function_panel.mouse_panel_not_in_button():
+		self.analysis_panel_open = false
+		self.appear_with_anime()
+	
+func on_station_config_panel_open():
+	self.station_config_panel_open = true
 	self.disappear_with_anime()
 	
-func on_analysis_panel_close():
-	self.analysis_panel_open = false
-	self.appear_with_anime()
+func on_station_config_panel_close():
+	self.station_config_panel_open = true
+	if function_panel.mouse_panel_not_in_button():
+		self.appear_with_anime()
 
 func track_station(station):
 	self.tracking_mode = TrackingMode.STATION

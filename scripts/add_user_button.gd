@@ -16,6 +16,7 @@ var slash_len = 3
 var on_work = true
 var is_mouse_in_box = false
 var original_rect
+# controlled only by function panel
 var can_be_controlled_by_key = true
 #var _engineer_mode = false
 #var _analyzer_mode = false
@@ -63,19 +64,19 @@ func _input(event: InputEvent) -> void:
 		return
 	if not can_be_controlled_by_key:
 		return
+	if not on_work:
+		return
 	
-	if event is InputEventKey and event.keycode == KEY_KP_ADD and event.is_pressed() and can_be_controlled_by_key:
-		can_be_controlled_by_key = false
+	if event is InputEventKey and event.keycode == KEY_KP_ADD and event.is_pressed():
+		on_work = false
 		user_controller.random_add_user(10)
 		await get_tree().create_timer(0.2).timeout
-		can_be_controlled_by_key = true
+		on_work = true
 	
 func _gui_input(event: InputEvent) -> void:
-	
 	if event is InputEventMouseButton and event.button_mask == MOUSE_BUTTON_MASK_LEFT:
 		user_controller.random_add_user(10)
 			
-
 func appear():
 	self.visible = true
 	self.on_work = false

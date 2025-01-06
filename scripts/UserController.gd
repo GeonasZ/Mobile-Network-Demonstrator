@@ -38,8 +38,6 @@ func initialize_user_system(user_height):
 func add_user(pos):
 	if obs_button.analysis_on:
 		return
-	if function_panel.analysis_panel_open:
-		return
 	
 	var current_user = user_prefab.instantiate()
 	users.add_child(current_user)
@@ -265,7 +263,15 @@ func eval_user_sir(user):
 			if station.channel_allocation_list[user.connected_channel] != null:
 									interference_power += station.eval_signal_pow_to_user(user, tile_controller.get_decay())
 	interference_power -= signal_power
-	return [signal_power, interference_power, signal_power/interference_power]
+	var sir
+	if interference_power == 0 and signal_power == 0:
+		sir = "N/A"
+	elif interference_power == 0:
+		sir = INF
+	else:
+		sir = signal_power/interference_power
+
+	return [signal_power, interference_power, sir]
 
 func all_user_enter_observer_mode():
 		for row in user_list:

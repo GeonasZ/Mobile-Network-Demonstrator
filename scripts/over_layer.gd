@@ -6,6 +6,8 @@ var delta = 1
 @onready var mouse_controller = $"../Controllers/MouseController"
 @onready var tile_controller = $"../Controllers/TileController"
 @onready var user_controller = $"../Controllers/UserController"
+@onready var analysis_panel = $"../AnalysisPanel"
+@onready var station_config_panel = $"../StationConfigPanel"
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -24,7 +26,8 @@ func _draw() -> void:
 		var station_scale = mouse_controller.current_hex.station_scale
 		if not keep_invisible:
 			# draw a line for mouse and closest station
-			draw_dashed_line(hex_center, get_local_mouse_position(),Color8(120,120,120),5*station_scale,10*station_scale)
+			if not analysis_panel.visible and not station_config_panel.visible:
+				draw_dashed_line(hex_center, get_local_mouse_position(),Color8(120,120,120),5*station_scale,10*station_scale)
 			# draw directions for each station
 			var station_global_transform
 			var global_station_pos

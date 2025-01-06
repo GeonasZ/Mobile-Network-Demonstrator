@@ -80,19 +80,21 @@ func _input(event: InputEvent) -> void:
 		return
 	if not on_work or self.analysis_on:
 		return
+	if not can_be_controlled_by_key:
+		return
 	
-	if event is InputEventKey and event.keycode == KEY_C and event.is_pressed() and self.can_be_controlled_by_key:
+	if event is InputEventKey and event.keycode == KEY_C and event.is_pressed():
 		config_panel.open_config_with_anime()
-		self.can_be_controlled_by_key = false
+		self.on_work = false
 		await get_tree().create_timer(1).timeout
-		self.can_be_controlled_by_key = true
+		self.on_work = true
 	
 func _gui_input(event: InputEvent) -> void:
 	
 	if not on_work:
 		return
 	
-	if event is InputEventMouseButton and event.button_mask == MOUSE_BUTTON_MASK_LEFT:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed():
 		config_panel.open_config_with_anime()
 			
 

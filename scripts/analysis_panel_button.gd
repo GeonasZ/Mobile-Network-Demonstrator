@@ -74,12 +74,14 @@ func _input(event: InputEvent) -> void:
 		return
 	if not can_be_controlled_by_key:
 		return
+	if not on_work:
+		return
 	
-	if event is InputEventKey and event.keycode == KEY_A and event.is_pressed() and can_be_controlled_by_key:
-		can_be_controlled_by_key = false
+	if event is InputEventKey and event.keycode == KEY_A and event.is_pressed():
+		on_work = false
 		self.button_click_function()
 		await get_tree().create_timer(0.2).timeout
-		can_be_controlled_by_key = true
+		on_work = true
 	
 func _gui_input(event: InputEvent) -> void:
 	

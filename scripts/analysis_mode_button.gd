@@ -73,14 +73,18 @@ func button_click_function():
 func _input(event: InputEvent) -> void:
 	if not self.visible or not function_panel.visible:
 		return
-	if not can_be_controlled_by_key or self.button_mode != self.Mode.OBSERVER:
+	if not can_be_controlled_by_key:
+		return
+	if self.button_mode != self.Mode.OBSERVER:
+		return
+	if not on_work:
 		return
 	
-	if event is InputEventKey and event.is_pressed() and can_be_controlled_by_key and (event.keycode == KEY_S and not self.analysis_on or event.keycode == KEY_E and self.analysis_on):
-		can_be_controlled_by_key = false
+	if event is InputEventKey and event.is_pressed() and (event.keycode == KEY_S and not self.analysis_on or event.keycode == KEY_E and self.analysis_on):
+		on_work = false
 		self.button_click_function()
 		await get_tree().create_timer(0.2).timeout
-		can_be_controlled_by_key = true
+		on_work = true
 	
 func _gui_input(event: InputEvent) -> void:
 	

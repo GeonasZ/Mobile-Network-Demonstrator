@@ -35,6 +35,9 @@ func zoom(zoom_ratio, zoom_to_mouse=false, subject=self):
 		subject.scale = subject.scale * zoom_ratio
 
 func on_mouse_left_click_on_background(event):
+	# if analysis panel open, do not react to left click
+	if mouse_panel.analysis_panel_open:
+		return
 	mouse_left_click_on_background.emit(event)
 	if mouse_controller.current_hex.is_center_on_focus():
 		mouse_panel.track_station(mouse_controller.current_hex)
@@ -43,6 +46,9 @@ func on_mouse_left_click_on_background(event):
 
 func on_mouse_right_click_on_background(event):
 	self.mouse_right_click_on_background.emit(event)
+	# if analysis panel open, do not react to right click
+	if mouse_panel.analysis_panel_open:
+		return
 	if mouse_panel.tracking_mode == mouse_panel.TrackingMode.MOUSE:
 		mouse_panel.on_mouse_right_click_on_background(event)
 		function_panel.on_mouse_right_click_on_background(event)

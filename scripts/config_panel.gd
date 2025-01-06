@@ -6,7 +6,7 @@ extends Polygon2D
 @onready var title_label = $TitleLabel
 @onready var over_layer = $"../OverLayer"
 @onready var function_panel = $"../FunctionPanel"
-
+@onready var station_config_panel = $"../StationConfigPanel"
 @onready var tile_length_edit = $ContentFrame/GridContainer/TileLengthEdit/LineEdit
 @onready var user_height_edit = $ContentFrame/GridContainer/UserHeightEdit/LineEdit
 @onready var decay_edit = $ContentFrame/GridContainer/DecayEdit/LineEdit
@@ -19,6 +19,7 @@ var edit_list = [tile_length_edit, user_height_edit, decay_edit, freq_n_edit,
 				 n_user_edit]
 var on_work = true
 var is_panel_open = false
+var config_on = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -41,6 +42,7 @@ func initialize():
 
 func open_config_with_anime():
 	function_panel.disable_all_keyboard_input()
+	await station_config_panel.disappear()
 	self.initialize()
 	if self.on_work:
 		over_layer.make_invisible()

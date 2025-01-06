@@ -102,7 +102,7 @@ func _gui_input(event: InputEvent) -> void:
 		return
 	
 	if event is InputEventMouseButton and event.button_mask == MOUSE_BUTTON_MASK_LEFT:
-		self.can_be_controlled_by_key = false
+		self.on_work = false
 		if self.button_mode != Mode.OBSERVER:
 			function_panel.set_all_button_mode(Mode.OBSERVER)
 			user_controller.all_user_enter_observer_mode()
@@ -111,7 +111,7 @@ func _gui_input(event: InputEvent) -> void:
 			function_panel.set_all_button_mode(Mode.NONE)
 			user_controller.all_user_leave_observer_mode()
 		await self.get_tree().create_timer(0.25).timeout
-		self.can_be_controlled_by_key = true
+		self.on_work = true
 		
 func appear():
 	self.visible = true

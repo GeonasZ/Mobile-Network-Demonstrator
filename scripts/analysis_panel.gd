@@ -1,7 +1,6 @@
 extends Control
 
 @onready var title = $Title
-@onready var plot_frame = $PlotPanel
 @onready var user_select_panel = $UserSelectPanel
 @onready var user_select = $"UserSelectPanel/UserSelectEdit"
 @onready var results_panel = $ResultsPanel
@@ -15,6 +14,9 @@ var slash_len = 50
 
 var current_user
 var on_work = true
+
+var last_mouse_pos = null
+var on_drag = false
 
 func _draw():
 	draw_set_transform(Vector2(length/2,width/2))
@@ -46,11 +48,20 @@ func _ready() -> void:
 	title.position = Vector2(0,0)
 	user_select_panel.position = Vector2(self.slash_len,self.width-3.*self.slash_len)
 
+func _gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed() and not on_drag:
+		self.on_drag = true
+		self.last_mouse_pos = get_global_mouse_position()
+	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.is_pressed() and on_drag:
+		self.on_drag = false
+		
 func set_current_user_by_index(index:int):
 	if index < 0:
 		self.current_user = null
 		# print("AnalysisPanel <set_current_user_by_index>: Negative Index Assignment")
 		return
+	if self.current_user != null:
+		self.current_user.hide_boundary()
 	self.current_user = user_controller.linear_user_list[index]
 
 func set_current_user_by_id(id:int):
@@ -83,7 +94,8 @@ func disappear():
 	self.visible = false
 	self.on_work = true
 
-
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-	pass
+	if self.on_drag:
+		self.position = self.position + (get_global_mouse_position()-self.last_mouse_pos)
+		self.last_mouse_pos = get_global_mouse_position()

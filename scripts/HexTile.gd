@@ -1,6 +1,7 @@
 extends Polygon2D
 
 var mouse_panel = null
+var station_config_panel = null
 @onready var parent_node = $".."
 var AntennaType = ["DIPOLE","ARRAY2","ARRAY3","ARRAY4"]
 
@@ -26,6 +27,8 @@ var on_focus =  false
 var center_on_focus =  false
 var under_tracked = false
 var mouse_panel_keep_invisible = false
+var under_config = false
+var under_config_last_frame = false
 var empty_display_user_list = false
 var station_tower_height = 16
 var station_total_height = 22
@@ -109,13 +112,16 @@ func _draw():
 		draw_line(Vector2(0,-station_tower_height*station_scale), Vector2(0,-station_total_height*station_scale), Color(0,0,0), 3,true)
 		print("HexTile ID " + str(id) + ": Unknown Antenna Type, treated as DIPOLE as default.")
 	# draw a circle at the center if center is on focus
-	if self.under_tracked and not mouse_panel.keep_invisible:
+	if self.under_tracked and not mouse_panel.keep_invisible or self.under_config:
 		draw_circle(Vector2(0,-station_total_height/2.), station_scale * focus_radius, Color8(50,50,50), false, width*4)
-	elif self.on_focus and self.center_on_focus and not mouse_panel.keep_invisible and empty_display_user_list:
+	elif self.center_on_focus and (not mouse_panel.keep_invisible and empty_display_user_list):
 		draw_circle(Vector2(0,-station_total_height/2.), station_scale * focus_radius, Color8(150,150,150), false, width*4)
+		
 	
-func initialize(mouse_panel):
+	
+func initialize(mouse_panel,station_config_panel):
 	self.mouse_panel = mouse_panel
+	self.station_config_panel = station_config_panel
 	
 func set_focus():
 	self.on_focus = true
@@ -297,3 +303,10 @@ func _process(delta):
 	elif not self.empty_display_user_list and mouse_panel.displayed_user.size() == 0:
 		self.empty_display_user_list = true
 		self.redraw_tile()
+	elif self.under_config and not self.under_config_last_frame:
+		self.under_config_last_frame = true
+		self.redraw_tile()
+	elif not self.under_config and self.under_config_last_frame:
+		self.under_config_last_frame = false
+		self.redraw_tile()
+		

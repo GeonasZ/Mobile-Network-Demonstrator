@@ -87,8 +87,10 @@ func _input(event: InputEvent) -> void:
 		return
 	if not on_work or self.analysis_on:
 		return
+	if not self.can_be_controlled_by_key:
+		return
 		
-	if event is InputEventKey and event.keycode == KEY_F and event.is_pressed() and self.can_be_controlled_by_key:
+	if event is InputEventKey and event.keycode == KEY_F and event.is_pressed():
 		next_frequency_pattern()
 	
 func _gui_input(event: InputEvent) -> void:

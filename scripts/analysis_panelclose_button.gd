@@ -1,7 +1,12 @@
-extends Button
+extends Panel
 
 @onready var analysis_panel = $".."
 @onready var analysis_panel_button = $"../../FunctionPanel/AnalysisPanelButton"
+@onready var label = $Label
+
+var length = 200
+var width = 80
+var slash_len = 10
 
 var is_mouse_in = false
 
@@ -10,7 +15,8 @@ var on_work = true
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	self.position = Vector2(analysis_panel.length/7*6.,self.size.y/1.8)
-	self.size = Vector2(200,80)
+	self.size = Vector2(self.length,self.width)
+	self.label.size = self.size
 	self.pivot_offset = self.size/2
 
 func _input(event: InputEvent) -> void:

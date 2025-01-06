@@ -42,6 +42,14 @@ func all_button_smart_disappear():
 	for button in self.registered_buttons:
 		button.smart_disappear()
 
+func mouse_panel_not_in_button():
+	var panel_not_in = true
+	for button in self.registered_buttons:
+		if button.is_mouse_in_original_rect():
+			panel_not_in = false
+			break
+	return panel_not_in
+
 func all_button_disappear_with_instr_panel_appear():
 	self.all_button_smart_disappear()
 	self.instruction_panel_visibility = true
@@ -62,15 +70,10 @@ func all_button_appear_with_instr_panel_disappear():
 	instr_panel.animator.play("panel_disappear")
 	user_controller.resume_all_user()
 	# wait until hide mouse_panel
-	var mouse_panel_should_show = true
-	for button in self.registered_buttons:
-		if button.is_mouse_in_original_rect():
-			mouse_panel_should_show = false
-			break
-	if mouse_panel_should_show:
+	if self.mouse_panel_not_in_button():
 		await mouse_panel.appear_with_anime()
 	else:
-		await self.instr_button.animator.animation_finished
+		await instr_button.animator.animation_finished
 	instr_panel.visible = false
 
 func all_button_set_analysis_on():

@@ -73,9 +73,12 @@ func smart_disappear():
 
 # handel key input
 func _input(event: InputEvent) -> void:
-	if not self.visible or not function_panel.visible:
+	if not function_panel.visible:
 		return
-	if not can_be_controlled_by_key or not on_work and not function_panel.is_instruction_panel_visible():
+	if not can_be_controlled_by_key:
+		return
+		
+	if not on_work and not function_panel.is_instruction_panel_visible():
 		return
 		
 	if self.analysis_on:
@@ -83,15 +86,15 @@ func _input(event: InputEvent) -> void:
 		
 	if event is InputEventKey and event.keycode == KEY_I and event.pressed:
 		if instr_panel.visible:
-			can_be_controlled_by_key = false
+			on_work = false
 			function_panel.all_button_appear_with_instr_panel_disappear()
 			await get_tree().create_timer(0.2).timeout
-			can_be_controlled_by_key = true
+			on_work = true
 		elif not instr_panel.visible:
-			can_be_controlled_by_key = false
+			on_work = false
 			function_panel.all_button_disappear_with_instr_panel_appear()
 			await get_tree().create_timer(0.2).timeout
-			can_be_controlled_by_key = true
+			on_work = true
 			
 
 # handel mouse input

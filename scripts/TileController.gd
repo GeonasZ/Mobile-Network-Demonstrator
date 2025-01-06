@@ -34,6 +34,7 @@ var hex_tile_prefab = null
 @onready var mouse_panel = $"../../MousePanel"
 @onready var mouse_controller = $"../../Controllers/MouseController"
 @onready var freq_reuse_button = $"../../FunctionPanel/FreqReuseButton"
+@onready var station_config_panel = $"../../StationConfigPanel"
 var hex_list = []
 
 ## not in use
@@ -144,7 +145,7 @@ func make_tile(pos:Vector2,arc_len:int=0,n_channel:int=7,antenna_type=null):
 	current_hex.set_arc_len(tile_len)
 	current_hex.set_id(station_number)
 	current_hex.set_channel_number(n_channel)
-	current_hex.initialize(self.mouse_panel)
+	current_hex.initialize(self.mouse_panel,self.station_config_panel)
 	if antenna_type == null:
 		var rand_num = randi_range(0,3)
 		current_hex.set_antenna_type(current_hex.AntennaType[rand_num])

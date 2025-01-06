@@ -9,6 +9,7 @@ extends Control
 @onready var cross = $Cross
 @onready var config_panel = $"../../ConfigPanel"
 @onready var function_panel = $".."
+@onready var station_config_panel = $"../../StationConfigPanel"
 
 enum Mode {NONE, OBSERVER, ENGINEER}
 var button_mode = Mode.NONE
@@ -104,6 +105,21 @@ func smart_disappear():
 	#if not function_panel.is_instruction_panel_visible() and self.visible and self.button_mode == Mode.OBSERVER:
 		#self.disappear()
 
+func button_left_click_function(event):
+	self.on_work = false
+	if self.button_mode != Mode.ENGINEER:
+		function_panel.set_all_button_mode(Mode.ENGINEER)
+		user_controller.all_user_enter_engineer_mode()
+		
+	else:
+		function_panel.set_all_button_mode(Mode.NONE)
+		user_controller.all_user_leave_engineer_mode()
+		station_config_panel.disappear()
+		mouse_panel.track_mouse()
+			
+	await get_tree().create_timer(0.25).timeout
+	self.on_work = true
+
 func _input(event: InputEvent) -> void:
 	if not self.visible or not function_panel.visible:
 		return
@@ -116,37 +132,18 @@ func _input(event: InputEvent) -> void:
 		return 
 	
 	if event is InputEventKey and event.keycode == KEY_E and event.is_pressed() and self.can_be_controlled_by_key:
-		self.can_be_controlled_by_key = false
-		if self.button_mode != Mode.ENGINEER:
-			function_panel.set_all_button_mode(Mode.ENGINEER)
-			user_controller.all_user_enter_engineer_mode()
-			
-		else:
-			function_panel.set_all_button_mode(Mode.NONE)
-			user_controller.all_user_leave_engineer_mode()
-		await get_tree().create_timer(0.25).timeout
-		self.can_be_controlled_by_key = true
+		self.button_left_click_function(event)
 	
 func _gui_input(event: InputEvent) -> void:
 	
 	if self.button_mode == Mode.OBSERVER:
 		return
 		
-	if not can_be_controlled_by_key or not on_work:
+	if not on_work:
 		return
 	
 	if event is InputEventMouseButton and event.button_mask == MOUSE_BUTTON_MASK_LEFT:
-		self.can_be_controlled_by_key = false
-		if self.button_mode != Mode.ENGINEER:
-			function_panel.set_all_button_mode(Mode.ENGINEER)
-			user_controller.all_user_enter_engineer_mode()
-			
-		else:
-			function_panel.set_all_button_mode(Mode.NONE)
-			user_controller.all_user_leave_engineer_mode()
-		await get_tree().create_timer(0.25).timeout
-		self.can_be_controlled_by_key = true
-			
+		self.button_left_click_function(event)
 
 func appear_with_disappearing_instr_panel():
 	self.visible = true

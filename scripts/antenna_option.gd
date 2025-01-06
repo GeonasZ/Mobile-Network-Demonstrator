@@ -8,8 +8,9 @@ func _ready() -> void:
 	self.pivot_offset = self.size/2.
 
 func _gui_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_MASK_LEFT and event.pressed:
-		mouse_left_click.emit(self.text)
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.is_pressed():
+		if self.get_global_rect().has_point(self.get_global_mouse_position()):
+			mouse_left_click.emit(self.text)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:

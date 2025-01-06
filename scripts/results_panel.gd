@@ -79,19 +79,27 @@ func extract_user_data(user):
 	var sir_max = sir_hist[0]
 	var sir_min = sir_hist[0]
 	for i in range(len(signal_hist)):
-		# sum signal and sir up
+		# sum signal up
 		signal_sum += signal_hist[i]
-		sir_sum += sir_hist[i]
 		# look for the max and min for signal power
 		if signal_hist[i] > signal_max:
 			signal_max = signal_hist[i]
 		elif signal_hist[i] < signal_min:
 			signal_min = signal_hist[i]
-		# look for the max and min of sir
-		if sir_hist[i] > sir_max:
-			sir_max = sir_hist[i]
-		elif sir_hist[i] < sir_min:
-			sir_min = sir_hist[i]
+		
+		# ensure sir is a number
+		if sir_hist[i] is int or sir_hist[i] is float:
+			# ensure sir is not Inf
+			if sir_hist[i] != INF:
+				# sum sir up
+				sir_sum += sir_hist[i]
+				# look for the max and min of sir
+				if sir_max is String or sir_hist[i] > sir_max:
+					sir_max = sir_hist[i]
+				elif sir_min is String or sir_hist[i] < sir_min:
+					sir_min = sir_hist[i]
+
+
 	return [signal_sum/len(signal_hist),
 			sir_sum/len(sir_hist), signal_max,
 			sir_max, signal_min, sir_min]
@@ -112,16 +120,30 @@ func _display_null_data():
 	max_sir_label.text = "Max SIR:\n\tN/A"
 	current_sir_label.text = "Realtime SIR:\n\tN/A"
 
+func make_displayed_content(input)->String:
+	var displayed_content
+	if (input is float or input is int):
+		if input == 0:
+			displayed_content = "0"
+		elif input != INF:
+			displayed_content = str(truncate_double(dBm(input))) +"dBm"
+		else:
+			displayed_content = "Inf"
+	else:
+		displayed_content = "N/A"
+	return displayed_content
+
 func _display_user_data(data):
 	var current_data = user_controller.eval_user_sir(analysis_panel.current_user)
-	average_signal_label.text = "Avg. Signal Power:\n\t%s dBm" % str(truncate_double(dBm(data[0])))
-	average_sir_label.text = "Avg. SIR:\n\t%s dBm" % (str(truncate_double(dBm(data[1]))) if data[1] != INF else "Inf")
-	current_signal_label.text = "Realtime Signal Power\n\t" % str(truncate_double(dBm(current_data[0])))
-	max_signal_label.text = "Max Signal Power:\n\t%s dBm" % str(truncate_double(dBm(data[2])))
-	max_sir_label.text = "Max SIR:\n\t%s dBm" % (str(truncate_double(dBm(data[3]))) if data[3] != INF else "Inf")
-	min_signal_label.text = "Min Signal Power:\n\t%s dBm" % str(truncate_double(dBm(data[4])))
-	min_sir_label.text = "Min SIR:\n\t%s dBm" % (str(truncate_double(dBm(data[5]))) if data[5] != INF else "Inf")
-	current_sir_label.text = "Realtime SIR\n\t" % (str(truncate_double(dBm(current_data[2]))) if current_data[2] != INF else "Inf")
+	average_signal_label.text = "Avg. Signal Power:\n\t%s" % make_displayed_content(data[0])
+	average_sir_label.text = "Avg. SIR:\n\t%s" % make_displayed_content(data[1])
+	current_signal_label.text = "Realtime Signal Power\n\t%s" % make_displayed_content(current_data[0])
+	max_signal_label.text = "Max Signal Power:\n\t%s" % make_displayed_content(data[2])
+	max_sir_label.text = "Max SIR:\n\t%s" % make_displayed_content(data[3])
+	min_signal_label.text = "Min Signal Power:\n\t%s" % make_displayed_content(data[4])
+	min_sir_label.text = "Min SIR:\n\t%s" % make_displayed_content(data[5])
+	current_sir_label.text = "Realtime SIR:\n\t%s" % make_displayed_content(current_data[2])
+
 func display_user_data(user):
 	if user == null:
 		self._display_null_data()

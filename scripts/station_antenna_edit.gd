@@ -14,7 +14,6 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	parent_node.custom_minimum_size = self.size
 	parent_node.position = Vector2(0,0)
-	self.size = Vector2(0,0)
 	
 
 func _on_option_mouse_left_click(option_content) -> void:

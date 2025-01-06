@@ -1,4 +1,4 @@
-[gd_scene load_steps=109 format=3 uid="uid://dp7br0wc03w8r"]
+[gd_scene load_steps=114 format=3 uid="uid://dp7br0wc03w8r"]
 
 [ext_resource type="Script" path="res://scripts/UserController.gd" id="1_18gww"]
 [ext_resource type="Script" path="res://scripts/TileController.gd" id="1_fg5v7"]
@@ -61,6 +61,8 @@
 [ext_resource type="Script" path="res://scripts/plot_frame.gd" id="52_t6j7q"]
 [ext_resource type="Script" path="res://scripts/analysis_panelclose_button.gd" id="53_5krwa"]
 [ext_resource type="StyleBox" uid="uid://b36jdi83vmboa" path="res://themes/analysis_panel_close_button_style_box.tres" id="53_c5h3d"]
+[ext_resource type="Shader" uid="uid://dswhn0a66pyjx" path="res://shader/const0.8a_shader.tres" id="54_kk55c"]
+[ext_resource type="Shader" uid="uid://cmhftmgn2d83b" path="res://shader/sonst0.9a_shader.tres" id="55_f76ue"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_h4n7r"]
 shader = ExtResource("6_ihk23")
@@ -103,6 +105,9 @@ _data = {
 "appear": SubResource("Animation_55j4g"),
 "disappear": SubResource("Animation_nivsp")
 }
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_6eho7"]
+shader = ExtResource("55_f76ue")
 
 [sub_resource type="Theme" id="Theme_h1vwm"]
 Label/colors/font_color = Color(0, 0, 0, 1)
@@ -557,6 +562,9 @@ _data = {
 "disappear": SubResource("Animation_s5vfg")
 }
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_vqwtm"]
+shader = ExtResource("54_kk55c")
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ghcyo"]
 bg_color = Color(0.772247, 0.772247, 0.772247, 1)
 border_width_left = 3
@@ -576,6 +584,21 @@ RichTextLabel/font_sizes/normal_font_size = 28
 RichTextLabel/fonts/bold_font = ExtResource("11_i26m1")
 RichTextLabel/fonts/bold_italics_font = ExtResource("11_acrdp")
 
+[sub_resource type="Animation" id="Animation_rr1mq"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+
 [sub_resource type="Animation" id="Animation_g4ix7"]
 resource_name = "appear"
 length = 0.2
@@ -590,21 +613,6 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(0.203064, 1),
 "update": 0,
 "values": [Vector2(0, 0), Vector2(1, 1)]
-}
-
-[sub_resource type="Animation" id="Animation_rr1mq"]
-length = 0.001
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath(".:scale")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(1, 1)]
 }
 
 [sub_resource type="Animation" id="Animation_hojdu"]
@@ -630,20 +638,14 @@ _data = {
 "disappear": SubResource("Animation_hojdu")
 }
 
-[sub_resource type="Theme" id="Theme_w0hd6"]
-Button/colors/font_color = Color(0, 0, 0, 1)
-Button/colors/font_focus_color = Color(0, 0, 0, 1)
-Button/colors/font_hover_color = Color(0, 0, 0, 1)
-Button/colors/font_hover_pressed_color = Color(0, 0, 0, 1)
-Button/colors/font_pressed_color = Color(0, 0, 0, 1)
-Button/colors/icon_focus_color = Color(0, 0, 0, 1)
-Button/font_sizes/font_size = 32
-Button/fonts/font = ExtResource("11_i26m1")
-Button/styles/disabled = ExtResource("53_c5h3d")
-Button/styles/focus = ExtResource("53_c5h3d")
-Button/styles/hover = ExtResource("53_c5h3d")
-Button/styles/normal = ExtResource("53_c5h3d")
-Button/styles/pressed = ExtResource("53_c5h3d")
+[sub_resource type="Theme" id="Theme_5kpia"]
+Panel/styles/panel = ExtResource("53_c5h3d")
+
+[sub_resource type="Theme" id="Theme_3l4ea"]
+Label/colors/font_color = Color(0, 0, 0, 1)
+Label/font_sizes/font_size = 40
+Label/fonts/font = ExtResource("11_i26m1")
+Label/styles/normal = null
 
 [sub_resource type="Animation" id="Animation_aubb7"]
 resource_name = "panel_appear"
@@ -803,6 +805,7 @@ libraries = {
 }
 
 [node name="StationConfigPanel" type="Control" parent="."]
+material = SubResource("ShaderMaterial_6eho7")
 anchors_preset = 0
 offset_right = 640.0
 offset_bottom = 640.0
@@ -910,15 +913,13 @@ horizontal_alignment = 1
 vertical_alignment = 1
 script = ExtResource("16_rv0b4")
 
-[node name="EditButton" type="Control" parent="StationConfigPanel/ScrollContainer/VBoxContainer/AntennaEditPanel/AntennaEdit"]
-layout_mode = 2
-
 [node name="AnimationPlayer" type="AnimationPlayer" parent="StationConfigPanel"]
 libraries = {
 "": SubResource("AnimationLibrary_m1fgk")
 }
 
 [node name="ConfigPanel" type="Polygon2D" parent="."]
+z_index = 10
 position = Vector2(1800, 100)
 script = ExtResource("24_ok7yp")
 
@@ -1660,6 +1661,7 @@ libraries = {
 [node name="AnalysisPanel" type="Control" parent="."]
 visible = false
 z_index = 2
+material = SubResource("ShaderMaterial_vqwtm")
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
@@ -1675,9 +1677,11 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="PlotFrame" type="Panel" parent="AnalysisPanel"]
+use_parent_material = true
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
+mouse_filter = 2
 theme = SubResource("Theme_rdy2j")
 script = ExtResource("52_t6j7q")
 
@@ -1702,6 +1706,7 @@ caret_blink = true
 script = ExtResource("51_qv08a")
 
 [node name="ResultsPanel" type="GridContainer" parent="AnalysisPanel"]
+use_parent_material = true
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
@@ -1712,6 +1717,7 @@ script = ExtResource("50_dmgx5")
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
+mouse_filter = 1
 theme = SubResource("Theme_wvde4")
 bbcode_enabled = true
 text = "[center] Average Signal Power: [/center]
@@ -1722,6 +1728,7 @@ script = ExtResource("51_vsv66")
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
+mouse_filter = 1
 theme = SubResource("Theme_wvde4")
 bbcode_enabled = true
 text = "[center] Average Signal Power: [/center]
@@ -1732,6 +1739,7 @@ script = ExtResource("51_vsv66")
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
+mouse_filter = 1
 theme = SubResource("Theme_wvde4")
 bbcode_enabled = true
 text = "[center] Average Signal Power: [/center]
@@ -1742,6 +1750,7 @@ script = ExtResource("51_vsv66")
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
+mouse_filter = 1
 theme = SubResource("Theme_wvde4")
 bbcode_enabled = true
 script = ExtResource("51_vsv66")
@@ -1750,6 +1759,7 @@ script = ExtResource("51_vsv66")
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
+mouse_filter = 1
 theme = SubResource("Theme_wvde4")
 bbcode_enabled = true
 text = "[center] Average Signal Power: [/center]
@@ -1760,6 +1770,7 @@ script = ExtResource("51_vsv66")
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
+mouse_filter = 1
 theme = SubResource("Theme_wvde4")
 bbcode_enabled = true
 text = "[center] Average Signal Power: [/center]
@@ -1770,6 +1781,7 @@ script = ExtResource("51_vsv66")
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
+mouse_filter = 1
 theme = SubResource("Theme_wvde4")
 bbcode_enabled = true
 text = "[center] Average Signal Power: [/center]
@@ -1780,6 +1792,7 @@ script = ExtResource("51_vsv66")
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
+mouse_filter = 1
 theme = SubResource("Theme_wvde4")
 bbcode_enabled = true
 script = ExtResource("51_vsv66")
@@ -1789,13 +1802,21 @@ libraries = {
 "": SubResource("AnimationLibrary_lhp1y")
 }
 
-[node name="CloseButton" type="Button" parent="AnalysisPanel"]
+[node name="CloseButton" type="Panel" parent="AnalysisPanel"]
 layout_mode = 0
-offset_right = 8.0
-offset_bottom = 8.0
-theme = SubResource("Theme_w0hd6")
-text = "Close Panel"
+offset_right = 187.0
+offset_bottom = 54.0
+theme = SubResource("Theme_5kpia")
 script = ExtResource("53_5krwa")
+
+[node name="Label" type="Label" parent="AnalysisPanel/CloseButton"]
+offset_top = -6.10352e-05
+offset_right = 40.0
+offset_bottom = 23.9999
+theme = SubResource("Theme_3l4ea")
+text = "Close"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="InstructionPanel" type="Polygon2D" parent="."]
 z_index = 2
@@ -1859,6 +1880,8 @@ offset_bottom = 480.0
 [connection signal="timeout" from="Controllers/UserController/AnalysisSamplingTimer" to="Controllers/UserController" method="_on_analysis_sampling_timer_timeout"]
 [connection signal="mouse_left_click_on_background" from="GatheredTiles" to="StationConfigPanel" method="_on_gathered_tiles_mouse_left_click_on_background"]
 [connection signal="mouse_right_click_on_background" from="GatheredTiles" to="StationConfigPanel" method="_on_gathered_tiles_mouse_right_click_on_background"]
+[connection signal="station_config_panel_close" from="StationConfigPanel" to="MousePanel" method="on_station_config_panel_close"]
+[connection signal="station_config_panel_open" from="StationConfigPanel" to="MousePanel" method="on_station_config_panel_open"]
 [connection signal="mouse_left_click" from="StationConfigPanel/ScrollContainer/VBoxContainer/AntennaEditPanel/AntennaEdit/OptionList/Option" to="StationConfigPanel/ScrollContainer/VBoxContainer/AntennaEditPanel/AntennaEdit" method="_on_option_mouse_left_click"]
 [connection signal="mouse_left_click" from="StationConfigPanel/ScrollContainer/VBoxContainer/AntennaEditPanel/AntennaEdit/OptionList/Option2" to="StationConfigPanel/ScrollContainer/VBoxContainer/AntennaEditPanel/AntennaEdit" method="_on_option_mouse_left_click"]
 [connection signal="mouse_left_click" from="StationConfigPanel/ScrollContainer/VBoxContainer/AntennaEditPanel/AntennaEdit/OptionList/Option3" to="StationConfigPanel/ScrollContainer/VBoxContainer/AntennaEditPanel/AntennaEdit" method="_on_option_mouse_left_click"]
