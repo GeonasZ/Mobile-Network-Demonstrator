@@ -47,7 +47,7 @@ func _ready() -> void:
 	self.pivot_offset = Vector2(self.length/2,self.width/2)
 	self.position = Vector2((1920-self.length)/2,(1080-self.width)/2)
 	title.size = Vector2(self.size.x,self.size.y/10)
-	title.position = Vector2(0,0)
+	title.position = Vector2(0,self.width/64.)
 	user_select_panel.position = Vector2(self.slash_len,self.width-3.*self.slash_len)
 
 func _gui_input(event: InputEvent) -> void:

@@ -1685,6 +1685,15 @@ mouse_filter = 2
 theme = SubResource("Theme_rdy2j")
 script = ExtResource("52_t6j7q")
 
+[node name="InvalidIDLabel" type="Label" parent="AnalysisPanel/PlotFrame"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+theme = ExtResource("25_x1dja")
+text = "Unexistent User ID"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="UserSelectPanel" type="HBoxContainer" parent="AnalysisPanel"]
 layout_mode = 0
 offset_right = 40.0
@@ -1697,6 +1706,26 @@ theme = SubResource("Theme_7tp5v")
 text = "Analysed User ID:    "
 
 [node name="UserSelectEdit" type="LineEdit" parent="AnalysisPanel/UserSelectPanel"]
+layout_mode = 2
+theme = ExtResource("26_bgssn")
+expand_to_text_length = true
+context_menu_enabled = false
+virtual_keyboard_enabled = false
+caret_blink = true
+script = ExtResource("51_qv08a")
+
+[node name="PlotSelectPanel" type="HBoxContainer" parent="AnalysisPanel"]
+visible = false
+offset_right = 423.0
+offset_bottom = 56.0
+
+[node name="Title" type="Label" parent="AnalysisPanel/PlotSelectPanel"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme = SubResource("Theme_7tp5v")
+text = "Displayed Plot"
+
+[node name="UserSelectEdit" type="LineEdit" parent="AnalysisPanel/PlotSelectPanel"]
 layout_mode = 2
 theme = ExtResource("26_bgssn")
 expand_to_text_length = true

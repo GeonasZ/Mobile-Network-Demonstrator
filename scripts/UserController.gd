@@ -313,8 +313,9 @@ func all_user_reset_data_list():
 			for user in tile["disconnected"]:
 				user.reset_analysis_data()
 
-func all_user_start_analysis():
-	self.all_user_reset_data_list()
+func all_user_start_analysis(append=false):
+	if not append:
+		self.all_user_reset_data_list()
 	for row in user_list:
 		for tile in row:
 			for user in tile["connected"]:

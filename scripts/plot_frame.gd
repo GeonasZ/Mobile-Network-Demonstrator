@@ -6,20 +6,30 @@ var x_padding = 5
 
 @onready var analysis_panel = $".."
 @onready var analysis_panel_title = $"../Title"
+@onready var invalid_userid_label = $InvalidIDLabel
 # @onready var user_controller = $"../../Controllers/UserController"
 
 enum DisplayMode {SIGNAL, SIR}
 var current_display_mode = DisplayMode.SIGNAL
 
 func _draw() -> void:
-	draw_set_transform(Vector2(0,self.size.y))
 	if analysis_panel.current_user == null:
+		invalid_userid_label.visible = true
+		invalid_userid_label.text = "Unexistent User ID"
 		return
+	invalid_userid_label.visible = false
+		
+	draw_set_transform(Vector2(0,self.size.y))
 	var data_list = []
 	if current_display_mode == self.DisplayMode.SIGNAL:
 		data_list = analysis_panel.current_user.signal_power_hist
 	else:
 		data_list = analysis_panel.current_user.sir_hist
+	
+	if data_list == []:
+		invalid_userid_label.visible = true
+		invalid_userid_label.text = "No Data Recorded"
+		return
 	
 	# take the last 100 points to be plotted
 	var indexes_to_be_ploted = []
@@ -58,7 +68,9 @@ func _draw() -> void:
 func _ready() -> void:
 	self.size = Vector2(analysis_panel.length*0.95,analysis_panel.width*0.6)
 	self.position = Vector2((analysis_panel.length-self.size.x)/2,analysis_panel_title.size.y*1.5)
-
+	invalid_userid_label.size = self.size
+	invalid_userid_label.position = Vector2(0,0)
+	invalid_userid_label.visible = false
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:

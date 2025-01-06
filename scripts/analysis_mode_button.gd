@@ -56,16 +56,19 @@ func _ready():
 	else:
 		is_mouse_in_box = false
 
-func button_click_function():
+func button_click_function(append=false):
 	if self.button_mode == self.Mode.OBSERVER:
 		if self.analysis_on == true:
 			function_panel.all_button_reset_analysis_on()
 			user_controller.all_user_end_analysis()
 			self.char.text = "S"
-			self.label.set_text("Start Analysis")
+			if user_controller.linear_user_list != [] and user_controller.linear_user_list[0].sir_hist != []:
+				self.label.set_text("Restart Analysis")
+			else:
+				self.label.set_text("Start Analysis")
 		else:
 			function_panel.all_button_set_analysis_on()
-			user_controller.all_user_start_analysis()
+			user_controller.all_user_start_analysis(append)
 			self.char.text = "E"
 			self.label.set_text("End Analysis")
 			

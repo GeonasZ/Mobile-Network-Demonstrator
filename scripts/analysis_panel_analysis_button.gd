@@ -1,13 +1,14 @@
 extends Panel
 
 @onready var analysis_panel = $".."
+@onready var user_controller = $"../../Controllers/UserController"
 @onready var analysis_mode_button = $"../../FunctionPanel/AnalysisModeButton"
 @onready var label = $Label
-
-var length = 300
+enum ButtonFunc {START,PAUSE,RESUME}
+var length = 360
 var width = 80
 var slash_len = 10
-
+var current_button_func = self.ButtonFunc.START
 var is_mouse_in = false
 # DO NOT replace this variable (analysis_on) with those
 # store under the function buttons. 
@@ -18,30 +19,39 @@ var on_work = true
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	self.position = Vector2(analysis_panel.length/7.,self.size.y/1.8)
+	self.position = Vector2(analysis_panel.length/10.,self.size.y/1.8)
 	self.size = Vector2(self.length,self.width)
 	self.label.size = self.size
 	self.pivot_offset = self.size/2
+	
 
 func set_analysis_start():
 	self.analysis_on = true
-	label.text = "End Analysis"
+	label.text = "Pause Analysis"
+	self.current_button_func = ButtonFunc.PAUSE
 
 func set_analysis_end():
 	self.analysis_on = false
+	if user_controller.linear_user_list != []:
+		if user_controller.linear_user_list[0].sir_hist != []:
+			label.text = "Resume Analysis"
+			self.current_button_func = ButtonFunc.RESUME
+			return
 	label.text = "Start Analysis"
+	self.current_button_func = ButtonFunc.START
 
 func button_click_function():
 	if self.analysis_on:
 		set_analysis_end()
 	else:
 		set_analysis_start()
-	analysis_mode_button.button_click_function()
+	# click analysis_mode_button with append = true
+	analysis_mode_button.button_click_function(true)
 
 
 func _input(event: InputEvent) -> void:
 	if (analysis_panel.visible and analysis_panel.on_work) and self.on_work:
-		if event is InputEventKey and (not self.analysis_on and event.keycode == KEY_S or self.analysis_on and event.keycode == KEY_E) and event.is_pressed():
+		if event is InputEventKey and (self.current_button_func==ButtonFunc.START and event.keycode == KEY_S or self.current_button_func==ButtonFunc.PAUSE and event.keycode == KEY_P or self.current_button_func==ButtonFunc.RESUME and event.keycode==KEY_R) and event.is_pressed():
 			self.on_work = false
 			self.button_click_function()
 			await get_tree().create_timer(0.2).timeout
