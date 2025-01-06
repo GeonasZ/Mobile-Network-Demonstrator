@@ -1,4 +1,4 @@
-[gd_scene load_steps=114 format=3 uid="uid://dp7br0wc03w8r"]
+[gd_scene load_steps=115 format=3 uid="uid://dp7br0wc03w8r"]
 
 [ext_resource type="Script" path="res://scripts/UserController.gd" id="1_18gww"]
 [ext_resource type="Script" path="res://scripts/TileController.gd" id="1_fg5v7"]
@@ -63,6 +63,7 @@
 [ext_resource type="StyleBox" uid="uid://b36jdi83vmboa" path="res://themes/analysis_panel_close_button_style_box.tres" id="53_c5h3d"]
 [ext_resource type="Shader" uid="uid://dswhn0a66pyjx" path="res://shader/const0.8a_shader.tres" id="54_kk55c"]
 [ext_resource type="Shader" uid="uid://cmhftmgn2d83b" path="res://shader/sonst0.9a_shader.tres" id="55_f76ue"]
+[ext_resource type="Script" path="res://scripts/analysis_panel_analysis_button.gd" id="60_dcd47"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_h4n7r"]
 shader = ExtResource("6_ihk23")
@@ -612,7 +613,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.2),
 "transitions": PackedFloat32Array(0.203064, 1),
 "update": 0,
-"values": [Vector2(0, 0), Vector2(1, 1)]
+"values": [Vector2(0, 0), Vector2(0.6, 0.6)]
 }
 
 [sub_resource type="Animation" id="Animation_hojdu"]
@@ -628,7 +629,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.2),
 "transitions": PackedFloat32Array(5.09825, 1),
 "update": 0,
-"values": [Vector2(1, 1), Vector2(1e-05, 1e-05)]
+"values": [Vector2(0.6, 0.6), Vector2(1e-05, 1e-05)]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_lhp1y"]
@@ -1145,6 +1146,100 @@ z_index = 1
 anchors_preset = 0
 script = ExtResource("8_weq5s")
 
+[node name="AnalysisModeButton" type="Control" parent="FunctionPanel"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+scale = Vector2(1e-05, 1e-05)
+script = ExtResource("41_hdmb4")
+
+[node name="Char" type="Label" parent="FunctionPanel/AnalysisModeButton"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+theme = ExtResource("13_22qid")
+text = "S"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("13_wkp48")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="FunctionPanel/AnalysisModeButton"]
+libraries = {
+"": SubResource("AnimationLibrary_it6wr")
+}
+
+[node name="FunctionLabel" type="Control" parent="FunctionPanel/AnalysisModeButton"]
+anchors_preset = 0
+offset_left = -20.0
+offset_top = 48.0
+offset_right = 20.0
+offset_bottom = 88.0
+scale = Vector2(1e-05, 1e-05)
+script = ExtResource("12_mq0m8")
+
+[node name="Label" type="Label" parent="FunctionPanel/AnalysisModeButton/FunctionLabel"]
+layout_mode = 0
+offset_left = 1.696e+08
+offset_top = 1.43e+07
+offset_right = 1.696e+08
+offset_bottom = 1.43001e+07
+theme = ExtResource("11_8l076")
+text = "Start Analysis"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="FunctionPanel/AnalysisModeButton/FunctionLabel"]
+libraries = {
+"": SubResource("AnimationLibrary_i6iwl")
+}
+
+[node name="AnalysisPanelButton" type="Control" parent="FunctionPanel"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+scale = Vector2(1e-05, 1e-05)
+script = ExtResource("42_ijebh")
+
+[node name="Char" type="Label" parent="FunctionPanel/AnalysisPanelButton"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+theme = ExtResource("13_22qid")
+text = "A"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("13_wkp48")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="FunctionPanel/AnalysisPanelButton"]
+libraries = {
+"": SubResource("AnimationLibrary_it6wr")
+}
+
+[node name="FunctionLabel" type="Control" parent="FunctionPanel/AnalysisPanelButton"]
+anchors_preset = 0
+offset_left = -20.0
+offset_top = 48.0
+offset_right = 20.0
+offset_bottom = 88.0
+scale = Vector2(1e-05, 1e-05)
+script = ExtResource("12_mq0m8")
+
+[node name="Label" type="Label" parent="FunctionPanel/AnalysisPanelButton/FunctionLabel"]
+layout_mode = 0
+offset_left = 1.696e+08
+offset_top = 1.43e+07
+offset_right = 1.696e+08
+offset_bottom = 1.43001e+07
+theme = ExtResource("11_8l076")
+text = "Analysis Panel"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="FunctionPanel/AnalysisPanelButton/FunctionLabel"]
+libraries = {
+"": SubResource("AnimationLibrary_i6iwl")
+}
+
 [node name="AddUserButton" type="Control" parent="FunctionPanel"]
 layout_mode = 3
 anchors_preset = 0
@@ -1295,100 +1390,6 @@ libraries = {
 "": SubResource("AnimationLibrary_i6iwl")
 }
 
-[node name="AnalysisModeButton" type="Control" parent="FunctionPanel"]
-layout_mode = 3
-anchors_preset = 0
-offset_right = 40.0
-scale = Vector2(1e-05, 1e-05)
-script = ExtResource("41_hdmb4")
-
-[node name="Char" type="Label" parent="FunctionPanel/AnalysisModeButton"]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 23.0
-theme = ExtResource("13_22qid")
-text = "S"
-horizontal_alignment = 1
-vertical_alignment = 1
-script = ExtResource("13_wkp48")
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="FunctionPanel/AnalysisModeButton"]
-libraries = {
-"": SubResource("AnimationLibrary_it6wr")
-}
-
-[node name="FunctionLabel" type="Control" parent="FunctionPanel/AnalysisModeButton"]
-anchors_preset = 0
-offset_left = -20.0
-offset_top = 48.0
-offset_right = 20.0
-offset_bottom = 88.0
-scale = Vector2(1e-05, 1e-05)
-script = ExtResource("12_mq0m8")
-
-[node name="Label" type="Label" parent="FunctionPanel/AnalysisModeButton/FunctionLabel"]
-layout_mode = 0
-offset_left = 1.696e+08
-offset_top = 1.43e+07
-offset_right = 1.696e+08
-offset_bottom = 1.43001e+07
-theme = ExtResource("11_8l076")
-text = "Start Analysis"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="FunctionPanel/AnalysisModeButton/FunctionLabel"]
-libraries = {
-"": SubResource("AnimationLibrary_i6iwl")
-}
-
-[node name="AnalysisPanelButton" type="Control" parent="FunctionPanel"]
-layout_mode = 3
-anchors_preset = 0
-offset_right = 40.0
-scale = Vector2(1e-05, 1e-05)
-script = ExtResource("42_ijebh")
-
-[node name="Char" type="Label" parent="FunctionPanel/AnalysisPanelButton"]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 23.0
-theme = ExtResource("13_22qid")
-text = "A"
-horizontal_alignment = 1
-vertical_alignment = 1
-script = ExtResource("13_wkp48")
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="FunctionPanel/AnalysisPanelButton"]
-libraries = {
-"": SubResource("AnimationLibrary_it6wr")
-}
-
-[node name="FunctionLabel" type="Control" parent="FunctionPanel/AnalysisPanelButton"]
-anchors_preset = 0
-offset_left = -20.0
-offset_top = 48.0
-offset_right = 20.0
-offset_bottom = 88.0
-scale = Vector2(1e-05, 1e-05)
-script = ExtResource("12_mq0m8")
-
-[node name="Label" type="Label" parent="FunctionPanel/AnalysisPanelButton/FunctionLabel"]
-layout_mode = 0
-offset_left = 1.696e+08
-offset_top = 1.43e+07
-offset_right = 1.696e+08
-offset_bottom = 1.43001e+07
-theme = ExtResource("11_8l076")
-text = "Analysis Panel"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="FunctionPanel/AnalysisPanelButton/FunctionLabel"]
-libraries = {
-"": SubResource("AnimationLibrary_i6iwl")
-}
-
 [node name="InstructionButton" type="Control" parent="FunctionPanel"]
 layout_mode = 1
 anchors_preset = 0
@@ -1485,8 +1486,8 @@ offset_left = 1.696e+08
 offset_top = 1.43e+07
 offset_right = 1.696e+08
 offset_bottom = 1.43001e+07
-theme = ExtResource("11_8l076")
-text = "Observer Mode"
+theme = ExtResource("28_1qo4p")
+text = "Enter Observer Mode"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -1547,9 +1548,8 @@ offset_left = 1.696e+08
 offset_top = 1.43e+07
 offset_right = 1.696e+08
 offset_bottom = 1.43001e+07
-theme = ExtResource("11_8l076")
-theme_override_font_sizes/font_size = 26
-text = "Engineer Mode"
+theme = ExtResource("28_1qo4p")
+text = "Enter Engineer Mode"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -1810,11 +1810,29 @@ theme = SubResource("Theme_5kpia")
 script = ExtResource("53_5krwa")
 
 [node name="Label" type="Label" parent="AnalysisPanel/CloseButton"]
+layout_mode = 0
 offset_top = -6.10352e-05
 offset_right = 40.0
 offset_bottom = 23.9999
 theme = SubResource("Theme_3l4ea")
 text = "Close"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AnalysisButton" type="Panel" parent="AnalysisPanel"]
+layout_mode = 0
+offset_right = 187.0
+offset_bottom = 54.0
+theme = SubResource("Theme_5kpia")
+script = ExtResource("60_dcd47")
+
+[node name="Label" type="Label" parent="AnalysisPanel/AnalysisButton"]
+layout_mode = 0
+offset_top = -6.10352e-05
+offset_right = 40.0
+offset_bottom = 23.9999
+theme = SubResource("Theme_3l4ea")
+text = "Start Analysis"
 horizontal_alignment = 1
 vertical_alignment = 1
 

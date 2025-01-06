@@ -37,6 +37,10 @@ func appear():
 
 ## future use for logical appear of button
 func smart_appear():
+	
+	if self.analysis_on:
+		return
+	
 	self.appear()
 
 func disappear():

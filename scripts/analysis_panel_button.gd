@@ -45,7 +45,7 @@ func _ready():
 	self.label.visible = false
 	self.scale = Vector2(1,1)
 	self.on_work = true
-	self.position = Vector2(1700 - button_radius, 580 - button_radius)
+	self.position = Vector2(1700 - button_radius, 340 - button_radius)
 	self.size = Vector2(2*button_radius, 2*button_radius)
 	self.pivot_offset = self.size/2
 	
@@ -69,8 +69,6 @@ func button_click_function():
 
 func _input(event: InputEvent) -> void:
 	if not self.visible or not function_panel.visible:
-		return
-	if self.analysis_on:
 		return
 	if not can_be_controlled_by_key:
 		return

@@ -138,6 +138,8 @@ func hide_boundary():
 	if not tracked_by_panel:
 		boundary.visible = false
 
+
+
 func connect_to_channel(channel):
 	if channel != self.connected_channel and (channel == null or self.connected_channel == null):
 		self.connected_channel = channel

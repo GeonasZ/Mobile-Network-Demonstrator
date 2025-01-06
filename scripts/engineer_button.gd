@@ -88,7 +88,9 @@ func appear():
 
 ## future use for logical appear of button
 func smart_appear():
-	if not self.analysis_on and self.button_mode != self.Mode.OBSERVER:
+	if self.analysis_on:
+		return
+	if self.button_mode != self.Mode.OBSERVER:
 		self.appear()
 
 func disappear():
@@ -110,12 +112,13 @@ func button_left_click_function(event):
 	if self.button_mode != Mode.ENGINEER:
 		function_panel.set_all_button_mode(Mode.ENGINEER)
 		user_controller.all_user_enter_engineer_mode()
-		
+		self.label.set_text("Leave Engineer Mode")
 	else:
 		function_panel.set_all_button_mode(Mode.NONE)
 		user_controller.all_user_leave_engineer_mode()
 		station_config_panel.disappear()
 		mouse_panel.track_mouse()
+		self.label.set_text("Enter Engineer Mode")
 			
 	await get_tree().create_timer(0.25).timeout
 	self.on_work = true

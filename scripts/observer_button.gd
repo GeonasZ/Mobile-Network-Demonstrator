@@ -5,6 +5,7 @@ extends Control
 @onready var mouse_panel = $"../../MousePanel"
 @onready var cross = $Cross
 @onready var label = $FunctionLabel
+@onready var analysis_mode_button = $"../AnalysisModeButton"
 @onready var function_panel = $".."
 
 enum Mode {NONE, OBSERVER, ENGINEER}
@@ -72,6 +73,21 @@ func _ready():
 	else:
 		is_mouse_in_box = false
 
+func button_click_function():
+	var analysis_temp = self.analysis_on
+	if self.analysis_on:
+		analysis_mode_button.button_click_function()
+	if self.button_mode != Mode.OBSERVER:
+		function_panel.set_all_button_mode(Mode.OBSERVER)
+		user_controller.all_user_enter_observer_mode()
+		self.label.set_text("Leave Observer Mode")
+	else:
+		function_panel.set_all_button_mode(Mode.NONE)
+		user_controller.all_user_leave_observer_mode()
+		self.label.set_text("Enter Observer Mode")
+	if analysis_temp:
+		function_panel.all_button_smart_appear()
+
 func _input(event: InputEvent) -> void:
 	if not self.visible or not function_panel.visible:
 		return
@@ -82,16 +98,12 @@ func _input(event: InputEvent) -> void:
 		return
 		
 	if event is InputEventKey and event.keycode == KEY_O and event.is_pressed() and can_be_controlled_by_key:
-		self.can_be_controlled_by_key = false
-		if self.button_mode != Mode.OBSERVER:
-			function_panel.set_all_button_mode(Mode.OBSERVER)
-			user_controller.all_user_enter_observer_mode()
-			
-		else:
-			function_panel.set_all_button_mode(Mode.NONE)
-			user_controller.all_user_leave_observer_mode()
+		self.on_work = false
+		self.button_click_function()
 		await self.get_tree().create_timer(0.25).timeout
-		self.can_be_controlled_by_key = true
+		self.on_work = true
+
+		self.on_work = true
 	
 func _gui_input(event: InputEvent) -> void:
 	
@@ -103,13 +115,7 @@ func _gui_input(event: InputEvent) -> void:
 	
 	if event is InputEventMouseButton and event.button_mask == MOUSE_BUTTON_MASK_LEFT:
 		self.on_work = false
-		if self.button_mode != Mode.OBSERVER:
-			function_panel.set_all_button_mode(Mode.OBSERVER)
-			user_controller.all_user_enter_observer_mode()
-			
-		else:
-			function_panel.set_all_button_mode(Mode.NONE)
-			user_controller.all_user_leave_observer_mode()
+		self.button_click_function()
 		await self.get_tree().create_timer(0.25).timeout
 		self.on_work = true
 		
@@ -140,11 +146,6 @@ func smart_disappear():
 		#self.disappear()
 
 func _process(delta):
-	# hide if analysis on, show if analysis off
-	if self.analysis_on and self.visible:
-		self.disappear()
-	elif self.button_mode == self.Mode.OBSERVER and not self.analysis_on and not self.visible and not function_panel.analysis_panel_open:
-		self.appear()
 	# mouse in button animes
 	if self.is_mouse_in_original_rect():
 		# trigger only at the frame cursor enters button
@@ -152,9 +153,9 @@ func _process(delta):
 			if not mouse_panel.is_tracking_station():
 				mouse_panel.disappear_with_anime()
 			is_mouse_in_box = true
-		if label.visible == false and self.visible and label:
+		if label.visible == false and self.visible:
 			self.scale = Vector2(1.05,1.05)
-			if self.button_mode != self.Mode.OBSERVER:
+			if self.button_mode != self.Mode.OBSERVER or self.analysis_on:
 				label.visible == true
 				label.appear_with_anime()
 	else:

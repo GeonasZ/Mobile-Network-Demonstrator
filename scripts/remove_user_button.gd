@@ -45,7 +45,7 @@ func _ready():
 	self.label.visible = false
 	self.scale = Vector2(1,1)
 	self.on_work = true
-	self.position = Vector2(1700 - button_radius, 340 - button_radius)
+	self.position = Vector2(1700 - button_radius, 580 - button_radius)
 	self.size = Vector2(2*button_radius, 2*button_radius)
 	self.pivot_offset = self.size/2
 	
@@ -111,6 +111,9 @@ func appear():
 
 ## future use for logical appear of button
 func smart_appear():
+	if self.analysis_on:
+		return
+	
 	if not function_panel.is_instruction_panel_visible() and not self.visible and self.button_mode == Mode.OBSERVER:
 		self.appear()
 

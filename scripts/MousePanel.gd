@@ -167,7 +167,7 @@ func disappear_with_anime():
 func on_analysis_panel_open():
 	self.analysis_panel_open = true
 	self.track_mouse()
-	self.disappear_with_anime_at_speed(0.2)
+	self.disappear_with_anime_at_speed(1)
 
 func on_analysis_panel_close():
 	if function_panel.mouse_panel_not_in_button():

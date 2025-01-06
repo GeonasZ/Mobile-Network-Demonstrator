@@ -7,6 +7,8 @@ extends Control
 @onready var animator = $AnimationPlayer
 @onready var mouse_panel = $"../MousePanel"
 @onready var user_controller = $"../Controllers/UserController"
+@onready var analysis_mode_button = $"../FunctionPanel/AnalysisModeButton"
+@onready var analysis_button = $AnalysisButton
 
 var length = 1850
 var width = 1000
@@ -56,26 +58,42 @@ func _gui_input(event: InputEvent) -> void:
 		self.on_drag = false
 		
 func set_current_user_by_index(index:int):
+	if self.current_user != null:
+		self.current_user.hide_boundary()
+		
 	if index < 0:
 		self.current_user = null
 		# print("AnalysisPanel <set_current_user_by_index>: Negative Index Assignment")
 		return
-	if self.current_user != null:
-		self.current_user.hide_boundary()
+
 	self.current_user = user_controller.linear_user_list[index]
+	if self.current_user != null:
+		self.current_user.show_boundary()
 
 func set_current_user_by_id(id:int):
+	if self.current_user != null:
+		self.current_user.hide_boundary()
+	
 	var index = user_controller.binary_search_user_in_linear_user_list(id)
 	
 	if index != -1:
 		self.current_user = user_controller.linear_user_list[index]
 	else:
 		self.current_user = null
+		
+	if self.current_user != null:
+		self.current_user.show_boundary()
 	
 func appear():
 	self.visible = true
 	self.animator.play("appear")
 	self.on_work = false
+	
+	if analysis_mode_button.analysis_on:
+		analysis_button.set_analysis_start()
+	else:
+		analysis_button.set_analysis_end()
+	
 	mouse_panel.on_analysis_panel_open()
 	if user_controller.linear_user_list != [] and self.current_user == null:
 		user_select.initialize(str(user_controller.linear_user_list[0].id))
@@ -83,10 +101,14 @@ func appear():
 	elif user_controller.linear_user_list == []:
 		user_select.initialize(str(0))
 		set_current_user_by_index(-1)
+	if current_user != null:
+		current_user.show_boundary()
 	await self.animator.animation_finished
 	self.on_work = true
 	
 func disappear():
+	if self.current_user != null:
+		self.current_user.hide_boundary()
 	self.animator.play("disappear")
 	self.on_work = false
 	mouse_panel.on_analysis_panel_close()

@@ -2,7 +2,7 @@ extends Control
 
 @onready var user = $".."
 var rect
-var rect_color = Color8(150,150,150)
+var rect_color = Color8(20,20,20)
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
