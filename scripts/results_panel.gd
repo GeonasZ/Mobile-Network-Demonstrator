@@ -52,7 +52,6 @@ func _ready() -> void:
 	
 func init_size():
 	self.size = Vector2(analysis_panel.length*0.68,analysis_panel.width/4.)
-	self.position = Vector2(analysis_panel.length*0.285,analysis_panel.width/4*3.)
 	self.length = self.size.x
 	self.width = self.size.y
 

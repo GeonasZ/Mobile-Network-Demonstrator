@@ -23,18 +23,24 @@ var line_width = 3
 func dBm(num:float):
 	return 10*log(num/0.001)
 
+func make_indicative_y_values():
+	# make an indicative axis if max or min value is not accessable
+	var element_data_diff = 1
+	for i in range(len(y_axis.y_axis_label_list)):
+		y_axis.y_axis_label_list[i].text = self._make_displayed_content(element_data_diff*i + 0)
+
 func _draw() -> void:
 	var y_diff = self.size.y-2.*self.y_padding
 	var y_start = self.y_padding
 	var diff_per_element = y_diff/(y_axis.n_labels-1)
-	# draw y axis
+	# draw y axis lines
 	for i in range(y_axis.n_labels):
 		draw_line(Vector2(0,y_start+i*diff_per_element),Vector2(axis_indicative_line_len,y_start+i*diff_per_element),Color8(0,0,0),5)
-	
 	
 	if analysis_panel.current_user == null:
 		invalid_userid_label.visible = true
 		invalid_userid_label.text = "Unexistent User ID"
+		make_indicative_y_values()
 		return
 	invalid_userid_label.visible = false
 		
@@ -74,12 +80,13 @@ func _draw() -> void:
 	
 	if diff == 0:
 		diff = 1
-		
+	# make y axis labels
 	if max_dBm != null and min_dBm != null:
 		var element_data_diff = diff/(y_axis.n_labels-1)
 		for i in range(len(y_axis.y_axis_label_list)):
 			y_axis.y_axis_label_list[i].text = self._make_displayed_content(element_data_diff*i + min_dBm)
-	
+	else:
+		make_indicative_y_values()
 	var j = 0
 	var last_data_point
 	var current_data_point

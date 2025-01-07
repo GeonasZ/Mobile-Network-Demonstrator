@@ -3,13 +3,16 @@ extends Control
 @onready var title = $Title
 @onready var user_select_panel = $UserSelectPanel
 @onready var plot_select_panel = $PlotSelectPanel
+@onready var n_plot_data_panel = $NPlotDataPanel
 @onready var user_select = $"UserSelectPanel/UserSelectEdit"
+@onready var n_plot_data_edit = $NPlotDataPanel/NPlotDataEdit
 @onready var results_panel = $ResultsPanel
 @onready var animator = $AnimationPlayer
 @onready var mouse_panel = $"../MousePanel"
 @onready var user_controller = $"../Controllers/UserController"
 @onready var analysis_mode_button = $"../FunctionPanel/AnalysisModeButton"
 @onready var analysis_button = $AnalysisButton
+@onready var plot_frame = $PlotFrame
 
 var length = 1850
 var width = 1000
@@ -49,9 +52,12 @@ func _ready() -> void:
 	self.position = Vector2((1920-self.length)/2,(1080-self.width)/2)
 	title.size = Vector2(self.size.x,self.size.y/10)
 	title.position = Vector2(0,self.width/64.)
-	user_select_panel.position = Vector2(self.slash_len,self.width-2.5*self.slash_len)
-	plot_select_panel.position = Vector2(self.slash_len,self.width-5.*self.slash_len)
-
+	user_select_panel.position = Vector2(self.slash_len,self.width-1.65*self.slash_len+0.15*self.slash_len)
+	n_plot_data_panel.position = Vector2(self.slash_len,self.width-3.3*self.slash_len+0.15*self.slash_len)
+	results_panel.position = Vector2(self.length*0.285,self.width-4.95*self.slash_len+0.15*self.slash_len)
+	plot_select_panel.position = Vector2(self.slash_len,self.width-5.2*self.slash_len+0.15*self.slash_len)
+	n_plot_data_edit.initialize(plot_frame.n_displayed_data)
+	
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed() and not on_drag:
 		self.on_drag = true

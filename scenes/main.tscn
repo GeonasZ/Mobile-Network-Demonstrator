@@ -1,4 +1,4 @@
-[gd_scene load_steps=118 format=3 uid="uid://dp7br0wc03w8r"]
+[gd_scene load_steps=119 format=3 uid="uid://dp7br0wc03w8r"]
 
 [ext_resource type="Script" path="res://scripts/UserController.gd" id="1_18gww"]
 [ext_resource type="Script" path="res://scripts/TileController.gd" id="1_fg5v7"]
@@ -63,6 +63,7 @@
 [ext_resource type="Shader" uid="uid://dswhn0a66pyjx" path="res://shader/const0.8a_shader.tres" id="54_kk55c"]
 [ext_resource type="Script" path="res://scripts/y_axis.gd" id="55_bkmeg"]
 [ext_resource type="Shader" uid="uid://cmhftmgn2d83b" path="res://shader/sonst0.9a_shader.tres" id="55_f76ue"]
+[ext_resource type="Script" path="res://scripts/n_plot_data_edit.gd" id="57_11oek"]
 [ext_resource type="Script" path="res://scripts/plot_select_button.gd" id="57_pr2yt"]
 [ext_resource type="Script" path="res://scripts/analysis_panel_analysis_button.gd" id="60_dcd47"]
 
@@ -1730,14 +1731,38 @@ text = "Analysed User ID:    "
 
 [node name="UserSelectEdit" type="LineEdit" parent="AnalysisPanel/UserSelectPanel"]
 layout_mode = 2
+size_flags_horizontal = 10
 theme = ExtResource("26_bgssn")
 expand_to_text_length = true
 context_menu_enabled = false
 virtual_keyboard_enabled = false
+select_all_on_focus = true
 caret_blink = true
 script = ExtResource("51_qv08a")
 
+[node name="NPlotDataPanel" type="HBoxContainer" parent="AnalysisPanel"]
+offset_right = 450.0
+offset_bottom = 56.0
+
+[node name="Title" type="Label" parent="AnalysisPanel/NPlotDataPanel"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme = SubResource("Theme_7tp5v")
+text = "Data Number:    "
+
+[node name="NPlotDataEdit" type="LineEdit" parent="AnalysisPanel/NPlotDataPanel"]
+layout_mode = 2
+size_flags_horizontal = 10
+theme = ExtResource("26_bgssn")
+expand_to_text_length = true
+context_menu_enabled = false
+virtual_keyboard_enabled = false
+select_all_on_focus = true
+caret_blink = true
+script = ExtResource("57_11oek")
+
 [node name="PlotSelectPanel" type="HBoxContainer" parent="AnalysisPanel"]
+layout_mode = 0
 offset_right = 450.0
 offset_bottom = 56.0
 
