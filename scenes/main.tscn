@@ -1,4 +1,4 @@
-[gd_scene load_steps=115 format=3 uid="uid://dp7br0wc03w8r"]
+[gd_scene load_steps=118 format=3 uid="uid://dp7br0wc03w8r"]
 
 [ext_resource type="Script" path="res://scripts/UserController.gd" id="1_18gww"]
 [ext_resource type="Script" path="res://scripts/TileController.gd" id="1_fg5v7"]
@@ -60,9 +60,10 @@
 [ext_resource type="Script" path="res://scripts/results_panel_element.gd" id="51_vsv66"]
 [ext_resource type="Script" path="res://scripts/plot_frame.gd" id="52_t6j7q"]
 [ext_resource type="Script" path="res://scripts/analysis_panelclose_button.gd" id="53_5krwa"]
-[ext_resource type="StyleBox" uid="uid://b36jdi83vmboa" path="res://themes/analysis_panel_close_button_style_box.tres" id="53_c5h3d"]
 [ext_resource type="Shader" uid="uid://dswhn0a66pyjx" path="res://shader/const0.8a_shader.tres" id="54_kk55c"]
+[ext_resource type="Script" path="res://scripts/y_axis.gd" id="55_bkmeg"]
 [ext_resource type="Shader" uid="uid://cmhftmgn2d83b" path="res://shader/sonst0.9a_shader.tres" id="55_f76ue"]
+[ext_resource type="Script" path="res://scripts/plot_select_button.gd" id="57_pr2yt"]
 [ext_resource type="Script" path="res://scripts/analysis_panel_analysis_button.gd" id="60_dcd47"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_h4n7r"]
@@ -566,6 +567,9 @@ _data = {
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_vqwtm"]
 shader = ExtResource("54_kk55c")
 
+[sub_resource type="Theme" id="Theme_qlh81"]
+Panel/styles/panel = null
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ghcyo"]
 bg_color = Color(0.772247, 0.772247, 0.772247, 1)
 border_width_left = 3
@@ -576,6 +580,21 @@ border_color = Color(0, 0, 0, 1)
 
 [sub_resource type="Theme" id="Theme_rdy2j"]
 Panel/styles/panel = SubResource("StyleBoxFlat_ghcyo")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pvxdf"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="Theme" id="Theme_5kpia"]
+Panel/styles/panel = SubResource("StyleBoxFlat_pvxdf")
 
 [sub_resource type="Theme" id="Theme_wvde4"]
 RichTextLabel/colors/default_color = Color(0, 0, 0, 1)
@@ -638,9 +657,6 @@ _data = {
 "appear": SubResource("Animation_g4ix7"),
 "disappear": SubResource("Animation_hojdu")
 }
-
-[sub_resource type="Theme" id="Theme_5kpia"]
-Panel/styles/panel = ExtResource("53_c5h3d")
 
 [sub_resource type="Theme" id="Theme_3l4ea"]
 Label/colors/font_color = Color(0, 0, 0, 1)
@@ -1665,6 +1681,7 @@ material = SubResource("ShaderMaterial_vqwtm")
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
+theme = SubResource("Theme_qlh81")
 script = ExtResource("49_07ke4")
 
 [node name="Title" type="Label" parent="AnalysisPanel"]
@@ -1694,10 +1711,16 @@ text = "Unexistent User ID"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="UserSelectPanel" type="HBoxContainer" parent="AnalysisPanel"]
-layout_mode = 0
+[node name="YAxisLabels" type="Control" parent="AnalysisPanel/PlotFrame"]
+anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
+script = ExtResource("55_bkmeg")
+
+[node name="UserSelectPanel" type="HBoxContainer" parent="AnalysisPanel"]
+layout_mode = 0
+offset_right = 450.0
+offset_bottom = 56.0
 
 [node name="Title" type="Label" parent="AnalysisPanel/UserSelectPanel"]
 layout_mode = 2
@@ -1715,24 +1738,30 @@ caret_blink = true
 script = ExtResource("51_qv08a")
 
 [node name="PlotSelectPanel" type="HBoxContainer" parent="AnalysisPanel"]
-visible = false
-offset_right = 423.0
+offset_right = 450.0
 offset_bottom = 56.0
 
 [node name="Title" type="Label" parent="AnalysisPanel/PlotSelectPanel"]
 layout_mode = 2
 size_flags_horizontal = 0
 theme = SubResource("Theme_7tp5v")
-text = "Displayed Plot"
+text = "Plot Displayed:   "
 
-[node name="UserSelectEdit" type="LineEdit" parent="AnalysisPanel/PlotSelectPanel"]
+[node name="PlotSelectButton" type="Panel" parent="AnalysisPanel/PlotSelectPanel"]
 layout_mode = 2
-theme = ExtResource("26_bgssn")
-expand_to_text_length = true
-context_menu_enabled = false
-virtual_keyboard_enabled = false
-caret_blink = true
-script = ExtResource("51_qv08a")
+size_flags_horizontal = 3
+theme = SubResource("Theme_5kpia")
+script = ExtResource("57_pr2yt")
+
+[node name="Label" type="Label" parent="AnalysisPanel/PlotSelectPanel/PlotSelectButton"]
+layout_mode = 0
+offset_top = -6.10352e-05
+offset_right = 40.0
+offset_bottom = 23.9999
+theme = ExtResource("11_8l076")
+text = "Signal Power"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="ResultsPanel" type="GridContainer" parent="AnalysisPanel"]
 use_parent_material = true

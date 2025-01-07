@@ -69,13 +69,13 @@ func _input(event: InputEvent) -> void:
 	
 	if event is InputEventKey and event.keycode == KEY_KP_ADD and event.is_pressed():
 		on_work = false
-		user_controller.random_add_user(10)
+		user_controller.random_add_user(10,true)
 		await get_tree().create_timer(0.2).timeout
 		on_work = true
 	
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_mask == MOUSE_BUTTON_MASK_LEFT:
-		user_controller.random_add_user(10)
+		user_controller.random_add_user(10,true)
 			
 func appear():
 	self.visible = true

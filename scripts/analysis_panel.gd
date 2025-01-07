@@ -2,6 +2,7 @@ extends Control
 
 @onready var title = $Title
 @onready var user_select_panel = $UserSelectPanel
+@onready var plot_select_panel = $PlotSelectPanel
 @onready var user_select = $"UserSelectPanel/UserSelectEdit"
 @onready var results_panel = $ResultsPanel
 @onready var animator = $AnimationPlayer
@@ -48,7 +49,8 @@ func _ready() -> void:
 	self.position = Vector2((1920-self.length)/2,(1080-self.width)/2)
 	title.size = Vector2(self.size.x,self.size.y/10)
 	title.position = Vector2(0,self.width/64.)
-	user_select_panel.position = Vector2(self.slash_len,self.width-3.*self.slash_len)
+	user_select_panel.position = Vector2(self.slash_len,self.width-2.5*self.slash_len)
+	plot_select_panel.position = Vector2(self.slash_len,self.width-5.*self.slash_len)
 
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed() and not on_drag:

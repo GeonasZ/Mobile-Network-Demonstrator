@@ -11,6 +11,7 @@ extends GridContainer
 @onready var max_sir_label = $MaxSIR
 @onready var current_signal_label = $CurrentSignalPower
 @onready var current_sir_label = $CurrentSIR
+@onready var plot_frame = $"../PlotFrame"
 
 var element_list = []
 var length
@@ -61,7 +62,7 @@ func set_all_elements_length(size:Vector2):
 
 ## return [signal_mean, sir_mean, signal_max, sir_max,
 ## signal_min, sir_min]
-func extract_user_data(user):
+func extract_user_data(user,n_displayed_data=-1):
 	
 	if user == null:
 		return []
@@ -72,13 +73,26 @@ func extract_user_data(user):
 	if not signal_hist or not sir_hist:
 		return []
 	
+	if n_displayed_data < 0:
+		n_displayed_data = len(sir_hist)
+	
 	var signal_sum = 0
 	var sir_sum = 0
 	var signal_max = signal_hist[0]
 	var signal_min = signal_hist[0]
 	var sir_max = sir_hist[0]
 	var sir_min = sir_hist[0]
-	for i in range(len(signal_hist)):
+	
+	var index_range
+	var n_valid_sir = 0
+	#if len(sir_hist) > n_displayed_data:
+		#index_range = range(len(sir_hist)-n_displayed_data,len(sir_hist))
+	#else:
+		#index_range = range(len(sir_hist))
+		
+	index_range = range(len(sir_hist))
+		
+	for i in index_range:
 		# sum signal up
 		signal_sum += signal_hist[i]
 		# look for the max and min for signal power
@@ -93,15 +107,16 @@ func extract_user_data(user):
 			if sir_hist[i] != INF:
 				# sum sir up
 				sir_sum += sir_hist[i]
+				n_valid_sir += 1
 				# look for the max and min of sir
 				if sir_max is String or sir_hist[i] > sir_max:
 					sir_max = sir_hist[i]
 				elif sir_min is String or sir_hist[i] < sir_min:
 					sir_min = sir_hist[i]
+	var mean_sir = sir_sum/n_valid_sir if n_valid_sir > 0 else "N/A"
 
-
-	return [signal_sum/len(signal_hist),
-			sir_sum/len(sir_hist), signal_max,
+	return [signal_sum/len(index_range),
+			mean_sir, signal_max,
 			sir_max, signal_min, sir_min]
 
 func dBm(num:float):
@@ -120,15 +135,18 @@ func _display_null_data():
 	max_sir_label.text = "Max SIR:\n\tN/A"
 	current_sir_label.text = "Realtime SIR:\n\tN/A"
 
-func make_displayed_content(input)->String:
+func make_displayed_content(input,zero_as_inf=false)->String:
 	var displayed_content
 	if (input is float or input is int):
 		if input == 0:
-			displayed_content = "0"
+			if zero_as_inf:
+				displayed_content = "-Inf dBm"
+			else:
+				displayed_content = "0"
 		elif input != INF:
-			displayed_content = str(truncate_double(dBm(input))) +"dBm"
+			displayed_content = str(truncate_double(dBm(input))) +" dBm"
 		else:
-			displayed_content = "Inf"
+			displayed_content = "Inf dBm"
 	else:
 		displayed_content = "N/A"
 	return displayed_content

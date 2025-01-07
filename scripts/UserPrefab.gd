@@ -35,8 +35,8 @@ var direction_from_station
 
 # the ratio of arc_len and deadzone radius. Deadzone is where users 
 # should not go in.
-var station_deadzone_ratio = 0.1
-var deadzone_outskirt_multiple = 2
+var station_deadzone_ratio = 0.5
+var deadzone_outskirt_multiple = 3
 var penalty_lr = 0.6
 
 var tracked_by_panel = false
@@ -95,6 +95,9 @@ func set_displacement_from_station(displacement: Vector2):
 	self.displacement_from_station = displacement
 	self.distance_from_station = displacement.length()
 	self.direction_from_station = displacement.normalized()
+
+func get_distance_from_station():
+	return self.position.distance_to(station.position)
 	
 func mouse_track_user():
 	mouse_panel.track_user()
@@ -105,6 +108,7 @@ func initialize(input_mouse_panel, input_gathered_tiles):
 	self.mouse_enter_user.connect(input_mouse_panel._on_mouse_enter_user)
 	self.mouse_leave_user.connect(input_mouse_panel._on_mouse_leave_user)
 	self.is_initialized = true
+	self.auto_set_displacement()
 
 func start_analysis():
 	self.under_analysis = true
@@ -121,9 +125,21 @@ func record_analysis_data(siganl_power,sir):
 	self.signal_power_hist.append(siganl_power)
 	self.sir_hist.append(sir)
 
+func auto_set_displacement():
+	var displacement = (self.position) - station.position
+	self.set_displacement_from_station(displacement)
+
+func in_dead_zone():
+	var deadzone_radius = station_deadzone_ratio * self.station.arc_len
+	return self.get_distance_from_station() < deadzone_radius
+
+func in_dead_zone_outskirt():
+	var deadzone_radius = station_deadzone_ratio * self.station.arc_len
+	return self.get_distance_from_station() < deadzone_outskirt_multiple * deadzone_radius
+
 func eval_motion_penalty():
 	var deadzone_radius = station_deadzone_ratio * self.station.arc_len
-	if self.distance_from_station >= deadzone_outskirt_multiple * deadzone_radius:
+	if not self.in_dead_zone():
 		self.motion_penalty = Vector2(0,0)
 	else:
 		var speed = self.velocity.length()
@@ -138,7 +154,9 @@ func hide_boundary():
 	if not tracked_by_panel:
 		boundary.visible = false
 
-
+func move_out_dead_zone():
+	if self.in_dead_zone():
+		self.position += self.displacement_from_station/self.distance_from_station*(self.station_deadzone_ratio*station.arc_len-self.distance_from_station)
 
 func connect_to_channel(channel):
 	if channel != self.connected_channel and (channel == null or self.connected_channel == null):
@@ -202,7 +220,7 @@ func user_speed_protect():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	
-	# move a step if not paused
+	# try to move a step if not paused
 	if (not observer_mode or under_analysis) and not engineer_mode and not motion_pause:
 		self.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		# take a random acceleration from max_acc to -max_acc
@@ -221,10 +239,10 @@ func _process(delta):
 		elif self.velocity.y < -self.max_velocity:
 			self.velocity.y = -self.max_velocity
 		
-		# analysis speed check
+		# use the analysis_user_speed_protect() function
+		# to run an analysis speed check, in which 
 		# if the under is currently under analysis,
 		# then they should not move beyond the map
-		# use the analysis_user_speed_protect() function
 		self.user_speed_protect()
 		
 		# move a step

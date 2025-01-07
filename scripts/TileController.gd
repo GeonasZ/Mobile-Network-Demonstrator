@@ -341,7 +341,7 @@ func get_current_hex(pos):
 	for i in range(hex_list.size()):
 		for j in range(hex_list[i].size()):
 			# evalute the distance from mouse to the station
-			var current_dis = (hex_list[i][j].get_global_transform()*Vector2(0,0)).distance_to(pos)
+			var current_dis = (hex_list[i][j].position).distance_to(pos)
 			if least_distance == -1 or current_dis < least_distance:
 				least_distance = current_dis
 				least_distance_hex = hex_list[i][j]

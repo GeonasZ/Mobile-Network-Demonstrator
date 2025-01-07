@@ -34,7 +34,7 @@ var station_tower_height = 16
 var station_total_height = 22
 var station_half_width = 9
 
-var ref_signal_power = 10
+var ref_signal_power = 1
 #var noise = 1e-3
 #var noise_distr_deviation = 1.
 #var noise_refresh_time = 0.5
@@ -117,7 +117,6 @@ func _draw():
 	elif self.center_on_focus and (not mouse_panel.keep_invisible and empty_display_user_list):
 		draw_circle(Vector2(0,-station_total_height/2.), station_scale * focus_radius, Color8(150,150,150), false, width*4)
 		
-	
 	
 func initialize(mouse_panel,station_config_panel):
 	self.mouse_panel = mouse_panel

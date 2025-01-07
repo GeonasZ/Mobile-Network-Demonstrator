@@ -35,7 +35,7 @@ func initialize_user_system(user_height):
 	current_available_user_id = 0
 	self.user_height = user_height
 
-func add_user(pos):
+func add_user(pos,out_of_dead_zone=false):
 	if obs_button.analysis_on:
 		return
 	
@@ -67,13 +67,15 @@ func add_user(pos):
 	if engineer_button.button_mode == engineer_button.Mode.ENGINEER:
 		current_user.enter_engineer_mode()
 	current_user.redraw_with_height(self.user_height)
+	if out_of_dead_zone:
+		current_user.move_out_dead_zone()
 	return current_user
 
-func random_add_user(n_user:int):
+func random_add_user(n_user:int,out_of_dead_zone=false):
 	var user_pos
 	for i in range(n_user):
 		user_pos = Vector2(randi_range(0.05*1920,0.95*1920),randi_range(0.05*1080,0.95*1080))
-		self.add_user(user_pos)
+		self.add_user(user_pos, out_of_dead_zone)
 
 func remove_user(user,index_in_linear_user_list=null):
 	var user_connection_stat = "connected" if user.connected_channel != null else "disconnected"

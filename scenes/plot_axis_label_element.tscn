@@ -1,0 +1,12 @@
+[gd_scene load_steps=3 format=3 uid="uid://4xloq7pvi4xf"]
+
+[ext_resource type="Theme" uid="uid://bgebxa4euua15" path="res://fonts/pre_set_theme/button_desc_small_font.tres" id="1_8kywl"]
+[ext_resource type="Script" path="res://scripts/y_label_plot.gd" id="2_7s1tu"]
+
+[node name="Label" type="Label"]
+offset_right = 40.0
+offset_bottom = 23.0
+theme = ExtResource("1_8kywl")
+horizontal_alignment = 2
+vertical_alignment = 1
+script = ExtResource("2_7s1tu")
