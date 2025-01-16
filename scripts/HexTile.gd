@@ -3,7 +3,7 @@ extends Polygon2D
 var mouse_panel = null
 var station_config_panel = null
 @onready var parent_node = $".."
-var AntennaType = ["DIPOLE","ARRAY2","ARRAY3","ARRAY4"]
+var AntennaType = ["SINGLE","ARRAY2","ARRAY3","ARRAY4"]
 
 var index_i
 var index_j
@@ -18,7 +18,7 @@ var id
 var mouse_position_in_tile = Vector2(0,0)
 # null for available, not null for not available
 var channel_allocation_list = []
-var antenna_type = "DIPOLE"
+var antenna_type = "SINGLE"
 var angle_divergence = 2 * PI
 var signal_direction = Vector2(0,0)
 var frequency_group
@@ -62,7 +62,7 @@ func _draw():
 	draw_line(Vector2(-1./2*arc_len,sqrt(3)/2*arc_len),Vector2(-arc_len, 0), Color8(210,210,210), width, true)
 	draw_line(Vector2(-arc_len, 0),Vector2(-1./2*arc_len,-sqrt(3)/2*arc_len), Color8(210,210,210), width, true)
 	# draw signal station
-	if self.antenna_type =="DIPOLE":
+	if self.antenna_type =="SINGLE":
 		# draw station body
 		draw_line(Vector2(-station_half_width*station_scale,0), Vector2(station_half_width*station_scale,0), Color(0,0,0), 3, true)
 		draw_line(Vector2(-(station_half_width-1)*station_scale,0), Vector2(0,-station_tower_height*station_scale), Color(0,0,0), 3,true)
@@ -103,14 +103,14 @@ func _draw():
 		draw_line(Vector2(-0.35*station_half_width*station_scale,-station_tower_height*station_scale),Vector2(-0.35*station_half_width*station_scale,-station_total_height*station_scale), Color(0,0,0), 3,true)
 		draw_line(Vector2(0.35*station_half_width*station_scale,-station_tower_height*station_scale),Vector2(0.35*station_half_width*station_scale,-station_total_height*station_scale), Color(0,0,0), 3,true)
 	else:
-		self.set_antenna_type("DIPOLE")
+		self.set_antenna_type("SINGLE")
 		# draw station body
 		draw_line(Vector2(-station_half_width*station_scale,0), Vector2(station_half_width*station_scale,0), Color(0,0,0), 3, true)
 		draw_line(Vector2(-(station_half_width-1)*station_scale,0), Vector2(0,-station_tower_height*station_scale), Color(0,0,0), 3,true)
 		draw_line(Vector2((station_half_width-1)*station_scale,0), Vector2(0,-station_tower_height*station_scale), Color(0,0,0), 3,true)
 		# draw antenna
 		draw_line(Vector2(0,-station_tower_height*station_scale), Vector2(0,-station_total_height*station_scale), Color(0,0,0), 3,true)
-		print("HexTile ID " + str(id) + ": Unknown Antenna Type, treated as DIPOLE as default.")
+		print("HexTile ID " + str(id) + ": Unknown Antenna Type, treated as SINGLE as default.")
 	# draw a circle at the center if center is on focus
 	if self.under_tracked and not mouse_panel.keep_invisible or self.under_config:
 		draw_circle(Vector2(0,-station_total_height/2.), station_scale * focus_radius, Color8(50,50,50), false, width*4)
@@ -129,8 +129,8 @@ func reset_focus():
 	self.on_focus = false
 
 func get_antenna_type():
-	if self.antenna_type == "DIPOLE":
-		return "Dipole Antenna"
+	if self.antenna_type == "SINGLE":
+		return "Single Antenna"
 	elif self.antenna_type == "ARRAY2":
 		return "Antenna Array <N=2>"
 	elif self.antenna_type == "ARRAY3":
@@ -142,7 +142,7 @@ func get_antenna_type_raw():
 	return self.antenna_type
 
 func eval_signal_pow(angle_from_center, distance, decay):
-	if self.antenna_type == "DIPOLE":
+	if self.antenna_type == "SINGLE":
 		return self.ref_signal_power/pow(distance,decay)
 	else:
 		var N

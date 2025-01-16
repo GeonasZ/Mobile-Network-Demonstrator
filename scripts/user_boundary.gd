@@ -2,7 +2,8 @@ extends Control
 
 @onready var user = $".."
 var rect
-var rect_color = Color8(255,20,20)
+var width = 3
+var rect_color = Color8(50,50,50)
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -21,7 +22,7 @@ func _ready() -> void:
 		user.is_mouse_in = false
 
 func _draw() -> void:
-	draw_rect(rect, self.rect_color, false, 3)
+	draw_rect(rect, self.rect_color, false, self.width)
 
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_MASK_LEFT and event.pressed:
@@ -31,6 +32,7 @@ func _gui_input(event: InputEvent) -> void:
 		user.gathered_tiles.on_mouse_right_click_on_background(event)
 	elif event is InputEventMouseButton and (event.button_index == MOUSE_BUTTON_WHEEL_UP or event.button_index == MOUSE_BUTTON_WHEEL_DOWN):
 		user.gathered_tiles._gui_input(event)
+		
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	# when mouse enter user

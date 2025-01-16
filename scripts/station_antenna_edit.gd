@@ -20,9 +20,9 @@ func _on_option_mouse_left_click(option_content) -> void:
 	
 	var station = station_config.focused_hex
 	
-	if option_content == "Dipole Antenna":
-		if station.get_antenna_type_raw() != "DIPOLE":
-			station.set_antenna_type("DIPOLE")
+	if option_content == "Single Antenna":
+		if station.get_antenna_type_raw() != "SINGLE":
+			station.set_antenna_type("SINGLE")
 			station_config.set_antenna_mode_to_custom()
 			return
 	elif option_content == "Antenna Array < N = 2 >":

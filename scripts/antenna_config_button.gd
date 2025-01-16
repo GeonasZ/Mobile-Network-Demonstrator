@@ -8,7 +8,7 @@ extends Control
 @onready var function_panel = $".."
 
 enum Mode {NONE, OBSERVER, ENGINEER}
-enum AntennaMode {DIPOLE,ARRAY2,ARRAY3,ARRAY4,RANDOM,CUSTOM}
+enum AntennaMode {SINGLE,ARRAY2,ARRAY3,ARRAY4,RANDOM,CUSTOM}
 var button_mode = Mode.NONE
 var analysis_on = false
 var button_radius = 45
@@ -70,7 +70,7 @@ func next_antenna_mode():
 	elif self.button_mode == self.Mode.OBSERVER and not self.analysis_on and not self.visible:
 		self.appear()
 	# mouse in button animes
-	if self.antenna_mode == AntennaMode.DIPOLE:
+	if self.antenna_mode == AntennaMode.SINGLE:
 		self.antenna_mode = AntennaMode.ARRAY2
 		tile_controlller.all_tile_set_antenna_type("Array2")
 		self.label.set_label2_text("Current: Antenna Array <2>")
@@ -87,13 +87,13 @@ func next_antenna_mode():
 		tile_controlller.all_tile_set_antenna_type("Random")
 		self.label.set_label2_text("Current: Random")
 	elif self.antenna_mode == AntennaMode.RANDOM:
-		self.antenna_mode = AntennaMode.DIPOLE
-		self.label.set_label2_text("Current: Dipole Antenna")
-		tile_controlller.all_tile_set_antenna_type("Dipole")
+		self.antenna_mode = AntennaMode.SINGLE
+		self.label.set_label2_text("Current: Single Antenna")
+		tile_controlller.all_tile_set_antenna_type("Single")
 	elif self.antenna_mode == AntennaMode.CUSTOM:
-		self.antenna_mode = AntennaMode.DIPOLE
-		self.label.set_label2_text("Current: Dipole Antenna")
-		tile_controlller.all_tile_set_antenna_type("Dipole")
+		self.antenna_mode = AntennaMode.SINGLE
+		self.label.set_label2_text("Current: Single Antenna")
+		tile_controlller.all_tile_set_antenna_type("Single")
 		
 func button_click_function():
 	self.next_antenna_mode()

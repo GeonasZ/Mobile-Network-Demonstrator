@@ -102,22 +102,22 @@ func eval_station_direction(tile_list, user_list, index_i, index_j):
 		return station_direction
 
 func all_tile_set_antenna_type(mode:String):
-	## mode: Choose from "Dipole", "Array2", "Array3", "Array4", "Random" and "Custom"
+	## mode: Choose from "Single", "Array2", "Array3", "Array4", "Random" and "Custom"
 	for row in self.hex_list:
 		for station in row:
-			if mode == "Dipole":
-				station.set_antenna_type("DIPOLE")
-			elif mode == "Array2":
+			if mode == "Single" or mode == "SINGLE":
+				station.set_antenna_type("SINGLE")
+			elif mode == "Array2" or mode == "ARRAY2":
 				station.set_antenna_type("ARRAY2")
-			elif mode == "Array3":
+			elif mode == "Array3" or mode == "ARRAY3":
 				station.set_antenna_type("ARRAY3")
-			elif mode == "Array4":
+			elif mode == "Array4" or mode == "ARRAY4":
 				station.set_antenna_type("ARRAY4")
 			elif mode == "Random":
 				
 				var rand = randi_range(1,4)
 				if rand == 1:
-					station.set_antenna_type("DIPOLE")
+					station.set_antenna_type("SINGLE")
 				elif rand == 2:
 					station.set_antenna_type("ARRAY2")
 				elif rand == 3:

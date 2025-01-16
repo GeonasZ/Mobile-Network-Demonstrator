@@ -6,8 +6,6 @@ var mouse_panel = null
 
 var observer_mode = false
 var engineer_mode = false
-var analyzer_mode = false
-var analysis_on = false
 
 signal mouse_enter_user()
 signal mouse_leave_user()
@@ -53,6 +51,7 @@ var motion_penalty = Vector2(0,0)
 
 # analysis mode paramters
 var under_analysis = false
+var previous_under_analysis = false
 var signal_power_hist = []
 var sir_hist = []
 
@@ -177,8 +176,6 @@ func set_station(tile):
 
 func begin_tracked_by_panel():
 	self.tracked_by_panel = true
-	boundary.rect_color = Color8(0,0,0)
-	boundary.queue_redraw()
 
 func end_tracked_by_panel():
 	self.tracked_by_panel = false
@@ -219,6 +216,16 @@ func user_speed_protect():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
+	if not under_analysis and previous_under_analysis:
+		boundary.width = 5
+		boundary.rect_color = Color8(255,0,0)
+		boundary.queue_redraw()
+		self.previous_under_analysis = under_analysis
+	elif under_analysis and not previous_under_analysis:
+		boundary.width = 3
+		boundary.rect_color = Color8(50,50,50)
+		boundary.queue_redraw()
+		self.previous_under_analysis = under_analysis
 	
 	# try to move a step if not paused
 	if (not observer_mode or under_analysis) and not engineer_mode and not motion_pause:

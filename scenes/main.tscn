@@ -881,7 +881,7 @@ script = ExtResource("14_2ybup")
 layout_mode = 2
 mouse_filter = 0
 theme = ExtResource("28_1qo4p")
-text = "Dipole Antenna"
+text = "Single Antenna"
 horizontal_alignment = 1
 vertical_alignment = 1
 script = ExtResource("16_rv0b4")
@@ -1741,6 +1741,7 @@ caret_blink = true
 script = ExtResource("51_qv08a")
 
 [node name="NPlotDataPanel" type="HBoxContainer" parent="AnalysisPanel"]
+layout_mode = 0
 offset_right = 450.0
 offset_bottom = 56.0
 
