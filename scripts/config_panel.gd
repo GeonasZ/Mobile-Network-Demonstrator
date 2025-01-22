@@ -12,11 +12,11 @@ extends Polygon2D
 @onready var decay_edit = $ContentFrame/GridContainer/DecayEdit/LineEdit
 @onready var freq_n_edit = $ContentFrame/GridContainer/NFrequencyEdit/LineEdit
 @onready var n_user_edit = $ContentFrame/GridContainer/NUserEdit/LineEdit
+@onready var path_width_edit = $ContentFrame/GridContainer/PathWidthEdit/LineEdit
 
 signal config_panel_opened
 
-var edit_list = [tile_length_edit, user_height_edit, decay_edit, freq_n_edit, 
-				 n_user_edit]
+var edit_list
 var on_work = true
 var is_panel_open = false
 var config_on = false
@@ -30,7 +30,7 @@ func _ready() -> void:
 	title_label.position = Vector2(0,0)
 	title_label.size = Vector2(1920,200)
 	edit_list = [tile_length_edit, user_height_edit, decay_edit, freq_n_edit, 
-				 n_user_edit]
+				 n_user_edit, path_width_edit]
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -42,7 +42,8 @@ func initialize():
 
 func open_config_with_anime():
 	function_panel.disable_all_keyboard_input()
-	await station_config_panel.disappear()
+	if station_config_panel.visible:
+		await station_config_panel.disappear(true)
 	self.initialize()
 	if self.on_work:
 		over_layer.make_invisible()

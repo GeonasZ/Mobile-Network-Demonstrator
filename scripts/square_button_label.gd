@@ -5,12 +5,14 @@ extends Label
 @onready var config_panel = $"../.."
 @onready var user_controller = $"../../../Controllers/UserController"
 @onready var tile_controller = $"../../../Controllers/TileController"
+@onready var path_controller = $"../../../Controllers/PathController"
 @onready var mouse_panel = $"../../../MousePanel"
 @onready var tile_length_edit = $"../../ContentFrame/GridContainer/TileLengthEdit/LineEdit"
 @onready var user_height_edit = $"../../ContentFrame/GridContainer/UserHeightEdit/LineEdit"
 @onready var decay_edit = $"../../ContentFrame/GridContainer/DecayEdit/LineEdit"
 @onready var freq_n_edit = $"../../ContentFrame/GridContainer/NFrequencyEdit/LineEdit"
 @onready var n_user_edit = $"../../ContentFrame/GridContainer/NUserEdit/LineEdit"
+@onready var path_width_edit = $"../../ContentFrame/GridContainer/PathWidthEdit/LineEdit"
 
 
 var on_work = true
@@ -22,11 +24,12 @@ func _ready() -> void:
 	var ref_pos = Vector2(-1.7*self.get_rect().size)
 	notice_label.position = Vector2(0.67*ref_pos.x,ref_pos.y)
 
-func restart_program(tile_length,user_height,n_channel,n_user):
+func restart_program(tile_length,user_height,n_channel,n_user,path_width):
 	user_controller.initialize_user_system(user_height)
 	tile_controller.initialize_map(tile_length,n_channel)
 	mouse_panel.initialize_mouse_panel()
 	user_controller.random_add_user(n_user,true)
+	path_controller.set_path_width(path_width)
 	
 func _gui_input(event):
 	if event is InputEventMouseButton and event.button_mask == MOUSE_BUTTON_MASK_LEFT and event.pressed:
@@ -36,7 +39,8 @@ func _gui_input(event):
 		var decay = float(decay_edit.text)
 		var n_freq = int(freq_n_edit.text)
 		var n_user = int(n_user_edit.text)
-		restart_program(tile_length, user_height,n_freq,n_user)
+		var path_width = int(path_width_edit.text)
+		restart_program(tile_length, user_height,n_freq,n_user,path_width)
 		tile_controller.set_decay(decay)
 		config_panel.close_config_with_anime()
 		

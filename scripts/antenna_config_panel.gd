@@ -18,6 +18,7 @@ var slash_len = 20
 var on_work = true
 var on_drag = false
 var last_mouse_pos = null
+var target_pos = null
 
 var focused_hex = null
 
@@ -42,19 +43,25 @@ func _draw():
 					[Color8(255,255,255),Color8(255,255,255),Color8(255,255,255),Color8(255,255,255),
 					Color8(255,255,255),Color8(255,255,255),Color8(255,255,255),Color8(255,255,255)])
 	
-func move_to_station(station):
+func move_to_station(station, with_anime=false):
+	self.title.text = "Station ID " + str(focused_hex.id) + " Edit"
+	self.target_pos = Vector2(0,0)
 	# config x position
 	if station.position.x > 960:
-		self.position.x = station.position.x - 0.5* self.length - 1 * self.length
+		self.target_pos.x = station.position.x - 0.5* self.length - 1 * self.length
 	else:
-		self.position.x = station.position.x - 0.5* self.length + 1 * self.length
+		self.target_pos.x = station.position.x - 0.5* self.length + 1 * self.length
 	# config y position
 	if station.position.y < 270:
-		self.position.y = station.position.y -0.5* self.width + 0.5* (270.-station.position.y)/270. * self.width
+		self.target_pos.y = station.position.y -0.5* self.width + 0.5* (270.-station.position.y)/270. * self.width
 	elif station.position.y > 810:
-		self.position.y = station.position.y -0.5* self.width - 0.5* (station.position.y-810.)/(1080.-810.) * self.width
+		self.target_pos.y = station.position.y -0.5* self.width - 0.5* (station.position.y-810.)/(1080.-810.) * self.width
 	else:
-		self.position.y = station.position.y -0.5* self.width
+		self.target_pos.y = station.position.y -0.5* self.width
+		
+	if not with_anime:
+		self.position = self.target_pos
+		self.target_pos = null
 
 func appear():
 	focused_hex.under_config = true
@@ -63,14 +70,13 @@ func appear():
 	self.move_to_station(focused_hex)
 	self.station_config_panel_open.emit()
 	await mouse_panel.anime_player.animation_finished
-	self.title.text = "Station ID " + str(focused_hex.id) + " Edit"
 	animator.play("appear")
 	self.scale = Vector2(0,0)
 	self.visible = true
 	await animator.animation_finished
 	self.on_work = true
 	
-func disappear():
+func disappear(force_mouse_panel_open=false):
 	self.on_work = false
 	animator.play("disappear")
 	await animator.animation_finished
@@ -78,7 +84,7 @@ func disappear():
 		focused_hex.under_config = false
 		focused_hex.redraw_tile()
 		self.focused_hex = null
-	self.station_config_panel_close.emit()
+	self.station_config_panel_close.emit(force_mouse_panel_open)
 	self.visible = false
 	self.on_work = true
 
@@ -111,12 +117,23 @@ func _process(delta: float) -> void:
 	if self.on_drag:
 		self.position = self.position + (get_global_mouse_position()-self.last_mouse_pos)
 		self.last_mouse_pos = get_global_mouse_position()
+	if self.target_pos != null:
+		self.position += 10*(self.target_pos - self.position)*delta
+		if self.target_pos.distance_to(self.position) < 10:
+			self.target_pos = null
 
 
 func _on_gathered_tiles_mouse_left_click_on_background(event) -> void:
-	if mouse_controller.current_hex.is_center_on_focus() and self.on_work and engineer_button.button_mode == engineer_button.Mode.ENGINEER:
-		self.focused_hex = mouse_controller.current_hex
-		self.appear()
+	if mouse_controller.current_hex.is_center_on_focus() and self.on_work and engineer_button.button_mode == engineer_button.Mode.ENGINEER and self.focused_hex != mouse_controller.current_hex:
+		if self.focused_hex != null:
+			self.focused_hex.under_config = false
+			self.focused_hex = mouse_controller.current_hex
+			self.move_to_station(self.focused_hex,true)
+			self.focused_hex.under_config = true
+		else:
+			self.focused_hex = mouse_controller.current_hex
+			self.appear()
+		
 		
 func _on_gathered_tiles_mouse_right_click_on_background(event) -> void:
 	if self.visible:

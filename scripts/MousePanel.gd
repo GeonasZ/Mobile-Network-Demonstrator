@@ -178,9 +178,9 @@ func on_station_config_panel_open():
 	self.station_config_panel_open = true
 	self.disappear_with_anime()
 	
-func on_station_config_panel_close():
-	self.station_config_panel_open = true
-	if function_panel.mouse_panel_not_in_button():
+func on_station_config_panel_close(force=false):
+	self.station_config_panel_open = false
+	if force or function_panel.mouse_panel_not_in_button():
 		self.appear_with_anime()
 
 func track_station(station):

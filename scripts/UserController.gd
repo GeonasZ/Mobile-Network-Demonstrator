@@ -15,7 +15,7 @@ var linear_user_list = []
 var current_available_user_id = 0
 var show_popup = false
 
-var user_height = 16
+var user_height = 10
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -36,7 +36,7 @@ func initialize_user_system(user_height):
 	self.user_height = user_height
 
 func add_user(pos,out_of_dead_zone=false):
-	if obs_button.analysis_on:
+	if obs_button.analysis_on or engineer_button.button_mode == engineer_button.Mode.ENGINEER:
 		return
 	
 	var current_user = user_prefab.instantiate()

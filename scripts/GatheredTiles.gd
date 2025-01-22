@@ -5,11 +5,13 @@ extends Control
 @onready var mouse_panel = $"../MousePanel"
 @onready var function_panel = $"../FunctionPanel"
 @onready var users = $"../Users"
+@onready var path_layer = $"../PathLayer"
 @onready var config_panel = $"../ConfigPanel"
 
 signal mouse_left_click_on_background()
 signal mouse_right_click_on_background()
 
+var zoom_list = []
 var zoom_in_ratio = 1.05
 var zoom_out_ratio = 0.95
 var max_scale = 2
@@ -19,6 +21,7 @@ var min_scale = 1
 func _ready():
 	self.pivot_offset = Vector2(0,0)
 	self.position = Vector2(0,0)
+	self.zoom_list = [self,users,path_layer]
 
 func zoom(zoom_ratio, zoom_to_mouse=false, subject=self):
 	var old_scale = subject.scale
@@ -65,35 +68,33 @@ func _gui_input(event):
 		elif event.button_index == MOUSE_BUTTON_WHEEL_UP:
 			
 			if self.scale < Vector2(max_scale,max_scale):
-				self.zoom(zoom_in_ratio, true)
-				zoom(zoom_in_ratio, true, users)
+				for obj in zoom_list:
+					zoom(zoom_in_ratio, true, obj)
 		# zoom out
 		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 			var viewport_size = get_viewport_rect().size
 			var rect_size = self.get_rect().size
 			if self.scale >= Vector2(min_scale,min_scale):
-				zoom(zoom_out_ratio, true, users)
-				self.zoom(zoom_out_ratio, true)
-				# if scale is smaller than 1, make it 1
-				if self.scale < Vector2(min_scale,min_scale):
-					self.scale = Vector2(min_scale,min_scale)
-					self.position = Vector2(0,0)
-					users.scale = Vector2(min_scale,min_scale)
-					users.position = Vector2(0,0)
+				for obj in zoom_list:
+					zoom(zoom_out_ratio, true, obj)
+					# if scale is smaller than 1, make it 1
+					if obj.scale < Vector2(min_scale,min_scale):
+						obj.scale = Vector2(min_scale,min_scale)
+						obj.position = Vector2(0,0)
 				
 			# modify position to avoid viewport from out of bound
 			if self.position.x > 0:
-				self.position.x = 0
-				users.position.x = 0
+				for obj in zoom_list:
+					obj.position.x = 0
 			if self.position.y > 0:
-				self.position.y = 0
-				users.position.y = 0
+				for obj in zoom_list:
+					obj.position.y = 0
 			if self.position.x + rect_size.x < viewport_size.x:
-				self.position.x = viewport_size.x - rect_size.x
-				users.position.x = viewport_size.x - rect_size.x
+				for obj in zoom_list:
+					obj.position.x = viewport_size.x - rect_size.x
 			if self.position.y + rect_size.y < viewport_size.y:
-				self.position.y = viewport_size.y - rect_size.y
-				users.position.y = viewport_size.x - rect_size.x
+				for obj in zoom_list:
+					obj.position.y = viewport_size.y - rect_size.y
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):

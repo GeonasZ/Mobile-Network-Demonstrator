@@ -828,6 +828,7 @@ mouse_filter = 1
 script = ExtResource("4_6s6fj")
 
 [node name="PathLayer" type="Control" parent="."]
+visible = false
 anchors_preset = 0
 mouse_filter = 2
 script = ExtResource("6_d3e1l")

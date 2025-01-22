@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://b3ncb0gwg680y"]
+
+[ext_resource type="Script" path="res://scripts/path_block_prefab.gd" id="1_hbr1y"]
+
+[node name="PathBlockPrefab" type="Node2D"]
+script = ExtResource("1_hbr1y")

@@ -90,7 +90,6 @@ func _input(event: InputEvent) -> void:
 		on_work = true
 	
 func _gui_input(event: InputEvent) -> void:
-	
 	if event is InputEventMouseButton and event.button_mask == MOUSE_BUTTON_MASK_LEFT:
 		self.button_click_function()
 			

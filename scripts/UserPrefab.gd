@@ -16,6 +16,7 @@ var id = -1
 # null for not connected, int for channel index
 var connected_channel = null
 
+var ref_height = 16.
 var height = 16
 var width = 6
 var radius = 8
@@ -33,8 +34,8 @@ var direction_from_station
 
 # the ratio of arc_len and deadzone radius. Deadzone is where users 
 # should not go in.
-var station_deadzone_ratio = 0.5
-var deadzone_outskirt_multiple = 3
+var station_deadzone_ratio = 0.4
+var deadzone_outskirt_multiple = 2
 var penalty_lr = 0.6
 
 var tracked_by_panel = false
@@ -231,20 +232,20 @@ func _process(delta):
 	if (not observer_mode or under_analysis) and not engineer_mode and not motion_pause:
 		self.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		# take a random acceleration from max_acc to -max_acc
-		var acc = Vector2(randi_range(0,2*max_acc.x) - max_acc.x,randi_range(0,2*max_acc.y) - max_acc.y)
+		var acc = Vector2(randi_range(0,2*max_acc.x) - max_acc.x,randi_range(0,2*max_acc.y) - max_acc.y) * self.height/ref_height
 		self.velocity += acc
 		
 		# limit the speed within a specific range
 		# limit x velocity
-		if self.velocity.x > self.max_velocity:
-			self.velocity.x = self.max_velocity
-		elif self.velocity.x < -self.max_velocity:
-			self.velocity.x = -self.max_velocity
+		if self.velocity.x > self.max_velocity * self.height/ref_height:
+			self.velocity.x = self.max_velocity * self.height/ref_height
+		elif self.velocity.x < -self.max_velocity * self.height/ref_height:
+			self.velocity.x = -self.max_velocity * self.height/ref_height
 		# limit y velocity
-		if self.velocity.y > self.max_velocity:
-			self.velocity.y = self.max_velocity
-		elif self.velocity.y < -self.max_velocity:
-			self.velocity.y = -self.max_velocity
+		if self.velocity.y > self.max_velocity * self.height/ref_height:
+			self.velocity.y = self.max_velocity * self.height/ref_height
+		elif self.velocity.y < -self.max_velocity * self.height/ref_height:
+			self.velocity.y = -self.max_velocity * self.height/ref_height
 		
 		# use the analysis_user_speed_protect() function
 		# to run an analysis speed check, in which 
