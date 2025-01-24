@@ -1,6 +1,11 @@
-[gd_scene load_steps=2 format=3 uid="uid://b3ncb0gwg680y"]
+[gd_scene load_steps=4 format=3 uid="uid://b3ncb0gwg680y"]
 
+[ext_resource type="Shader" path="res://shader/path_block_prefab.gdshader" id="1_54sdh"]
 [ext_resource type="Script" path="res://scripts/path_block_prefab.gd" id="1_hbr1y"]
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_byy7d"]
+shader = ExtResource("1_54sdh")
+
 [node name="PathBlockPrefab" type="Node2D"]
+material = SubResource("ShaderMaterial_byy7d")
 script = ExtResource("1_hbr1y")
