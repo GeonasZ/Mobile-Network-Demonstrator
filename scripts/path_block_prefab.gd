@@ -104,37 +104,58 @@ func dir_unit_vec(key):
 	else:
 		print("PathBlockPrefab<dir_unit_vec>: Invalid Key.")
 
-
-func nearest_connected_block():
+func nearest_connected_block(user):
 	var count: int = 1
 	var max_row = len(path_controller.path_blocks)-1
 	var max_col = len(path_controller.path_blocks[0])-1
 	while 1:
 		# if no block is found
 		if count > max_col and count > max_row:
+			print("AFSSD")
 			return null
 		# travel to find the nearest block
+		var nearest_dis
+		var nearest_block
 		for j in range(0,count+1):
 			for i in [-count,count]:
 				if self.row+i >= 0 and self.row+i <= max_row and self.col+j >= 0 and self.col+j <= max_col:
 					if path_controller.path_blocks[self.row+i][self.col+j].at_least_connected():
-						return path_controller.path_blocks[self.row+i][self.col+j]
+						if nearest_dis == null or nearest_dis > user.global_position.distance_to(path_controller.path_blocks[self.row+i][self.col+j].global_position):
+							nearest_block = path_controller.path_blocks[self.row+i][self.col+j]
+							nearest_dis = user.global_position.distance_to(path_controller.path_blocks[self.row+i][self.col+j].global_position)
 				elif self.row+i >= 0 and self.row+i <= max_row and self.col-j >= 0 and self.col-j <= max_col:
 					if path_controller.path_blocks[self.row+i][self.col-j].at_least_connected():
-						return path_controller.path_blocks[self.row+i][self.col-j]
+						if nearest_dis == null or nearest_dis > user.global_position.distance_to(path_controller.path_blocks[self.row+i][self.col-j].global_position):
+							nearest_block = path_controller.path_blocks[self.row+i][self.col-j]
+							nearest_dis = user.global_position.distance_to(path_controller.path_blocks[self.row+i][self.col-j].global_position)
 				elif self.row+j >= 0 and self.row+j <= max_row and self.col+i >= 0 and self.col+i <= max_col:
 					if path_controller.path_blocks[self.row+j][self.col+i].at_least_connected():
-						return path_controller.path_blocks[self.row+j][self.col+i]
+						if nearest_dis == null or nearest_dis > user.global_position.distance_to(path_controller.path_blocks[self.row+j][self.col+i].global_position):
+							nearest_block = path_controller.path_blocks[self.row+j][self.col+i]
+							nearest_dis = user.global_position.distance_to(path_controller.path_blocks[self.row+j][self.col+i].global_position)
 				elif self.row-j >= 0 and self.row-j <= max_row and self.col+i >= 0 and self.col+i <= max_col:
 					if path_controller.path_blocks[self.row-j][self.col+i].at_least_connected():
-						return path_controller.path_blocks[self.row-j][self.col+i]
+						if nearest_dis == null or nearest_dis > user.global_position.distance_to(path_controller.path_blocks[self.row-j][self.col+i].global_position):
+							nearest_block = path_controller.path_blocks[self.row-j][self.col+i]
+							nearest_dis = user.global_position.distance_to(path_controller.path_blocks[self.row-j][self.col+i].global_position)
 		count += 1
 		
+		if nearest_block != null:
+			return nearest_block
 		
+func block_with_connection():
+	for row in path_controller.path_blocks:
+		for block in row:
+			if block.at_least_connected():
+				return block
+	
 func update_user_acc(user,max_acc: Vector2):
-	var dis_ratio = 2
+	var dis_ratio = 0.7
 	var block_width = self.width/3.
 	var user_pos = self.get_global_transform().affine_inverse()*user.global_position
+	# the ratio to be multiplied to the magnitude of 
+	# the acceleration
+	var acc_mag_ratio = 1
 	var x_key
 	var y_key
 	# find its x position
@@ -154,11 +175,37 @@ func update_user_acc(user,max_acc: Vector2):
 	var unit_acc = Vector2(0,0)
 	# when the block has no connection to others
 	if not self.at_least_connected():
-		var nearest_connected_block = self.nearest_connected_block()
-		if nearest_connected_block == null:
-			print("PathBlockPrefab<update_user_acc>: Cannot find a block with path connection.")
+		var false_connections = self.connected_directions(false)
+		if len(false_connections) > 0:
+			var key = false_connections[randi_range(0,len(false_connections)-1)]
+			if x_key in false_connections or y_key in false_connections:
+				unit_acc = dir_unit_vec(x_key)+dir_unit_vec(y_key)
+			elif key == "left":
+				unit_acc = user_pos.direction_to(Vector2(-1.5*block_width,0))
+			elif key == "right":
+				unit_acc = user_pos.direction_to(Vector2(1.5*block_width,0))
+			elif key == "top":
+				unit_acc = user_pos.direction_to(Vector2(0,-1.5*block_width))
+			elif key == "bottom":
+				unit_acc = user_pos.direction_to(Vector2(0,1.5*block_width))
+			else:
+				print("PathBlockPrefab<update_user_acc>: Invalid Key.")
 		else:
-			unit_acc = user.global_position.direction_to(nearest_connected_block.global_position)
+			var nearest_connected_block = self.nearest_connected_block(user)
+			# if failed to find a nearest connected block, try to find a block with connection
+			if nearest_connected_block == null:
+				print("PathBlockPrefab<update_user_acc>: Failed to find a nearest connected block. Trying to find a block with connection...")
+				nearest_connected_block = self.block_with_connection()
+				# if no block is connected, re-generate a path map
+				if nearest_connected_block == null:
+					print("PathBlockPrefab<update_user_acc>: Cannot find a block with path connection. Regenerating a new path map for use...")
+					# re-generate a path map
+					path_controller.set_path_width(path_controller.path_width)
+			else:
+				unit_acc = user.global_position.direction_to(nearest_connected_block.global_position)
+	# when self is fully spaced and user is around center
+	elif self.fully_spaced and user_pos.distance_to(Vector2(0,0)) < 0.9 * 1.5 * block_width:
+		unit_acc = Vector2(1,0).rotated(randf_range(0,2*PI))
 	# when the user is in the corner blocks
 	elif x_key != "middle" and y_key != "middle":
 		if self.path_connectivity[x_key] == true and self.path_connectivity[y_key] == true:
@@ -167,51 +214,75 @@ func update_user_acc(user,max_acc: Vector2):
 			else:
 				unit_acc = dir_unit_vec(self.inverse_key(y_key))
 		elif self.path_connectivity[x_key] == true:
-			unit_acc = dir_unit_vec(self.inverse_key(x_key))
-		elif self.path_connectivity[y_key] == true:
 			unit_acc = dir_unit_vec(self.inverse_key(y_key))
+		elif self.path_connectivity[y_key] == true:
+			unit_acc = dir_unit_vec(self.inverse_key(x_key))
 		else:
+			acc_mag_ratio = 3
 			unit_acc = Vector2(0,0).direction_to(dir_unit_vec(self.inverse_key(x_key))+dir_unit_vec(self.inverse_key(y_key)))
 	# when the user at the top, bottom, left or right block
 	elif x_key != "middle" or y_key != "middle":
-		if self.path_connectivity[x_key if x_key != "middle" else y_key] == true:
-			unit_acc = Vector2(1,0).rotated(randf_range(0,2*PI))
-			# modify acceleration
-			var ref_dir = dir_unit_vec(self.inverse_key(x_key))+dir_unit_vec(self.inverse_key(y_key))
-			# reverse the reference direction if needed
-			if ref_dir.dot(unit_acc) > 0:
-				pass
+		# if the block is connected to other directions
+		var pos_key = x_key if x_key != "middle" else y_key
+		if self.path_connectivity[pos_key] == true:
+			if pos_key == "right" or pos_key == "left":
+				# randomly move
+				if abs((user_pos.y+1e-5)/(0.5*block_width)) < dis_ratio:
+					unit_acc = Vector2(1,0).rotated(randf_range(0,2*PI))
+				# move with direction
+				else:
+					unit_acc = Vector2(randf_range(-1,1),-(user_pos.y+1e-5)/abs(user_pos.y+1e-5)*randf_range(0,abs(user_pos.y+1e-5/(0.5*block_width))))
+			elif pos_key == "top" or pos_key == "bottom":
+				# randomly move
+				if abs((user_pos.x+1e-5)/(0.5*block_width)) < dis_ratio:
+					unit_acc = Vector2(1,0).rotated(randf_range(0,2*PI))
+				# move with direction
+				else:
+					unit_acc = Vector2(-(user_pos.x+1e-5)/abs(user_pos.x+1e-5)*randf_range(0,abs(user_pos.x+1e-5/(0.5*block_width))),randf_range(-1,1))
+		elif self.path_connectivity[pos_key] == false and not self.fully_spaced:
+			if pos_key == "right" or pos_key == "left":
+				if user_pos.x > block_width or user_pos.x < -block_width:
+					var min_dis = min(1.5*block_width-user_pos.x,user_pos.x+1.5*block_width)
+					var min_ratio = randf_range(min_dis/(0.5*block_width),1) if min_dis > 0.9 * block_width else 1
+					unit_acc = randf_range(min_ratio,1) * dir_unit_vec(x_key)+dir_unit_vec(y_key)
+				else:
+					unit_acc = dir_unit_vec(self.inverse_key(x_key))+dir_unit_vec(self.inverse_key(y_key))
 			else:
-				ref_dir = - ref_dir
-			# angle_to_ref_dir must smaller than 90 degrees
-			var angle_to_ref_dir = unit_acc.angle_to(ref_dir)
-			
-			if angle_to_ref_dir > 0.1 * PI:
-				var angle_diff = angle_to_ref_dir - PI / dis_ratio
-				unit_acc = unit_acc.rotated(angle_diff+randf_range(0.2*PI / dis_ratio,PI / dis_ratio))
-			elif angle_to_ref_dir < -0.1 * PI:
-				var angle_diff = angle_to_ref_dir + PI / dis_ratio
-				unit_acc = unit_acc.rotated(angle_diff-randf_range(0.2*PI / dis_ratio,PI / dis_ratio)) 
+				if user_pos.y > block_width or user_pos.y < -block_width:
+					var min_dis = min(1.5*block_width-user_pos.y,user_pos.x+1.5*block_width)
+					var min_ratio = randf_range(min_dis/(0.5*block_width),1) if min_dis > 0.9 * block_width else 1
+					unit_acc = randf_range(min_ratio,1) * dir_unit_vec(x_key)+dir_unit_vec(y_key)
+				else:
+					acc_mag_ratio = 3
+					unit_acc = dir_unit_vec(self.inverse_key(x_key))+dir_unit_vec(self.inverse_key(y_key))
+				
 		else:
+			acc_mag_ratio = 3
 			unit_acc = dir_unit_vec(self.inverse_key(x_key))+dir_unit_vec(self.inverse_key(y_key))
-			
+					
 	# when at middle, take a noise vector as acceleration
 	else:
 		unit_acc = Vector2(1,0).rotated(randf_range(0,2*PI))
 	
 	# add some little noise to acceleration
-	var noise = randfn(0,0.15) 
-	if noise > 0.75:
-		noise = 0.75
-	elif noise < -0.75:
-		noise = -0.75
+	var noise = randfn(0,0.35) 
+	if noise > 1:
+		noise = 1
+	elif noise < -1:
+		noise = -1
+	unit_acc += (acc_mag_ratio-1)*unit_acc
 	unit_acc += noise * Vector2(1,0).rotated(randf_range(0,2*PI))
 	
+	# normalize the unit acceleration vector
 	unit_acc = unit_acc / unit_acc.length()
 	
 	# make a magnitude for tne accleration
-	var acc = unit_acc * randi_range(0,max_acc.length())
-
+	var acc = unit_acc * randi_range(0,acc_mag_ratio*max_acc.length())
+	
+	# limit acceleration to a specific range
+	if acc.length() > max_acc.length():
+		acc = acc/acc.length() * max_acc.length()
+	
 	return acc
 	
 func redraw():

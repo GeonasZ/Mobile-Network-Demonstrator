@@ -204,7 +204,7 @@ func redirect_user(current_user, station_i, station_j, user_k) -> Array:
 	if current_user.connected_channel == null:
 		connection_stat = "disconnected"
 	# delete the user if they reach the boundary
-	if current_user.position.x < -20 or current_user.position.y < -20 or current_user.position.x > 1940 or current_user.position.y > 1100:
+	if current_user.position.x < - tile_controller.arc_len or current_user.position.y < -tile_controller.arc_len or current_user.position.x > 1920+tile_controller.arc_len or current_user.position.y > 1080+tile_controller.arc_len:
 		
 		# restore the chanenl of user
 		var user_channel = station[connection_stat][user_k].connected_channel

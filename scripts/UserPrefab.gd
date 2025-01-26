@@ -39,15 +39,14 @@ var station_deadzone_ratio = 0.25
 var spawn_deadzone_ratio = 0.45
 var deadzone_outskirt_multiple = 1.5
 var penalty_lr = 0.6
-# This value represents the ratio of
+# This value represents a ratio of
 # the distance between the user to the station
-# to the arc_len of the cell. Users' acceleration
-# will be rotated to a better angle when the user
-# distance to the station is smalle than this ratio.
-# Users can move closer to the base station
-# if this variable is larger, typically
-# this value should be between 1 and 3.
-var dis_ratio = 1/1.8
+# to the arc_len of the cell. 
+# When the user is at a distance smaller than this ratio,
+# they will not accelerate to the direction of
+# the station any more.
+# This value should be between 0.3 and 1.
+var dis_ratio = 0.5
 
 
 var tracked_by_panel = false
@@ -87,6 +86,8 @@ func _draw():
 func _ready():
 	# take a random initial velocity
 	self.velocity = Vector2(randi_range(0,2*max_ini_velocity) - max_ini_velocity,randi_range(0,2*max_ini_velocity) - max_ini_velocity)
+	self.position = Vector2(0,0)
+	
 	
 func redraw_user():
 		self.queue_redraw()
@@ -240,8 +241,8 @@ func user_speed_protect(with_buffer_space = false):
 	var y_lim = [0,1080]
 	
 	if with_buffer_space:
-		x_lim = [-20,1940]
-		y_lim = [-20,1100]
+		x_lim = [0-station.arc_len*0.9,1920+station.arc_len*0.9]
+		y_lim = [0-station.arc_len*0.9,1080+station.arc_len*0.9]
 		
 	# x speed check
 	if self.position.x < x_lim[0] and self.velocity.x < 0:
@@ -256,19 +257,15 @@ func user_speed_protect(with_buffer_space = false):
 
 func random_move(delta):
 	boundary.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	# take a random acceleration from max_acc to -max_acc
-	var acc = Vector2(randi_range(0,2*max_acc.x) - max_acc.x,randi_range(0,2*max_acc.y) - max_acc.y) * self.height/ref_height
-	var angle_to_station = acc.angle_to(direction_from_station)
-	#var vel_angle_bonus = abs(self.velocity.angle_to(direction_from_station)) + 1
-	
+	# take a random acceleration
 	# modify acceleration
-	if angle_to_station > PI / dis_ratio * (self.distance_from_station/self.station.arc_len):
-		var angle_diff = angle_to_station - PI / dis_ratio * self.distance_from_station/self.station.arc_len
-		acc = acc.rotated(angle_diff+randf_range(0,PI / dis_ratio * self.distance_from_station/self.station.arc_len))
-	elif angle_to_station < -PI / dis_ratio * (self.distance_from_station/self.station.arc_len):
-		var angle_diff = angle_to_station + PI / dis_ratio * self.distance_from_station/self.station.arc_len
-		acc = acc.rotated(angle_diff-randf_range(0,PI / dis_ratio * self.distance_from_station/self.station.arc_len)) 
-	
+	var unit_acc = self.direction_from_station
+	if self.distance_from_station/self.station.arc_len < dis_ratio:
+		unit_acc = unit_acc.rotated(randf_range(-PI,PI)/dis_ratio*self.distance_from_station/self.station.arc_len)
+	else:
+		unit_acc = unit_acc.rotated(randf_range(-PI,PI))
+	var acc = unit_acc * randf_range(0,max_acc.length())
+
 	self.velocity += acc
 	# limit the speed within a specific range
 	if self.velocity.length() > self.max_velocity * self.height/ref_height:
@@ -287,9 +284,10 @@ func random_move(delta):
 	# learn from penalty
 	self.velocity += self.penalty_lr * self.eval_motion_penalty()
 
-
+var pre_pos
 func path_move(delta):
 	var block = self.path_controller.in_which_block(self.global_position)
+		
 	var acc = block.update_user_acc(self,self.max_acc)
 	self.velocity += acc
 	# limit the speed within a specific range
@@ -298,7 +296,8 @@ func path_move(delta):
 	
 	self.user_speed_protect(true)
 	# make a step
-	self.position += (self.velocity) * delta
+	self.pre_pos = self.position
+	self.position += self.velocity * delta
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):

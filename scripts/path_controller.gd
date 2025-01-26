@@ -15,6 +15,8 @@ var path_block_prefab
 func in_which_block(point:Vector2):
 	var col = int((point.x-(path_layer.global_position+self.start_pos*path_layer.scale.x).x+0.5*self.block_width*path_layer.global_scale.x)/(self.block_width*path_layer.global_scale.x))
 	var row = int((point.y-(path_layer.global_position+self.start_pos*path_layer.scale.y).y+0.5*self.block_width*path_layer.global_scale.x)/(self.block_width*path_layer.global_scale.y))
+	if col < 0 or row < 0:
+		return null
 	#print("Point ",point)
 	#print("Scale ",path_layer.scale)
 	#print("col ", (point.x-(self.global_position+self.start_pos*path_layer.scale.x).x-0.5*self.block_width*path_layer.global_scale.x)/(self.block_width*path_layer.global_scale.x))

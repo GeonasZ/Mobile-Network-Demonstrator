@@ -307,11 +307,11 @@ func initialize_tile_background(ref_point:Vector2, tile_length:int=0):
 	ref_point.x = x
 	ref_point.y = y
 	var y_index = 0
-	while y < 1480:
+	while y < 1080 + 2 * tile_length:
 		hex_list.append([])
 		user_controller.user_list.append([])
 		
-		while x < 2200:
+		while x < 1920 + 2 * tile_length:
 			var current_hex = make_tile(Vector2(x,y),tile_length)
 			hex_list[y_index].append(current_hex)
 			user_controller.user_list[y_index].append({"connected":[],
@@ -362,7 +362,7 @@ func initialize_map(tile_length:int=0,total_channel:int=24):
 	# if tile_length larger than 0, change default tile length
 	if tile_length > 0:
 		self.arc_len = tile_length
-	initialize_tile_background(Vector2(-randi()%arc_len-arc_len, -randi()%arc_len-arc_len),tile_length)
+	initialize_tile_background(Vector2(-randi_range(-2*arc_len,-2.5*arc_len), -randi_range(-2*arc_len,-2.5*arc_len)),tile_length)
 	self.current_freq_pattern_idnex = randi_range(0,allowed_freq_pattern.size()-1)
 	initialize_freq_pattern(hex_list, allowed_freq_pattern[current_freq_pattern_idnex])
 	self.station_number = 0
