@@ -4,16 +4,25 @@ extends Control
 @onready var tile_controller = $"../TileController"
 @onready var user_controller = $"../UserController"
 
-var block_width = 150
+var block_width = 600
 var start_pos = Vector2(0,0)
-var end_pos = Vector2(2100,1200)
+var end_pos = Vector2(1920,1080)
 var path_blocks = []
 
 var path_block_prefab
 
+# the point should be a global position.
 func in_which_block(point:Vector2):
-	var col = int((point.x-self.start_pos.x)/self.block_width)
-	var row = int((point.y-self.start_pos.y)/self.block_width)
+	var col = int((point.x-(path_layer.global_position+self.start_pos*path_layer.scale.x).x+0.5*self.block_width*path_layer.global_scale.x)/(self.block_width*path_layer.global_scale.x))
+	var row = int((point.y-(path_layer.global_position+self.start_pos*path_layer.scale.y).y+0.5*self.block_width*path_layer.global_scale.x)/(self.block_width*path_layer.global_scale.y))
+	#print("Point ",point)
+	#print("Scale ",path_layer.scale)
+	#print("col ", (point.x-(self.global_position+self.start_pos*path_layer.scale.x).x-0.5*self.block_width*path_layer.global_scale.x)/(self.block_width*path_layer.global_scale.x))
+	#print("row ",(point.y-(self.global_position+self.start_pos*path_layer.scale.y).y-0.5*self.block_width*path_layer.global_scale.x)/(self.block_width*path_layer.global_scale.y))
+	#print("global pos ",self.global_position)
+	#print("start pos ",path_layer.global_position+self.start_pos*path_layer.scale)
+	#print("true start pos ",self.path_blocks[0][0].global_position)
+	#print("col ",col," row ",row)
 	return self.path_blocks[row][col]
 
 func make_path_step(current_row,current_col,direction,only_on_screen=false,padding=0):
@@ -25,40 +34,32 @@ func make_path_step(current_row,current_col,direction,only_on_screen=false,paddi
 		if only_on_screen and self.path_blocks[current_row-1][current_col].position.y<0:
 			return [current_row,current_col]
 		self.path_blocks[current_row][current_col].path_connectivity["top"] = true
-		self.path_blocks[current_row][current_col].redraw()
 		current_row -= 1
 		self.path_blocks[current_row][current_col].path_connectivity["bottom"] = true
-		self.path_blocks[current_row][current_col].redraw()
 	elif direction == "down":
 		if current_row >= len(self.path_blocks) - padding - 1:
 			return [current_row,current_col]
 		if only_on_screen and self.path_blocks[current_row+1][current_col].position.y>1080:
 			return [current_row,current_col]
 		self.path_blocks[current_row][current_col].path_connectivity["bottom"] = true
-		self.path_blocks[current_row][current_col].redraw()
 		current_row += 1
 		self.path_blocks[current_row][current_col].path_connectivity["top"] = true
-		self.path_blocks[current_row][current_col].redraw()
 	elif direction == "left":
 		if current_col <= padding:
 			return [current_row,current_col]
 		if only_on_screen and self.path_blocks[current_row][current_col-1].position.x<0:
 			return [current_row,current_col]
 		self.path_blocks[current_row][current_col].path_connectivity["left"] = true
-		self.path_blocks[current_row][current_col].redraw()
 		current_col -= 1
 		self.path_blocks[current_row][current_col].path_connectivity["right"] = true
-		self.path_blocks[current_row][current_col].redraw()
 	elif direction == "right":
 		if current_col >= len(self.path_blocks[0])-padding-1:
 			return [current_row,current_col]
 		if only_on_screen and self.path_blocks[current_row][current_col+1].position.x>1920:
 			return [current_row,current_col]
 		self.path_blocks[current_row][current_col].path_connectivity["right"] = true
-		self.path_blocks[current_row][current_col].redraw()
 		current_col += 1
 		self.path_blocks[current_row][current_col].path_connectivity["left"] = true
-		self.path_blocks[current_row][current_col].redraw()
 	else:
 		print("path_controller<make_path_step>: Unknown Direction.")
 		
@@ -128,7 +129,6 @@ func avoid_path_across_point_with_connectivity(point:Vector2):
 			return
 		elif n_connected_directions == 1:
 			current_path_block.path_connectivity[connected_directions[0]] = false
-			current_path_block.redraw()
 			return
 		elif n_connected_directions > 1:
 			if current_path_block.path_connectivity["top"] == true and current_path_block.path_connectivity["right"] == true:
@@ -210,12 +210,6 @@ func avoid_path_across_point_with_connectivity(point:Vector2):
 			for key in current_path_block.path_connectivity:
 				if current_path_block.path_connectivity[key] == true:
 					current_path_block.path_connectivity[key] = false
-			
-			# redraw all neighboured blocks.
-			for i in [row-1,row,row+1]:
-				for j in [col-1,col,col+1]:
-					if i >= 0 and i < len(self.path_blocks) and j >= 0 and j < len(self.path_blocks[0]):
-						self.path_blocks[i][j].redraw()
 
 # Not in use. Bad perforamce warning.
 func just_avoid_path_across_point(point:Vector2):
@@ -236,94 +230,66 @@ func just_avoid_path_across_point(point:Vector2):
 				else:
 					continue
 				current_path_block.path_connectivity[key] = false
-	# redraw all neighboured blocks.
-	for i in [row-1,row,row+1]:
-		for j in [col-1,col,col+1]:
-			if i >= 0 and i < len(self.path_blocks) and j >= 0 and j < len(self.path_blocks[0]):
-				self.path_blocks[i][j].redraw()
-				
+
+# set connectivity to false if just one direction has a connectivity of true
 func clear_redundant_connection(path_block):
 	if path_block.connected_direction_count() == 1:
 		for key in path_block.path_connectivity:
 			if path_block.path_connectivity[key] == true:
 				path_block.path_connectivity[key] = false
-		path_block.redraw()
 
-# connect the ends whose connectivity are false 
+# connect the ends whose connectivity are all false 
 # to form a path if the connectivity of 
 # more than one direction is false.
-func connect_potential_path(path_block):
+func connect_multi_false_path(path_block):
 	var false_connection = path_block.connected_directions(false)
 	if len(false_connection) > 1:
 		for key in path_block.path_connectivity:
 			if path_block.path_connectivity[key] == false:
 				path_block.path_connectivity[key] = true
 		
+func connect_true_false_path(path_block):
+	var false_connection = path_block.connected_directions(false)
+	var true_connection = path_block.connected_directions(true)
+	if len(false_connection) == 1 and len(true_connection) == 1:
+		for key in path_block.path_connectivity:
+			if path_block.path_connectivity[key] == false:
+				path_block.path_connectivity[key] = true
+				return
+		
+func connect_fully_spaced_neighbours(path_block):
+	# dont do anything if the block is not connected at all.
+	if not path_block.at_least_connected():
+		return
+	# try to connect the block with its fully-spaced neighbours
+	for key in path_block.path_connectivity:
+		if path_block.fully_spaced and path_block.neighbours[key] != null and path_block.neighbours[key].fully_spaced:
+			path_block.path_connectivity[key] = true
+			path_block.neighbours[key].path_connectivity[path_block.inverse_key(key)] = true
+			
 # remove wrongly generated paths
 # it is necessary to run this to maintain a proper path map
 func globally_maintain_path_map():
 	for i in range(len(self.path_blocks)):
 		for j in range(len(self.path_blocks[i])):
-			var current_path_block = self.path_blocks[i][j]
-			for key in current_path_block.path_connectivity:
-				if key == "top":
-					if current_path_block.path_connectivity[key] == true:
-						if i > 0 and self.path_blocks[i-1][j].path_connectivity["bottom"] == null or i == 0:
-							current_path_block.path_connectivity[key] = null
-					elif current_path_block.path_connectivity[key] == false:
-						if i > 0 and self.path_blocks[i-1][j].path_connectivity["bottom"] != true or i == 0:
-							current_path_block.path_connectivity[key] = null
-							if not i == 0:
-								self.path_blocks[i-1][j].path_connectivity["bottom"] = null
-				elif key == "bottom":
-					if current_path_block.path_connectivity[key] == true:
-						if i < len(self.path_blocks)-1 and self.path_blocks[i+1][j].path_connectivity["top"] == null or i == len(self.path_blocks)-1:
-							current_path_block.path_connectivity[key] = null
-					elif current_path_block.path_connectivity[key] == false:
-						if i < len(self.path_blocks)-1 and self.path_blocks[i+1][j].path_connectivity["top"] != true or i == len(self.path_blocks)-1:
-							current_path_block.path_connectivity[key] = null
-							if not i == len(self.path_blocks)-1:
-								self.path_blocks[i+1][j].path_connectivity["top"] = false
-				elif key == "left":
-					if current_path_block.path_connectivity[key] == true:
-						if j > 0 and self.path_blocks[i][j-1].path_connectivity["right"] == null or j == 0:
-							current_path_block.path_connectivity[key] = null
-					elif current_path_block.path_connectivity[key] == false:
-						if j > 0 and self.path_blocks[i][j-1].path_connectivity["right"] != true or j == 0:
-							current_path_block.path_connectivity[key] = null
-							if not j == 0:
-								self.path_blocks[i][j-1].path_connectivity["right"] = null
-				elif key == "right":
-					if current_path_block.path_connectivity[key] == true:
-						if j < len(self.path_blocks[i]) - 1 and self.path_blocks[i][j+1].path_connectivity["left"] == null or j == len(self.path_blocks[i]) - 1:
-							current_path_block.path_connectivity[key] = null
-					elif current_path_block.path_connectivity[key] == false:
-						if j < len(self.path_blocks[i]) - 1 and self.path_blocks[i][j+1].path_connectivity["left"] != true or j == len(self.path_blocks[i]) - 1:
-							current_path_block.path_connectivity[key] = null
-							if not j == len(self.path_blocks[i]) - 1:
-								self.path_blocks[i][j+1].path_connectivity["left"] = null
-				else:
-					print("path_controller<globally_maintain_path_map>: Invalid Key.")
-			current_path_block.redraw()
-					
-func make_map(width,start:Vector2,end:Vector2):
-	var current_pos = start
-	var id = 0
-	while current_pos.y - 0.5 * width < end_pos.y:
-		self.path_blocks.append([])
-		while current_pos.x - 0.5 * width < end_pos.x:
-			var current_path_block = path_block_prefab.instantiate()
-			path_layer.add_child(current_path_block)
-			current_path_block.id = id
-			id += 1
-			current_path_block.position = current_pos
-			current_path_block.set_width(width)
-			current_path_block.redraw()
-			self.path_blocks[-1].append(current_path_block)
-			current_pos.x += width
-			
-		current_pos.y += width
-		current_pos.x = start_pos.x
+			var path_block = self.path_blocks[i][j]
+			for key in path_block.path_connectivity:
+				if path_block.path_connectivity[key] == true:
+					if path_block.neighbours[key] != null and path_block.neighbours[key].path_connectivity[path_block.inverse_key(key)] == null or path_block.neighbours[key] == null:
+						path_block.path_connectivity[key] = null
+					elif path_block.neighbours[key] != null and path_block.neighbours[key].fully_spaced and path_block.neighbours[key].path_connectivity[path_block.inverse_key(key)] != true:
+						path_block.path_connectivity[key] = null
+				elif path_block.path_connectivity[key] == false:
+					if path_block.neighbours[key] != null and path_block.neighbours[key].path_connectivity[path_block.inverse_key(key)] == false or path_block.neighbours[key] == null:
+						path_block.path_connectivity[key] = null
+						if path_block.neighbours[key] != null:
+							path_block.neighbours[key].path_connectivity[path_block.inverse_key(key)] = null
+		
+			path_layer.redraw()
+
+# generate more random paths on the map. connectivity 
+# throughout the whole map is not garenteed.
+func generate_random_paths():
 	# draw paths
 	make_path(0,0,len(self.path_blocks)-1,len(self.path_blocks[0])-1,false)
 	make_path(0,len(self.path_blocks[0])-1,len(self.path_blocks)-1,0,false)
@@ -334,22 +300,175 @@ func make_map(width,start:Vector2,end:Vector2):
 		for station in row:
 			self.avoid_path_across_point_with_connectivity(station.position)
 
-	# clear redundant path connections
+	# clear some of the redundant path connections, keep the others to keep the path variaty
 	for row in self.path_blocks:
 		for path_blcok in row:
-			self.clear_redundant_connection(path_blcok)
-
+			# clear half of the connections and keep the other half
+			if randi_range(0,1):
+				self.clear_redundant_connection(path_blcok)
+	
 	# connect potentially existed paths
 	for row in self.path_blocks:
 		for path_blcok in row:
-			self.connect_potential_path(path_blcok)
+			self.connect_multi_false_path(path_blcok)
+			
+	# connect neighboured fully-spaced blocks 
+	for row in self.path_blocks:
+		for path_blcok in row:
+			self.connect_fully_spaced_neighbours(path_blcok)
 	
 	# remove wrongly generated paths
 	self.globally_maintain_path_map()
+
+func _randomly_update_block_connectivity(block, threshold=null):	
+	if threshold == null:
+		var connection_count = block.connected_direction_count()
+		threshold = randi_range(15,max(25*(3-connection_count),20))
+
+	for key in block.path_connectivity:
+		if block.path_connectivity[key] == null and block.neighbours[key] != null:
+			if randi_range(0,99) < threshold:
+				block.path_connectivity[key] = true
+				if randf_range(0,99) < threshold * 1.5:
+					block.neighbours[key].path_connectivity[block.inverse_key(key)] = true
+				else:
+					block.neighbours[key].path_connectivity[block.inverse_key(key)] = false
+
+func _generate_better_connected_paths(bonused_produce_times,_count_down,_untraveled_blocks,_block=null):
+	# randomly initialize a block as start if the block is not specified
+	if _block == null:
+		var row = randi_range(int(len(self.path_blocks)*0.4),int(len(self.path_blocks)*0.6))
+		var col = randi_range(int(len(self.path_blocks[0])*0.4),int(len(self.path_blocks[0])*0.6))
+		_block = self.path_blocks[row][col]
+	# mark the block itself as has been travelled
+	_untraveled_blocks.erase(_block)
+	var thres = null
+	if _count_down > 0:
+		thres = (_count_down/bonused_produce_times) * 50 + 50
+	_randomly_update_block_connectivity(_block, thres)
+	for key in _block.path_connectivity:
+		if _block.neighbours[key] != null and _block.neighbours[key] in _untraveled_blocks:
+			_generate_better_connected_paths(bonused_produce_times, _count_down - 1, _untraveled_blocks, _block.neighbours[key])
+	
+# generate random paths on the map. connectivity throughout the
+# whole map is still not garenteed, but is expected to be better
+# than generate_random_paths().
+func generate_better_connected_paths(bonused_produce_times):
+	_generate_better_connected_paths(bonused_produce_times, bonused_produce_times, path_layer.get_children())
+	for row in self.path_blocks:
+		for block in row:
+			if randi_range(0,99) < 70:
+				connect_multi_false_path(block)
+			if randi_range(0,99) < 70:
+				connect_true_false_path(block)
+			connect_fully_spaced_neighbours(block)
+	globally_maintain_path_map()
+
+# generate random paths on the map. connectivity throughout the
+# whole map is garenteed.
+func _generate_fully_connected_paths(_block_list,_block_travel_times_list=null,_max_travel_time=4,_block=null):
+	# randomly initialize a block as start if the block is not specified
+	if _block == null:
+		var row = randi_range(int(len(self.path_blocks)*0.4),int(len(self.path_blocks)*0.6))
+		var col = randi_range(int(len(self.path_blocks[0])*0.4),int(len(self.path_blocks[0])*0.6))
+		_block = self.path_blocks[row][col]
+		_block.set_connectivity(true,true,true,true)
+	# initialize a block travel_times list
+	if _block_travel_times_list == null:
+		_block_travel_times_list = []
+		for i in range(len(_block_list)):
+			_block_travel_times_list.append(0)
+			
+	# determine whether the block has been traveled too many times
+	var index = _block_list.find(_block)
+	if _block_travel_times_list[index] < _max_travel_time:
+		_block_travel_times_list[index] += 1
+		if _block.at_least_connected():
+			# update the block itself
+			var n_connections = _block.connected_direction_count()
+			for key in _block.path_connectivity:
+				if _block.path_connectivity[key] == null:
+					if randi_range(0,99) < (4-n_connections) * 25:
+						_block.path_connectivity[key] = true
+						
+			# update the enighbour blocks
+			for key in _block.path_connectivity:
+				if _block.neighbours[key] != null:
+					if _block.path_connectivity[key] == true and _block.neighbours[key].path_connectivity[_block.inverse_key(key)] == null:
+						var do_connect = randi_range(0,99) < 70
+						if do_connect:
+							_block.neighbours[key].path_connectivity[_block.inverse_key(key)] = true
+						else:
+							_block.neighbours[key].path_connectivity[_block.inverse_key(key)] = false
+						if _block.neighbours[key].at_least_connected():
+							_generate_fully_connected_paths(_block_list,_block_travel_times_list,_max_travel_time,_block.neighbours[key])
+			
+func generate_fully_connected_paths():
+	var blocks = path_layer.get_children()
+	_generate_fully_connected_paths(blocks)
+
+	for row in self.path_blocks:
+		for block in row:
+
+			connect_fully_spaced_neighbours(block)
+			
+	globally_maintain_path_map()
+			
+func make_path_block(pos):
+	pass
+			
+func make_map(width,start:Vector2,end:Vector2):
+	var current_pos = start
+	var id = 0
+	var col = 0
+	var row = 0
+	while current_pos.y - 0.5 * width < end_pos.y:
+		self.path_blocks.append([])
+		while current_pos.x - 0.5 * width < end_pos.x:
+			var current_path_block = path_block_prefab.instantiate()
+			path_layer.add_child(current_path_block)
+			current_path_block.initialize(id,row,col,self)
+			current_path_block.position = current_pos
+			current_path_block.set_width(width)
+			self.path_blocks[-1].append(current_path_block)
+			current_pos.x += width
+			id += 1
+			col += 1
+		col = 0
+		row += 1
+		current_pos.y += width
+		current_pos.x = start_pos.x
+		
+	# record the four neighbour blocks for each block
+	for i in range(len(self.path_blocks)):
+		for j in range(len(self.path_blocks[i])):
+			if i > 0:
+				self.path_blocks[i][j].neighbours["top"] = self.path_blocks[i-1][j]
+			if i < len(self.path_blocks) - 1:
+				self.path_blocks[i][j].neighbours["bottom"] = self.path_blocks[i+1][j]
+			if j > 0:
+				self.path_blocks[i][j].neighbours["left"] = self.path_blocks[i][j-1]
+			if j < len(self.path_blocks[i]) - 1:
+				self.path_blocks[i][j].neighbours["right"] = self.path_blocks[i][j+1]
+					
+	
+	# set some of the blocks to the fully-spaced style.
+	for i in range(len(self.path_blocks)):
+		var threshold = randi_range(5,50)
+		for j in range(len(self.path_blocks[i])):
+			# clear half of the connections and keep the other half
+			if randi_range(0,99) < threshold:
+				self.path_blocks[i][j].fully_spaced = true
+				
+	#generate_random_paths()
+	#generate_better_connected_paths(10)
+	generate_fully_connected_paths()
+	path_layer.redraw()
 	
 func set_path_width(width):
 	for row in self.path_blocks:
 		for block in row:
+			path_layer.remove_child(block)
 			block.queue_free()
 	self.path_blocks = []
 	self.block_width = width
@@ -358,8 +477,7 @@ func set_path_width(width):
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	
-	self.start_pos = Vector2(-randi_range(0,block_width*0.5),-randi_range(0,block_width*0.5))
-	self.end_pos = Vector2(1925,1085)
+	self.start_pos = Vector2(-randi_range(0,block_width*0.1),-randi_range(0,block_width*0.1))
 	
 	self.path_block_prefab = preload("res://scenes/path_block_prefab.tscn")
 	make_map(block_width,self.start_pos,self.end_pos)
@@ -367,6 +485,4 @@ func _ready() -> void:
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-	for user in user_controller.linear_user_list:
-		var block = self.in_which_block(user.position)
-		print(block.in_block(user.position))
+	pass

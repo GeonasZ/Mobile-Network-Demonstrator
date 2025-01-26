@@ -8,18 +8,13 @@
 shader = ExtResource("2_k7pyv")
 shader_parameter/alpha = null
 
-[node name="UserPrefab" type="Control"]
-layout_mode = 3
-anchors_preset = 0
-mouse_filter = 2
+[node name="UserPrefab" type="Node2D"]
 script = ExtResource("1_eitbs")
 
 [node name="Boundary" type="Control" parent="."]
 material = SubResource("ShaderMaterial_wb2p1")
+layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 script = ExtResource("3_6qhdh")
-
-[connection signal="mouse_entered" from="Boundary" to="Boundary" method="_on_mouse_entered"]
-[connection signal="mouse_exited" from="Boundary" to="Boundary" method="_on_mouse_exited"]

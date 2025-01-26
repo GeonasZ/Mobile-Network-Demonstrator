@@ -1,14 +1,15 @@
-extends Control
+extends Node2D
 
 @onready var boundary = $Boundary
 @onready var gathered_tiles = null
-var mouse_panel = null
+@onready var mouse_panel = null
+@onready var path_controller = null
 
 var observer_mode = false
 var engineer_mode = false
 
-signal mouse_enter_user()
-signal mouse_leave_user()
+signal mouse_enter_user
+signal mouse_leave_user
 
 var is_initialized = false
 
@@ -34,9 +35,20 @@ var direction_from_station
 
 # the ratio of arc_len and deadzone radius. Deadzone is where users 
 # should not go in.
-var station_deadzone_ratio = 0.4
-var deadzone_outskirt_multiple = 2
+var station_deadzone_ratio = 0.25
+var spawn_deadzone_ratio = 0.45
+var deadzone_outskirt_multiple = 1.5
 var penalty_lr = 0.6
+# This value represents the ratio of
+# the distance between the user to the station
+# to the arc_len of the cell. Users' acceleration
+# will be rotated to a better angle when the user
+# distance to the station is smalle than this ratio.
+# Users can move closer to the base station
+# if this variable is larger, typically
+# this value should be between 1 and 3.
+var dis_ratio = 1/1.8
+
 
 var tracked_by_panel = false
 var motion_pause = false
@@ -75,8 +87,7 @@ func _draw():
 func _ready():
 	# take a random initial velocity
 	self.velocity = Vector2(randi_range(0,2*max_ini_velocity) - max_ini_velocity,randi_range(0,2*max_ini_velocity) - max_ini_velocity)
-	self.position = Vector2(1920./2,1080./2)
-
+	
 func redraw_user():
 		self.queue_redraw()
 
@@ -87,6 +98,11 @@ func redraw_with_height(people_height):
 	self.radius = 0.5 * people_height
 	self.feet_height = 0.5 * people_height
 	self.arm_height = 0.875 * people_height
+	
+	boundary.position = Vector2(-self.radius,-self.height-self.radius*2)
+	boundary.size = Vector2(self.radius*2,self.height+self.radius*2)
+	self.boundary.rect = Rect2(Vector2(0,0),boundary.size)
+	boundary.queue_redraw()
 	self.queue_redraw()
 	await get_tree().process_frame
 	self.visible = true
@@ -102,13 +118,19 @@ func get_distance_from_station():
 func mouse_track_user():
 	mouse_panel.track_user()
 
-func initialize(input_mouse_panel, input_gathered_tiles):
+func initialize(input_mouse_panel, input_gathered_tiles, input_path_controller):
 	self.gathered_tiles = input_gathered_tiles
 	self.mouse_panel = input_mouse_panel
+	self.path_controller = input_path_controller
 	self.mouse_enter_user.connect(input_mouse_panel._on_mouse_enter_user)
 	self.mouse_leave_user.connect(input_mouse_panel._on_mouse_leave_user)
 	self.is_initialized = true
 	self.auto_set_displacement()
+	
+	boundary.position = Vector2(-self.radius,-self.height+2*radius)
+	boundary.size = Vector2(self.radius*2,self.height+self.radius*2)
+	boundary.rect = Rect2(Vector2(0,0),Vector2(self.radius*2,self.height+self.radius*2))
+	boundary.queue_redraw()
 
 func start_analysis():
 	self.under_analysis = true
@@ -154,9 +176,18 @@ func hide_boundary():
 	if not tracked_by_panel:
 		boundary.visible = false
 
-func move_out_dead_zone():
+func move_out_deadzone():
 	if self.in_dead_zone():
 		self.position += self.displacement_from_station/self.distance_from_station*(self.station_deadzone_ratio*station.arc_len-self.distance_from_station)
+
+func in_spawn_dead_zone():
+	var deadzone_radius = self.spawn_deadzone_ratio * self.station.arc_len
+	return self.get_distance_from_station() < deadzone_radius
+
+func move_out_spawn_deadzone():
+	if self.in_spawn_dead_zone():
+		self.position += self.displacement_from_station/self.distance_from_station*(self.spawn_deadzone_ratio*station.arc_len-self.distance_from_station)
+
 
 func connect_to_channel(channel):
 	if channel != self.connected_channel and (channel == null or self.connected_channel == null):
@@ -203,18 +234,72 @@ func resume_motion():
 	self.motion_pause = false
 
 ## protect the user from going beyond the screen
-func user_speed_protect():
+func user_speed_protect(with_buffer_space = false):
+	
+	var x_lim = [0,1920]
+	var y_lim = [0,1080]
+	
+	if with_buffer_space:
+		x_lim = [-20,1940]
+		y_lim = [-20,1100]
+		
 	# x speed check
-	if self.position.x < 0 and self.velocity.x < 0:
+	if self.position.x < x_lim[0] and self.velocity.x < 0:
 		self.velocity.x = -self.velocity.x
-	elif self.position.x > 1920 and self.velocity.x > 0:
+	elif self.position.x > x_lim[1] and self.velocity.x > 0:
 		self.velocity.x = -self.velocity.x
 	# y speed check
-	if self.position.y < 0 and self.velocity.y < 0:
+	if self.position.y < y_lim[0] and self.velocity.y < 0:
 		self.velocity.y = -self.velocity.y
-	elif self.position.y > 1080 and self.velocity.y > 0:
+	elif self.position.y > y_lim[1] and self.velocity.y > 0:
 		self.velocity.y = -self.velocity.y
 
+func random_move(delta):
+	boundary.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# take a random acceleration from max_acc to -max_acc
+	var acc = Vector2(randi_range(0,2*max_acc.x) - max_acc.x,randi_range(0,2*max_acc.y) - max_acc.y) * self.height/ref_height
+	var angle_to_station = acc.angle_to(direction_from_station)
+	#var vel_angle_bonus = abs(self.velocity.angle_to(direction_from_station)) + 1
+	
+	# modify acceleration
+	if angle_to_station > PI / dis_ratio * (self.distance_from_station/self.station.arc_len):
+		var angle_diff = angle_to_station - PI / dis_ratio * self.distance_from_station/self.station.arc_len
+		acc = acc.rotated(angle_diff+randf_range(0,PI / dis_ratio * self.distance_from_station/self.station.arc_len))
+	elif angle_to_station < -PI / dis_ratio * (self.distance_from_station/self.station.arc_len):
+		var angle_diff = angle_to_station + PI / dis_ratio * self.distance_from_station/self.station.arc_len
+		acc = acc.rotated(angle_diff-randf_range(0,PI / dis_ratio * self.distance_from_station/self.station.arc_len)) 
+	
+	self.velocity += acc
+	# limit the speed within a specific range
+	if self.velocity.length() > self.max_velocity * self.height/ref_height:
+		self.velocity = self.velocity / self.velocity.length() * self.max_velocity * self.height/ref_height
+	
+	# use the analysis_user_speed_protect() function
+	# to run an analysis speed check, in which 
+	# if the under is currently under analysis,
+	# then they should not move beyond the map
+	self.user_speed_protect()
+	
+	# move a step
+	#self.position += (self.velocity) * delta
+	self.position += (self.velocity+self.eval_motion_penalty()) * delta
+	
+	# learn from penalty
+	self.velocity += self.penalty_lr * self.eval_motion_penalty()
+
+
+func path_move(delta):
+	var block = self.path_controller.in_which_block(self.global_position)
+	var acc = block.update_user_acc(self,self.max_acc)
+	self.velocity += acc
+	# limit the speed within a specific range
+	if self.velocity.length() > self.max_velocity * self.height/ref_height:
+		self.velocity = self.velocity / self.velocity.length() * self.max_velocity * self.height/ref_height
+	
+	self.user_speed_protect(true)
+	# make a step
+	self.position += (self.velocity) * delta
+	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	if not under_analysis and previous_under_analysis:
@@ -230,38 +315,7 @@ func _process(delta):
 	
 	# try to move a step if not paused
 	if (not observer_mode or under_analysis) and not engineer_mode and not motion_pause:
-		self.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		# take a random acceleration from max_acc to -max_acc
-		var acc = Vector2(randi_range(0,2*max_acc.x) - max_acc.x,randi_range(0,2*max_acc.y) - max_acc.y) * self.height/ref_height
-		self.velocity += acc
-		
-		# limit the speed within a specific range
-		# limit x velocity
-		if self.velocity.x > self.max_velocity * self.height/ref_height:
-			self.velocity.x = self.max_velocity * self.height/ref_height
-		elif self.velocity.x < -self.max_velocity * self.height/ref_height:
-			self.velocity.x = -self.max_velocity * self.height/ref_height
-		# limit y velocity
-		if self.velocity.y > self.max_velocity * self.height/ref_height:
-			self.velocity.y = self.max_velocity * self.height/ref_height
-		elif self.velocity.y < -self.max_velocity * self.height/ref_height:
-			self.velocity.y = -self.max_velocity * self.height/ref_height
-		
-		# use the analysis_user_speed_protect() function
-		# to run an analysis speed check, in which 
-		# if the under is currently under analysis,
-		# then they should not move beyond the map
-		self.user_speed_protect()
-		
-		# move a step
-		self.position += (self.velocity+self.eval_motion_penalty()) * delta
-		
-		# learn from penalty
-		self.velocity += self.penalty_lr * self.eval_motion_penalty()
-		
-		#print(self.eval_motion_penalty()/(self.velocity*(self.velocity.normalized().dot(self.direction_from_station))))
-
-		#self.position += Vector2(50,50) * delta
+		#self.random_move(delta)
+		self.path_move(delta)
 	else:
-		self.mouse_filter = Control.MOUSE_FILTER_STOP
-	
+		boundary.mouse_filter = Control.MOUSE_FILTER_STOP

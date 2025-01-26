@@ -7,8 +7,8 @@ var previous_text = ""
 
 var legal_characters = ["0","1","2","3","4","5","6","7","8","9"]
 
-var max_value = 300
-var min_value = 20
+var max_value = 600
+var min_value = 60
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -60,15 +60,21 @@ func _input(event: InputEvent) -> void:
 		focus_exited.emit()
 
 func initialize():
-	print("asf")
 	self.text = str(path_controller.block_width)
 	
 func _on_focus_exited() -> void:
 	father_node.grab_focus()
+
+	var length = int(self.text)
+	while length % 3 != 0:
+		length += 1
+		
 	if self.text == "":
 		self.text = str(min_value)
-	var length = int(self.text)
+		
 	if length > max_value:
 		self.text = str(max_value)
 	elif length < min_value:
 		self.text = str(min_value)
+	else:
+		self.text = str(length)

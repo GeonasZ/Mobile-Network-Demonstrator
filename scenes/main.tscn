@@ -1,4 +1,4 @@
-[gd_scene load_steps=121 format=3 uid="uid://dp7br0wc03w8r"]
+[gd_scene load_steps=123 format=3 uid="uid://dp7br0wc03w8r"]
 
 [ext_resource type="Script" path="res://scripts/UserController.gd" id="1_18gww"]
 [ext_resource type="Script" path="res://scripts/TileController.gd" id="1_fg5v7"]
@@ -11,6 +11,7 @@
 [ext_resource type="Theme" uid="uid://c47dh1lxfotbp" path="res://themes/rich_text_title.tres" id="4_e7qlr"]
 [ext_resource type="Script" path="res://scripts/path_controller.gd" id="4_fefr6"]
 [ext_resource type="Script" path="res://scripts/FunctionLabel.gd" id="6_0kpw6"]
+[ext_resource type="Shader" path="res://shader/path_map.gdshader" id="6_0rd32"]
 [ext_resource type="Script" path="res://scripts/InstructionPanel_AnimationPlayer.gd" id="6_65c8k"]
 [ext_resource type="Theme" uid="uid://wsrrmg4u8rjb" path="res://themes/small_panel_font.tres" id="6_caxdq"]
 [ext_resource type="Script" path="res://scripts/path_layer.gd" id="6_d3e1l"]
@@ -68,6 +69,9 @@
 [ext_resource type="Script" path="res://scripts/n_plot_data_edit.gd" id="57_11oek"]
 [ext_resource type="Script" path="res://scripts/plot_select_button.gd" id="57_pr2yt"]
 [ext_resource type="Script" path="res://scripts/analysis_panel_analysis_button.gd" id="60_dcd47"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_u15il"]
+shader = ExtResource("6_0rd32")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_h4n7r"]
 shader = ExtResource("6_ihk23")
@@ -827,9 +831,8 @@ offset_bottom = 1080.0
 mouse_filter = 1
 script = ExtResource("4_6s6fj")
 
-[node name="PathLayer" type="Control" parent="."]
-anchors_preset = 0
-mouse_filter = 2
+[node name="PathLayer" type="Node2D" parent="."]
+material = SubResource("ShaderMaterial_u15il")
 script = ExtResource("6_d3e1l")
 
 [node name="Users" type="Control" parent="."]

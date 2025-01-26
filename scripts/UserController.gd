@@ -1,6 +1,7 @@
 extends Control
 @onready var users = $"../../Users"
 @onready var tile_controller = $"../TileController"
+@onready var path_controller = $"../PathController"
 @onready var mouse_panel = $"../../MousePanel"
 @onready var gathered_tiles = $"../../GatheredTiles"
 @onready var obs_button = $"../../FunctionPanel/ObserverButton"
@@ -61,14 +62,14 @@ func add_user(pos,out_of_dead_zone=false):
 	else:
 		user_list[i][j]["disconnected"].append(current_user)
 		current_user.index_k_in_user_list = user_list[i][j]["disconnected"].size() - 1
-	current_user.initialize(mouse_panel, gathered_tiles)
+	current_user.initialize(mouse_panel, gathered_tiles, path_controller)
 	if obs_button.button_mode == obs_button.Mode.OBSERVER:
 		current_user.enter_observer_mode()
 	if engineer_button.button_mode == engineer_button.Mode.ENGINEER:
 		current_user.enter_engineer_mode()
 	current_user.redraw_with_height(self.user_height)
 	if out_of_dead_zone:
-		current_user.move_out_dead_zone()
+		current_user.move_out_spawn_deadzone()
 	return current_user
 
 func random_add_user(n_user:int,out_of_dead_zone=false):
