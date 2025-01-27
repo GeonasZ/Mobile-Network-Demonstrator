@@ -124,7 +124,8 @@ func _process(delta: float) -> void:
 
 
 func _on_gathered_tiles_mouse_left_click_on_background(event) -> void:
-	if mouse_controller.current_hex.is_center_on_focus() and self.on_work and engineer_button.button_mode == engineer_button.Mode.ENGINEER and self.focused_hex != mouse_controller.current_hex:
+	#if mouse_controller.current_hex.is_center_on_focus() and self.on_work and engineer_button.button_mode == engineer_button.Mode.ENGINEER and self.focused_hex != mouse_controller.current_hex:
+	if  self.on_work and engineer_button.button_mode == engineer_button.Mode.ENGINEER and self.focused_hex != mouse_controller.current_hex:
 		if self.focused_hex != null:
 			self.focused_hex.under_config = false
 			self.focused_hex = mouse_controller.current_hex
@@ -138,3 +139,4 @@ func _on_gathered_tiles_mouse_left_click_on_background(event) -> void:
 func _on_gathered_tiles_mouse_right_click_on_background(event) -> void:
 	if self.visible:
 		self.disappear()
+		mouse_panel.track_mouse()

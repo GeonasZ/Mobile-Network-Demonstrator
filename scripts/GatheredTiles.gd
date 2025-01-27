@@ -7,6 +7,7 @@ extends Control
 @onready var users = $"../Users"
 @onready var path_layer = $"../PathLayer"
 @onready var config_panel = $"../ConfigPanel"
+@onready var station_config_panel = $"../StationConfigPanel"
 
 signal mouse_left_click_on_background()
 signal mouse_right_click_on_background()
@@ -52,6 +53,9 @@ func on_mouse_right_click_on_background(event):
 	# if analysis panel open, do not react to right click
 	if mouse_panel.analysis_panel_open:
 		return
+	elif station_config_panel.visible:
+		return
+		
 	if mouse_panel.tracking_mode == mouse_panel.TrackingMode.MOUSE:
 		mouse_panel.on_mouse_right_click_on_background(event)
 		function_panel.on_mouse_right_click_on_background(event)
