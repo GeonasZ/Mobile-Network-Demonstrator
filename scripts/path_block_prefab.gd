@@ -182,7 +182,7 @@ func rotate_user_acc_from_station(user, unit_acc, dis_ratio, penalty_add_ratio):
 	return unit_acc
 		
 func update_user_acc(user,max_acc: Vector2):
-	var dis_ratio = 0.7
+	var dis_ratio = 0.5
 	var block_width = self.width/3.
 	var user_pos = self.get_global_transform().affine_inverse()*user.global_position
 	# the ratio to be multiplied to the magnitude of 
@@ -209,6 +209,7 @@ func update_user_acc(user,max_acc: Vector2):
 	# when the block has no connection to others
 	if not self.at_least_connected():
 		var false_connections = self.connected_directions(false)
+		# if there is at least one false connection
 		if len(false_connections) > 0:
 			var key = false_connections[randi_range(0,len(false_connections)-1)]
 			if x_key in false_connections or y_key in false_connections:
@@ -257,7 +258,6 @@ func update_user_acc(user,max_acc: Vector2):
 		elif self.path_connectivity[y_key] == true:
 			unit_acc = dir_unit_vec(self.inverse_key(x_key))
 		else:
-			acc_mag_ratio = 3
 			unit_acc = Vector2(0,0).direction_to(dir_unit_vec(self.inverse_key(x_key))+dir_unit_vec(self.inverse_key(y_key)))
 	# when the user at the top, bottom, left or right block
 	elif x_key != "middle" or y_key != "middle":
@@ -283,20 +283,18 @@ func update_user_acc(user,max_acc: Vector2):
 				if user_pos.x > block_width or user_pos.x < -block_width:
 					var min_dis = min(1.5*block_width-user_pos.x,user_pos.x+1.5*block_width)
 					var min_ratio = randf_range(min_dis/(0.5*block_width),1) if min_dis > 0.9 * block_width else 1
-					unit_acc = randf_range(min_ratio,1) * dir_unit_vec(x_key)+dir_unit_vec(y_key)
+					unit_acc = randf_range(min_ratio,1) * (dir_unit_vec(x_key)+dir_unit_vec(y_key))
 				else:
 					unit_acc = dir_unit_vec(self.inverse_key(x_key))+dir_unit_vec(self.inverse_key(y_key))
 			else:
 				if user_pos.y > block_width or user_pos.y < -block_width:
 					var min_dis = min(1.5*block_width-user_pos.y,user_pos.x+1.5*block_width)
 					var min_ratio = randf_range(min_dis/(0.5*block_width),1) if min_dis > 0.9 * block_width else 1
-					unit_acc = randf_range(min_ratio,1) * dir_unit_vec(x_key)+dir_unit_vec(y_key)
+					unit_acc = randf_range(min_ratio,1) * (dir_unit_vec(x_key)+dir_unit_vec(y_key))
 				else:
-					acc_mag_ratio = 3
 					unit_acc = dir_unit_vec(self.inverse_key(x_key))+dir_unit_vec(self.inverse_key(y_key))
 				
 		else:
-			acc_mag_ratio = 3
 			unit_acc = dir_unit_vec(self.inverse_key(x_key))+dir_unit_vec(self.inverse_key(y_key))
 	# when at middle, take a noise vector as acceleration
 	else:

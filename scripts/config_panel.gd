@@ -16,13 +16,13 @@ extends Polygon2D
 @onready var over_layer = $"../OverLayer"
 @onready var function_panel = $"../FunctionPanel"
 @onready var station_config_panel = $"../StationConfigPanel"
+@onready var mouse_panel = $"../MousePanel"
 
 signal config_panel_opened
 
 var edit_list
 var on_work = true
 var is_panel_open = false
-var config_on = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -69,4 +69,5 @@ func close_config_with_anime():
 		self.visible = false
 		on_work = true
 		function_panel.enable_all_keyboard_input()
+		
 	

@@ -16,9 +16,12 @@ func _draw() -> void:
 		var path_line_width = block.path_line_width
 		var path_line_color = block.path_line_color
 		var no_access_block_color = block.no_access_block_color
-		# highlight the border of each block
+		
+		# highlight the border of each block, for testing usage
+		#draw_rect(Rect2(Vector2(-1.5*block_width,-1.5*block_width),Vector2(block.width,block.width)),Color8(255,0,0),false,2)
+		
+		# set draw transform to default
 		draw_set_transform(block.position,0)
-		draw_rect(Rect2(Vector2(-1.5*block_width,-1.5*block_width),Vector2(block.width,block.width)),Color8(255,0,0),false,2)
 		# fully-spaced block style
 		if block.fully_spaced:
 			if at_least_connected:

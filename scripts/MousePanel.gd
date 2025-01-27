@@ -87,6 +87,7 @@ func initialize_mouse_panel():
 	self.tracking_mode = TrackingMode.MOUSE
 	self.displayed_user = []
 	self.tracked_user = null
+	self.position = self.get_global_mouse_position()
 	label_change_style(self.display_mode, self.tracking_mode)
 	
 # Called when the node enters the scene tree for the first time.
@@ -106,32 +107,33 @@ func on_mouse_right_click_on_background(event):
 		else:
 			disappear_with_anime()
 
-func process_x_motion(mouse_position, delta):
-	# if in left motion
-	if x_motion_state == XMotion.MOVE_LEFT:
-		self.position.x -= delta/motion_speed_param * (position.x - mouse_position.x + 0.7*length)
-	# if in right motion
-	elif x_motion_state == XMotion.MOVE_RIGHT:
-		self.position.x -= delta/motion_speed_param * (position.x - mouse_position.x - 0.7*length)
-		
+func move_to(pos):
+	process_x_motion(pos,0,true)
+	process_y_motion(pos,0,true)
+
+func process_x_motion(mouse_position, delta, directly_move_to=false):
 	# determine whether there should be a motion
 	if mouse_position.x > 1920*0.6:
 		x_motion_state = XMotion.MOVE_LEFT
 	elif mouse_position.x < 1920*0.4:
 		x_motion_state = XMotion.MOVE_RIGHT
-
-func process_y_motion(mouse_position, delta):
 	
-	# move upward
-	if y_motion_state == YMotion.MOVE_UP:
-		self.position.y -= delta/motion_speed_param  * (position.y - mouse_position.y + 0.7*width)
-	# move downward
-	elif y_motion_state == YMotion.MOVE_DOWN:
-		self.position.y -= delta/motion_speed_param * (position.y - mouse_position.y - 0.7*width)
-	# move to level
-	elif y_motion_state == YMotion.MOVE_LEVEL:
-		self.position.y -= delta/motion_speed_param * (position.y - mouse_position.y)
-		
+	# if in left motion
+	if x_motion_state == XMotion.MOVE_LEFT:
+		if directly_move_to:
+			self.position.x = mouse_position.x + 0.7*length
+		else:
+			self.position.x -= delta/motion_speed_param * (position.x - mouse_position.x + 0.7*length)
+	# if in right motion
+	elif x_motion_state == XMotion.MOVE_RIGHT:
+		if directly_move_to:
+			self.position.x = mouse_position.x - 0.7*length
+		else:
+			self.position.x -= delta/motion_speed_param * (position.x - mouse_position.x - 0.7*length)
+			
+			
+func process_y_motion(mouse_position, delta, directly_move_to=false):
+	
 	# determine whether there should be a motion
 	if mouse_position.y >= 1080*0.93:
 		y_motion_state = YMotion.MOVE_UP
@@ -139,6 +141,26 @@ func process_y_motion(mouse_position, delta):
 		y_motion_state = YMotion.MOVE_LEVEL
 	elif mouse_position.y <= 1080*0.07:
 		y_motion_state = YMotion.MOVE_DOWN
+	
+	# move upward
+	if y_motion_state == YMotion.MOVE_UP:
+		if directly_move_to:
+			self.position.y = mouse_position.y + 0.7*width
+		else:
+			self.position.y -= delta/motion_speed_param  * (position.y - mouse_position.y + 0.7*width)
+	# move downward
+	elif y_motion_state == YMotion.MOVE_DOWN:
+		if directly_move_to:
+			self.position.y = mouse_position.y - 0.7*width
+		else:
+			self.position.y -= delta/motion_speed_param * (position.y - mouse_position.y - 0.7*width)
+	# move to level
+	elif y_motion_state == YMotion.MOVE_LEVEL:
+		if directly_move_to:
+			self.position.y = mouse_position.y
+		else:
+			self.position.y -= delta/motion_speed_param * (position.y - mouse_position.y)
+
 
 func appear_with_anime():
 	if self.tracking_mode == TrackingMode.USER:
@@ -250,13 +272,14 @@ func _process(delta):
 	
 	var tracking_position
 	var zoom_scale = gathered_tiles.scale.x
+	
 	if self.tracking_mode == TrackingMode.MOUSE:
 		# get mouse position
 		tracking_position = get_viewport().get_mouse_position()
 	elif self.tracking_mode == TrackingMode.USER:
-		tracking_position = tracked_user.get_global_transform()*Vector2(0,0)
+		tracking_position = tracked_user.global_position
 	else:
-		tracking_position = tracked_station.get_global_transform()*Vector2(0,0)
+		tracking_position = tracked_station.global_position
 	process_x_motion(tracking_position, delta)
 	process_y_motion(tracking_position, delta)
 	

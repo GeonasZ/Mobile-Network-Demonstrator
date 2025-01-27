@@ -13,8 +13,6 @@ extends Label
 @onready var freq_n_edit = $"../../ContentFrame/GridContainer/NFrequencyEdit/LineEdit"
 @onready var n_user_edit = $"../../ContentFrame/GridContainer/NUserEdit/LineEdit"
 @onready var path_width_edit = $"../../ContentFrame/GridContainer/PathWidthEdit/LineEdit"
-
-
 var on_work = true
 var is_mouse_in = false
 
@@ -23,6 +21,7 @@ func _ready() -> void:
 	notice_label.size = Vector2(1200,50)
 	var ref_pos = Vector2(-1.7*self.get_rect().size)
 	notice_label.position = Vector2(0.67*ref_pos.x,ref_pos.y)
+	self.set_focus_mode(FocusMode.FOCUS_ALL)
 
 func restart_program(tile_length,user_height,n_channel,n_user,block_width):
 	user_controller.initialize_user_system(user_height)
@@ -67,6 +66,7 @@ func is_mouse_in_rect():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	if is_mouse_in_rect():
+		self.grab_focus()
 		self.parent_node.scale = Vector2(1.05,1.05)
 		if int(tile_length_edit.text) != tile_controller.arc_len or len(user_controller.linear_user_list) != int(n_user_edit.text):
 			notice_label.text = "[b]Notice:[/b] This operation [b]WILL[/b] remove all users currently on the map. "
