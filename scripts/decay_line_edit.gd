@@ -26,12 +26,14 @@ func _process(delta: float) -> void:
 	for i in range(self.text.length()):
 		if text[i] in legal_characters or (i>0 and text[i] == "."):
 			processed_text += text[i]
+		elif i < caret_location:
+			caret_location -= 1
 			
 	if processed_text == "":
 		self.text = ""
 		self.previous_text = ""
 		return
-		
+
 	processed_text = float(processed_text)
 	self.text = str(processed_text)
 	if caret_location > self.text.length():

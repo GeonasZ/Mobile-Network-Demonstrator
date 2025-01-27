@@ -1,10 +1,13 @@
 extends Node2D
 
 var background_color = Color(1,1,1,0.3)
+var map_visible = true
 
 func _draw() -> void:
 	# draw the background of blocks
 	draw_rect(Rect2(Vector2(0,0),Vector2(1920,1080)),background_color,true)
+	if not map_visible:
+		return
 	# draw all children
 	for block in self.get_children():
 		var block_width = int(block.width/3.)

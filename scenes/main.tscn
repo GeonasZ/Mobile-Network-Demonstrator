@@ -1,4 +1,4 @@
-[gd_scene load_steps=123 format=3 uid="uid://dp7br0wc03w8r"]
+[gd_scene load_steps=125 format=3 uid="uid://dp7br0wc03w8r"]
 
 [ext_resource type="Script" path="res://scripts/UserController.gd" id="1_18gww"]
 [ext_resource type="Script" path="res://scripts/TileController.gd" id="1_fg5v7"]
@@ -57,8 +57,10 @@
 [ext_resource type="Script" path="res://scripts/path_width_line_edit.gd" id="34_lhma1"]
 [ext_resource type="Script" path="res://scripts/analysis_mode_button.gd" id="41_hdmb4"]
 [ext_resource type="Script" path="res://scripts/analysis_panel_button.gd" id="42_ijebh"]
+[ext_resource type="Script" path="res://scripts/generate_map_button.gd" id="48_rxbyv"]
 [ext_resource type="Script" path="res://scripts/analysis_panel.gd" id="49_07ke4"]
 [ext_resource type="Script" path="res://scripts/results_panel.gd" id="50_dmgx5"]
+[ext_resource type="Script" path="res://scripts/hide_map_button.gd" id="50_x66g3"]
 [ext_resource type="Script" path="res://scripts/user_select_panel.gd" id="51_qv08a"]
 [ext_resource type="Script" path="res://scripts/results_panel_element.gd" id="51_vsv66"]
 [ext_resource type="Script" path="res://scripts/plot_frame.gd" id="52_t6j7q"]
@@ -1025,7 +1027,6 @@ offset_bottom = 23.0
 mouse_filter = 2
 theme = SubResource("Theme_os7gk")
 bbcode_enabled = true
-text = "[b]Notice:[/b] This operation will remove all users currently on the map. "
 fit_content = true
 scroll_active = false
 
@@ -1484,6 +1485,100 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="FunctionPanel/AntennaConfigButton/FunctionLabel"]
+libraries = {
+"": SubResource("AnimationLibrary_i6iwl")
+}
+
+[node name="GenerateMapButton" type="Control" parent="FunctionPanel"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+scale = Vector2(1e-05, 1e-05)
+script = ExtResource("48_rxbyv")
+
+[node name="Char" type="Label" parent="FunctionPanel/GenerateMapButton"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+theme = ExtResource("13_22qid")
+text = "G"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("13_wkp48")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="FunctionPanel/GenerateMapButton"]
+libraries = {
+"": SubResource("AnimationLibrary_it6wr")
+}
+
+[node name="FunctionLabel" type="Control" parent="FunctionPanel/GenerateMapButton"]
+anchors_preset = 0
+offset_left = -20.0
+offset_top = 48.0
+offset_right = 20.0
+offset_bottom = 88.0
+scale = Vector2(1e-05, 1e-05)
+script = ExtResource("6_0kpw6")
+
+[node name="Label" type="Label" parent="FunctionPanel/GenerateMapButton/FunctionLabel"]
+layout_mode = 0
+offset_left = 1.696e+08
+offset_top = 1.43e+07
+offset_right = 1.696e+08
+offset_bottom = 1.43001e+07
+theme = ExtResource("11_8l076")
+text = "Regenerate Map"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="FunctionPanel/GenerateMapButton/FunctionLabel"]
+libraries = {
+"": SubResource("AnimationLibrary_i6iwl")
+}
+
+[node name="HideMapButton" type="Control" parent="FunctionPanel"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+scale = Vector2(1e-05, 1e-05)
+script = ExtResource("50_x66g3")
+
+[node name="Char" type="Label" parent="FunctionPanel/HideMapButton"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+theme = ExtResource("13_22qid")
+text = "H"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("13_wkp48")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="FunctionPanel/HideMapButton"]
+libraries = {
+"": SubResource("AnimationLibrary_it6wr")
+}
+
+[node name="FunctionLabel" type="Control" parent="FunctionPanel/HideMapButton"]
+anchors_preset = 0
+offset_left = -20.0
+offset_top = 48.0
+offset_right = 20.0
+offset_bottom = 88.0
+scale = Vector2(1e-05, 1e-05)
+script = ExtResource("6_0kpw6")
+
+[node name="Label" type="Label" parent="FunctionPanel/HideMapButton/FunctionLabel"]
+layout_mode = 0
+offset_left = 1.696e+08
+offset_top = 1.43e+07
+offset_right = 1.696e+08
+offset_bottom = 1.43001e+07
+theme = ExtResource("11_8l076")
+text = "Hide  Map"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="FunctionPanel/HideMapButton/FunctionLabel"]
 libraries = {
 "": SubResource("AnimationLibrary_i6iwl")
 }

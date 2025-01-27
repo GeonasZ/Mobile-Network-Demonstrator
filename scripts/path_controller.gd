@@ -15,16 +15,17 @@ var path_block_prefab
 func in_which_block(point:Vector2):
 	var col = int((point.x-(path_layer.global_position+self.start_pos*path_layer.scale.x).x+0.5*self.block_width*path_layer.global_scale.x)/(self.block_width*path_layer.global_scale.x))
 	var row = int((point.y-(path_layer.global_position+self.start_pos*path_layer.scale.y).y+0.5*self.block_width*path_layer.global_scale.x)/(self.block_width*path_layer.global_scale.y))
-	if col < 0 or row < 0:
+	if row < 0 or row >= len(self.path_blocks) or col < 0 or col >= len(self.path_blocks[0]):
+		print("Point ",point)
+		print("Scale ",path_layer.scale)
+		print("col ", (point.x-(self.global_position+self.start_pos*path_layer.scale.x).x-0.5*self.block_width*path_layer.global_scale.x)/(self.block_width*path_layer.global_scale.x))
+		print("row ",(point.y-(self.global_position+self.start_pos*path_layer.scale.y).y-0.5*self.block_width*path_layer.global_scale.x)/(self.block_width*path_layer.global_scale.y))
+		print("global pos ",self.global_position)
+		print("start pos ",path_layer.global_position+self.start_pos*path_layer.scale)
+		print("true start pos ",self.path_blocks[0][0].global_position)
+		print("col ",col," row ",row)
 		return null
-	#print("Point ",point)
-	#print("Scale ",path_layer.scale)
-	#print("col ", (point.x-(self.global_position+self.start_pos*path_layer.scale.x).x-0.5*self.block_width*path_layer.global_scale.x)/(self.block_width*path_layer.global_scale.x))
-	#print("row ",(point.y-(self.global_position+self.start_pos*path_layer.scale.y).y-0.5*self.block_width*path_layer.global_scale.x)/(self.block_width*path_layer.global_scale.y))
-	#print("global pos ",self.global_position)
-	#print("start pos ",path_layer.global_position+self.start_pos*path_layer.scale)
-	#print("true start pos ",self.path_blocks[0][0].global_position)
-	#print("col ",col," row ",row)
+
 	return self.path_blocks[row][col]
 
 func make_path_step(current_row,current_col,direction,only_on_screen=false,padding=0):
@@ -467,7 +468,7 @@ func make_map(width,start:Vector2,end:Vector2):
 	generate_fully_connected_paths()
 	path_layer.redraw()
 	
-func set_path_width(width):
+func set_block_width(width):
 	for row in self.path_blocks:
 		for block in row:
 			path_layer.remove_child(block)
@@ -479,7 +480,7 @@ func set_path_width(width):
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	
-	self.start_pos = Vector2(-randi_range(0,block_width*0.1),-randi_range(0,block_width*0.1))
+	self.start_pos = Vector2(-randi_range(block_width*0.2,block_width*0.5),-randi_range(block_width*0.2,block_width*0.5))
 	
 	self.path_block_prefab = preload("res://scenes/path_block_prefab.tscn")
 	make_map(block_width,self.start_pos,self.end_pos)

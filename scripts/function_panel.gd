@@ -11,6 +11,8 @@ extends Control
 @onready var antenna_config_button = $AntennaConfigButton
 @onready var analysis_mode_button = $AnalysisModeButton
 @onready var analysis_panel_button = $AnalysisPanelButton
+@onready var generate_map_button = $GenerateMapButton
+@onready var hide_map_button = $HideMapButton
 
 # other nodes
 @onready var user_controller = $"../Controllers/UserController"
@@ -28,7 +30,8 @@ func _ready() -> void:
 							  self.freq_button, self.config_button,
 							  self.engineer_button, self.add_user_button,
 							  self.remove_user_button, self.antenna_config_button,
-							  self.analysis_mode_button, self.analysis_panel_button]
+							  self.analysis_mode_button, self.analysis_panel_button,
+							  self.generate_map_button, self.hide_map_button]
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:

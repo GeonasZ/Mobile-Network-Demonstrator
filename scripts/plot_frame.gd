@@ -51,6 +51,7 @@ func _draw() -> void:
 	else:
 		data_list = analysis_panel.current_user.sir_hist
 	
+	
 	if data_list == []:
 		invalid_userid_label.visible = true
 		invalid_userid_label.text = "No Data Recorded"
@@ -74,9 +75,14 @@ func _draw() -> void:
 				min_dBm = dBm(data_list[i])
 	var diff
 	if max_dBm != null and min_dBm != null:
+		invalid_userid_label.visible = false
 		diff = max_dBm - min_dBm
 	else:
-		diff = 0
+		invalid_userid_label.visible = true
+		invalid_userid_label.text = "No Invalid Data can be Plotted"
+		diff = 1
+		return
+		
 	
 	if diff == 0:
 		diff = 1

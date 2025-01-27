@@ -25,6 +25,8 @@ func _process(delta: float) -> void:
 	for i in range(self.text.length()):
 		if text[i] in legal_characters:
 			processed_text += text[i]
+		elif i < caret_location:
+			caret_location -= 1
 			
 	if processed_text == "":
 		self.text = ""

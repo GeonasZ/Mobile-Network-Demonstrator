@@ -6,7 +6,7 @@ const sqrt3 = 1.732
 var allowed_freq_pattern = [3,4,7,12]
 
 var arc_len = 150
-var current_freq_pattern_idnex = 0
+var current_freq_pattern_index = 0
 var total_channel_number = 24
 var station_number = 0
 
@@ -52,6 +52,34 @@ var hex_list = []
 		#for j in range(i, index+1, -1):
 			#users[j].angle_to_station = users[j-1].angle_to_station
 	#return users
+
+# reallocate channels for a station, properly tackle the users
+# being connected or disconnected
+func tile_safely_reallocate_channels(current_hex, channel_number):
+	var disconnected_user_list = current_hex.set_channel_number(channel_number)
+	for user in disconnected_user_list:
+		user_controller.user_list[current_hex.index_i][current_hex.index_j]["disconnected"].append(user)
+		for i in range(len(user_controller.user_list[current_hex.index_i][current_hex.index_j]["connected"])-1,-1,-1):
+			if user == user_controller.user_list[current_hex.index_i][current_hex.index_j]["connected"][i]:
+				user_controller.user_list[current_hex.index_i][current_hex.index_j]["connected"].pop_at(i)
+	user_controller.try_connect_user(current_hex.index_i,current_hex.index_j)
+
+# reallocate channels for all stations, properly tackle the users
+# being connected or disconnected
+func all_tile_safely_reallocate_channels():
+	if freq_reuse_button.current_pattern not in self.allowed_freq_pattern:
+		print("TileController<tiles_reallocate_channels>: Invalid tile pattern.")
+		return
+	var current_hex
+	var disconnected_user_list
+	for i in range(len(self.hex_list)):
+		for j in len(self.hex_list[i]):
+			current_hex = self.hex_list[i][j]
+			if current_hex.frequency_group != self.frequency_group[0]:
+				tile_safely_reallocate_channels(current_hex,int(self.total_channel_number / freq_reuse_button.current_pattern))
+			else:
+				tile_safely_reallocate_channels(current_hex,int(self.total_channel_number / freq_reuse_button.current_pattern)+self.total_channel_number%freq_reuse_button.current_pattern)
+
 
 ## evaluate the signal angle of a station which contains the most users
 ## within a given angle size.
@@ -278,13 +306,13 @@ func get_decay():
 	return self.decay
 
 func next_freq_pattern():
-	current_freq_pattern_idnex += 1
-	if current_freq_pattern_idnex == allowed_freq_pattern.size():
-		current_freq_pattern_idnex = 0
-	initialize_freq_pattern(hex_list, allowed_freq_pattern[current_freq_pattern_idnex])
+	current_freq_pattern_index += 1
+	if current_freq_pattern_index == allowed_freq_pattern.size():
+		current_freq_pattern_index = 0
+	initialize_freq_pattern(hex_list, allowed_freq_pattern[current_freq_pattern_index])
 
 func get_current_freq_pattern():
-	return allowed_freq_pattern[current_freq_pattern_idnex]
+	return allowed_freq_pattern[current_freq_pattern_index]
 
 func initialize_tile_background(ref_point:Vector2, tile_length:int=0):
 	
@@ -363,8 +391,8 @@ func initialize_map(tile_length:int=0,total_channel:int=24):
 	if tile_length > 0:
 		self.arc_len = tile_length
 	initialize_tile_background(Vector2(-randi_range(-2*arc_len,-2.5*arc_len), -randi_range(-2*arc_len,-2.5*arc_len)),tile_length)
-	self.current_freq_pattern_idnex = randi_range(0,allowed_freq_pattern.size()-1)
-	initialize_freq_pattern(hex_list, allowed_freq_pattern[current_freq_pattern_idnex])
+	self.current_freq_pattern_index = randi_range(0,allowed_freq_pattern.size()-1)
+	initialize_freq_pattern(hex_list, allowed_freq_pattern[current_freq_pattern_index])
 	self.station_number = 0
 	
 # Called when the node enters the scene tree for the first time.

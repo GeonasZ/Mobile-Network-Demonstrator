@@ -213,6 +213,7 @@ func init_channel_number(n_channel:int):
 func set_channel_number(n_channel:int):
 	# add or delete channel until channel number is as expected
 	var user
+	var disconencted_user_list = []
 	while n_available_channel != n_channel:
 		# add a channel if smaller
 		if n_available_channel < n_channel:
@@ -223,7 +224,9 @@ func set_channel_number(n_channel:int):
 			user = channel_allocation_list.pop_back()
 			if user != null:
 				user.connect_to_channel(null)
+				disconencted_user_list.append(user)
 			n_available_channel -= 1
+	return disconencted_user_list
 
 	
 	

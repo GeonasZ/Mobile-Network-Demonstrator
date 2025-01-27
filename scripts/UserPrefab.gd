@@ -4,6 +4,7 @@ extends Node2D
 @onready var gathered_tiles = null
 @onready var mouse_panel = null
 @onready var path_controller = null
+@onready var path_layer = null
 
 var observer_mode = false
 var engineer_mode = false
@@ -119,10 +120,11 @@ func get_distance_from_station():
 func mouse_track_user():
 	mouse_panel.track_user()
 
-func initialize(input_mouse_panel, input_gathered_tiles, input_path_controller):
+func initialize(input_mouse_panel, input_gathered_tiles, input_path_controller,input_path_layer):
 	self.gathered_tiles = input_gathered_tiles
 	self.mouse_panel = input_mouse_panel
 	self.path_controller = input_path_controller
+	self.path_layer = input_path_layer
 	self.mouse_enter_user.connect(input_mouse_panel._on_mouse_enter_user)
 	self.mouse_leave_user.connect(input_mouse_panel._on_mouse_leave_user)
 	self.is_initialized = true
@@ -241,8 +243,8 @@ func user_speed_protect(with_buffer_space = false):
 	var y_lim = [0,1080]
 	
 	if with_buffer_space:
-		x_lim = [0-station.arc_len*0.9,1920+station.arc_len*0.9]
-		y_lim = [0-station.arc_len*0.9,1080+station.arc_len*0.9]
+		x_lim = [0-station.arc_len*0.1,1920+station.arc_len*0.1]
+		y_lim = [0-station.arc_len*0.1,1080+station.arc_len*0.1]
 		
 	# x speed check
 	if self.position.x < x_lim[0] and self.velocity.x < 0:
@@ -258,7 +260,7 @@ func user_speed_protect(with_buffer_space = false):
 func random_move(delta):
 	boundary.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	# take a random acceleration
-	# modify acceleration
+	# modify acceleration to avoid getting too close to the base station
 	var unit_acc = self.direction_from_station
 	if self.distance_from_station/self.station.arc_len < dis_ratio:
 		unit_acc = unit_acc.rotated(randf_range(-PI,PI)/dis_ratio*self.distance_from_station/self.station.arc_len)
@@ -284,7 +286,6 @@ func random_move(delta):
 	# learn from penalty
 	self.velocity += self.penalty_lr * self.eval_motion_penalty()
 
-var pre_pos
 func path_move(delta):
 	var block = self.path_controller.in_which_block(self.global_position)
 		
@@ -295,26 +296,38 @@ func path_move(delta):
 		self.velocity = self.velocity / self.velocity.length() * self.max_velocity * self.height/ref_height
 	
 	self.user_speed_protect(true)
-	# make a step
-	self.pre_pos = self.position
-	self.position += self.velocity * delta
+	# move a step
+	#self.position += (self.velocity) * delta
+	self.position += (self.velocity+self.eval_motion_penalty()) * delta
 	
+	# learn from penalty
+	self.velocity += self.penalty_lr * self.eval_motion_penalty()
+	
+func set_boundary_color_red():
+	boundary.rect_color = Color8(255,0,0)
+	
+func set_boundary_color_default():
+	boundary.rect_color = Color8(50,50,50)
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	if not under_analysis and previous_under_analysis:
-		boundary.width = 5
-		boundary.rect_color = Color8(255,0,0)
-		boundary.queue_redraw()
-		self.previous_under_analysis = under_analysis
-	elif under_analysis and not previous_under_analysis:
-		boundary.width = 3
-		boundary.rect_color = Color8(50,50,50)
-		boundary.queue_redraw()
-		self.previous_under_analysis = under_analysis
-	
+	#if not under_analysis and previous_under_analysis:
+		#boundary.width = 5
+		#set_boundary_color_default()
+		#boundary.queue_redraw()
+		#self.previous_under_analysis = under_analysis
+	#elif under_analysis and not previous_under_analysis:
+		#boundary.width = 3
+		#set_boundary_color_red()
+		#boundary.queue_redraw()
+		#self.previous_under_analysis = under_analysis
+	#
 	# try to move a step if not paused
 	if (not observer_mode or under_analysis) and not engineer_mode and not motion_pause:
-		#self.random_move(delta)
-		self.path_move(delta)
+		if path_layer.map_visible:
+			self.path_move(delta)
+		else:
+			self.random_move(delta)
+		
 	else:
 		boundary.mouse_filter = Control.MOUSE_FILTER_STOP

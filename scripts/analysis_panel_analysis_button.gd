@@ -27,17 +27,17 @@ func _ready() -> void:
 
 func set_analysis_start():
 	self.analysis_on = true
-	label.text = "Pause Analysis"
+	label.text = "Analysis Pause"
 	self.current_button_func = ButtonFunc.PAUSE
 
 func set_analysis_end():
 	self.analysis_on = false
 	if user_controller.linear_user_list != []:
 		if user_controller.linear_user_list[0].sir_hist != []:
-			label.text = "Resume Analysis"
+			label.text = "Analysis Resume"
 			self.current_button_func = ButtonFunc.RESUME
 			return
-	label.text = "Start Analysis"
+	label.text = "Analysis Start"
 	self.current_button_func = ButtonFunc.START
 
 func button_click_function():
@@ -51,10 +51,10 @@ func button_click_function():
 
 func _input(event: InputEvent) -> void:
 	if (analysis_panel.visible and analysis_panel.on_work) and self.on_work:
-		if event is InputEventKey and (self.current_button_func==ButtonFunc.START and event.keycode == KEY_S or self.current_button_func==ButtonFunc.PAUSE and event.keycode == KEY_P or self.current_button_func==ButtonFunc.RESUME and event.keycode==KEY_R) and event.is_pressed():
+		if event is InputEventKey and event.keycode == KEY_A and event.is_pressed():
 			self.on_work = false
 			self.button_click_function()
-			await get_tree().create_timer(0.2).timeout
+			await get_tree().create_timer(0.1).timeout
 			self.on_work = true
 
 func _gui_input(event: InputEvent) -> void:

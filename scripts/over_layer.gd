@@ -49,10 +49,10 @@ func _draw() -> void:
 					# if angle size is not applicable for this tile
 					if angle_size == null:
 						if user_controller.user_list[i][j]["connected"].size() > 0 and hex.is_next_signal_proporgation_ready():
-							draw_circle(global_station_pos,hex.current_signal_radius,anime_indicate_line_color,false,5*station_scale)
+							draw_circle(global_station_pos,hex.current_signal_radius,Color(anime_indicate_line_color.r,anime_indicate_line_color.g,anime_indicate_line_color.b,hex.current_signal_alpha/255),false,5*station_scale)
 							hex.current_signal_radius += self.delta * hex.signal_proporgation_ratio_per_second * hex.arc_len
 							hex.current_signal_alpha -= self.delta * 220 / (hex.max_signal_radius_ratio/hex.signal_proporgation_ratio_per_second)
-							if hex.current_signal_radius > hex.arc_len*hex.max_signal_radius_ratio:
+							if hex.current_signal_radius >= hex.arc_len*hex.max_signal_radius_ratio:
 								hex.current_signal_radius = 0
 								hex.current_signal_alpha = 255
 								hex.start_wait_for_next_signal_proporgation()

@@ -89,7 +89,6 @@ func set_connectivity(right,left,top,bottom):
 func set_width(width):
 	self.width = width
 
-
 func dir_unit_vec(key):
 	if key == "right":
 		return Vector2(1,0)
@@ -111,31 +110,31 @@ func nearest_connected_block(user):
 	while 1:
 		# if no block is found
 		if count > max_col and count > max_row:
-			print("AFSSD")
+			print(count)
 			return null
 		# travel to find the nearest block
-		var nearest_dis
-		var nearest_block
+		var nearest_dis = null
+		var nearest_block = null
 		for j in range(0,count+1):
 			for i in [-count,count]:
 				if self.row+i >= 0 and self.row+i <= max_row and self.col+j >= 0 and self.col+j <= max_col:
 					if path_controller.path_blocks[self.row+i][self.col+j].at_least_connected():
-						if nearest_dis == null or nearest_dis > user.global_position.distance_to(path_controller.path_blocks[self.row+i][self.col+j].global_position):
+						if nearest_block == null or nearest_dis > user.global_position.distance_to(path_controller.path_blocks[self.row+i][self.col+j].global_position):
 							nearest_block = path_controller.path_blocks[self.row+i][self.col+j]
 							nearest_dis = user.global_position.distance_to(path_controller.path_blocks[self.row+i][self.col+j].global_position)
-				elif self.row+i >= 0 and self.row+i <= max_row and self.col-j >= 0 and self.col-j <= max_col:
+				if self.row+i >= 0 and self.row+i <= max_row and self.col-j >= 0 and self.col-j <= max_col:
 					if path_controller.path_blocks[self.row+i][self.col-j].at_least_connected():
-						if nearest_dis == null or nearest_dis > user.global_position.distance_to(path_controller.path_blocks[self.row+i][self.col-j].global_position):
+						if nearest_block == null or nearest_dis > user.global_position.distance_to(path_controller.path_blocks[self.row+i][self.col-j].global_position):
 							nearest_block = path_controller.path_blocks[self.row+i][self.col-j]
 							nearest_dis = user.global_position.distance_to(path_controller.path_blocks[self.row+i][self.col-j].global_position)
-				elif self.row+j >= 0 and self.row+j <= max_row and self.col+i >= 0 and self.col+i <= max_col:
+				if self.row+j >= 0 and self.row+j <= max_row and self.col+i >= 0 and self.col+i <= max_col:
 					if path_controller.path_blocks[self.row+j][self.col+i].at_least_connected():
-						if nearest_dis == null or nearest_dis > user.global_position.distance_to(path_controller.path_blocks[self.row+j][self.col+i].global_position):
+						if nearest_block == null or nearest_dis > user.global_position.distance_to(path_controller.path_blocks[self.row+j][self.col+i].global_position):
 							nearest_block = path_controller.path_blocks[self.row+j][self.col+i]
 							nearest_dis = user.global_position.distance_to(path_controller.path_blocks[self.row+j][self.col+i].global_position)
-				elif self.row-j >= 0 and self.row-j <= max_row and self.col+i >= 0 and self.col+i <= max_col:
+				if self.row-j >= 0 and self.row-j <= max_row and self.col+i >= 0 and self.col+i <= max_col:
 					if path_controller.path_blocks[self.row-j][self.col+i].at_least_connected():
-						if nearest_dis == null or nearest_dis > user.global_position.distance_to(path_controller.path_blocks[self.row-j][self.col+i].global_position):
+						if nearest_block == null or nearest_dis > user.global_position.distance_to(path_controller.path_blocks[self.row-j][self.col+i].global_position):
 							nearest_block = path_controller.path_blocks[self.row-j][self.col+i]
 							nearest_dis = user.global_position.distance_to(path_controller.path_blocks[self.row-j][self.col+i].global_position)
 		count += 1
@@ -149,6 +148,39 @@ func block_with_connection():
 			if block.at_least_connected():
 				return block
 	
+func fully_spaced_connection(block):
+	var fully_spaced_connected_neighbours = []
+	if block.fully_spaced:
+		for key in  block.neighbours:
+			if  block.neighbours[key] != null and block.neighbours[key].fully_spaced and block.path_connectivity[key]==true and block.neighbours[key].path_connectivity[block.inverse_key(key)] == true:
+				fully_spaced_connected_neighbours.append(key)
+	return fully_spaced_connected_neighbours
+	
+func user_in_fully_spaced_connection_extra_area(user_pos:Vector2,x_key,y_key,block_width:float):
+		
+	# get the keys of fully sapced conenctions of the block
+	var fully_spaced_connections = self.fully_spaced_connection(self)
+	var x_key_fitted = x_key in fully_spaced_connections
+	var y_key_fitted = y_key in fully_spaced_connections
+	if len(fully_spaced_connections) > 0:
+		if x_key_fitted:
+			if abs(user_pos.y) < 1.2 * block_width:
+				return true
+		elif y_key_fitted:
+			if abs(user_pos.x) < 1.2 * block_width:
+				return true
+		
+func rotate_user_acc_from_station(user, unit_acc, dis_ratio, penalty_add_ratio):
+	var dir_from_station = user.direction_from_station
+	# modify acceleration to avoid the user getting too close to the station
+	if user.distance_from_station/user.station.arc_len < dis_ratio:
+		dir_from_station = dir_from_station.rotated(randf_range(-dis_ratio*PI,dis_ratio*PI)/dis_ratio*user.distance_from_station/user.station.arc_len)
+		unit_acc += dir_from_station * penalty_add_ratio
+	
+	unit_acc = unit_acc/unit_acc.length()
+	
+	return unit_acc
+		
 func update_user_acc(user,max_acc: Vector2):
 	var dis_ratio = 0.7
 	var block_width = self.width/3.
@@ -173,6 +205,7 @@ func update_user_acc(user,max_acc: Vector2):
 	else:
 		y_key = "middle"
 	var unit_acc = Vector2(0,0)
+
 	# when the block has no connection to others
 	if not self.at_least_connected():
 		var false_connections = self.connected_directions(false)
@@ -201,10 +234,16 @@ func update_user_acc(user,max_acc: Vector2):
 					print("PathBlockPrefab<update_user_acc>: Cannot find a block with path connection. Regenerating a new path map for use...")
 					# re-generate a path map
 					path_controller.set_path_width(path_controller.path_width)
+				else:
+					unit_acc = user.global_position.direction_to(nearest_connected_block.global_position)
 			else:
 				unit_acc = user.global_position.direction_to(nearest_connected_block.global_position)
 	# when self is fully spaced and user is around center
 	elif self.fully_spaced and user_pos.distance_to(Vector2(0,0)) < 0.9 * 1.5 * block_width:
+		unit_acc = Vector2(1,0).rotated(randf_range(0,2*PI))
+	# when self is fully spaced and one or more neighbours
+	# are also fully spaced and they are connected.
+	elif user_in_fully_spaced_connection_extra_area(user_pos,x_key,y_key,block_width):
 		unit_acc = Vector2(1,0).rotated(randf_range(0,2*PI))
 	# when the user is in the corner blocks
 	elif x_key != "middle" and y_key != "middle":
@@ -259,11 +298,58 @@ func update_user_acc(user,max_acc: Vector2):
 		else:
 			acc_mag_ratio = 3
 			unit_acc = dir_unit_vec(self.inverse_key(x_key))+dir_unit_vec(self.inverse_key(y_key))
-					
 	# when at middle, take a noise vector as acceleration
 	else:
-		unit_acc = Vector2(1,0).rotated(randf_range(0,2*PI))
-	
+		# if the block is not fully_spaced
+		if not self.fully_spaced:
+			# obtain the inner position of user 
+			# in the middle block
+			var inner_xkey = ""
+			var inner_ykey = ""
+			var inner_boundary_ratio = 0.8
+			# find its x position
+			if user_pos.x < -inner_boundary_ratio*0.5*block_width:
+				inner_xkey = "left"
+			elif user_pos.x > inner_boundary_ratio*0.5*block_width:
+				inner_xkey = "right"
+			else:
+				inner_xkey = "middle"
+			# find its y position
+			if user_pos.y < -inner_boundary_ratio*0.5*block_width:
+				inner_ykey = "top"
+			elif user_pos.y > inner_boundary_ratio*0.5*block_width:
+				inner_ykey = "bottom"
+			else:
+				inner_ykey = "middle"
+			# if the user is in the corner of the 
+			# middle block
+			if inner_xkey != "middle" and inner_ykey != "middle":
+				var user_dis = Vector2(abs(user_pos.x),abs(user_pos.y)).distance_to(Vector2(inner_boundary_ratio*0.5*block_width,inner_boundary_ratio*0.5*block_width))
+				# the distance from the outer boundary corner of the block (0.5*block_width)
+				# to the inner boundary corner (inner_boundary_ratio*0.5*block_width).
+				var inner_dis_diff = Vector2(0.5*block_width,0.5*block_width).distance_to(Vector2(inner_boundary_ratio*0.5*block_width,inner_boundary_ratio*0.5*block_width))
+				var inner_dis_ratio = user_dis/inner_dis_diff
+				unit_acc = user_pos.direction_to(Vector2(0,0)).rotated(randf_range(-PI*0.5*(1-inner_dis_ratio),PI*0.5*(1-inner_dis_ratio)))
+			# if the user is in the side blocks of the
+			# middle block
+			elif inner_xkey != "middle" or inner_ykey != "middle":
+				var inner_none_middle_key = inner_xkey if inner_xkey != "middle" else inner_ykey
+				# if the side block is not connected
+				if self.path_connectivity[inner_none_middle_key] != true:
+					unit_acc = dir_unit_vec(self.inverse_key(inner_none_middle_key))
+				# if the side block is connected
+				else:
+					unit_acc = Vector2(1,0).rotated(randf_range(0,2*PI))
+					
+			# if the user is in the middle of the 
+			# middle block
+			else:
+				unit_acc = Vector2(1,0).rotated(randf_range(0,2*PI))
+				
+		else:
+			unit_acc = Vector2(1,0).rotated(randf_range(0,2*PI))
+		
+	unit_acc = rotate_user_acc_from_station(user,unit_acc,0.5,1)
 	# add some little noise to acceleration
 	var noise = randfn(0,0.35) 
 	if noise > 1:

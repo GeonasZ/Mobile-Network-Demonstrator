@@ -24,12 +24,25 @@ func _ready() -> void:
 	var ref_pos = Vector2(-1.7*self.get_rect().size)
 	notice_label.position = Vector2(0.67*ref_pos.x,ref_pos.y)
 
-func restart_program(tile_length,user_height,n_channel,n_user,path_width):
+func restart_program(tile_length,user_height,n_channel,n_user,block_width):
 	user_controller.initialize_user_system(user_height)
 	tile_controller.initialize_map(tile_length,n_channel)
 	mouse_panel.initialize_mouse_panel()
 	user_controller.random_add_user(n_user,true)
-	path_controller.set_path_width(path_width)
+	path_controller.set_block_width(block_width)
+		
+func apply_config(tile_length,user_height,n_channel,n_user,block_width):
+	if tile_length != tile_controller.arc_len or len(user_controller.linear_user_list) != n_user:
+		user_controller.initialize_user_system(user_height)
+		tile_controller.initialize_map(tile_length,n_channel)
+		mouse_panel.initialize_mouse_panel()
+		user_controller.random_add_user(n_user,true)
+	elif tile_controller.total_channel_number != n_channel:
+		tile_controller.total_channel_number = n_channel
+		tile_controller.all_tile_safely_reallocate_channels()
+	
+	if path_controller.block_width != block_width:
+		path_controller.set_block_width(block_width)
 	
 func _gui_input(event):
 	if event is InputEventMouseButton and event.button_mask == MOUSE_BUTTON_MASK_LEFT and event.pressed:
@@ -39,8 +52,9 @@ func _gui_input(event):
 		var decay = float(decay_edit.text)
 		var n_freq = int(freq_n_edit.text)
 		var n_user = int(n_user_edit.text)
-		var path_width = int(path_width_edit.text)
-		restart_program(tile_length, user_height,n_freq,n_user,path_width)
+		var block_width = int(path_width_edit.text)
+			
+		apply_config(tile_length, user_height,n_freq,n_user,block_width)
 		tile_controller.set_decay(decay)
 		config_panel.close_config_with_anime()
 		
@@ -54,6 +68,11 @@ func is_mouse_in_rect():
 func _process(delta: float) -> void:
 	if is_mouse_in_rect():
 		self.parent_node.scale = Vector2(1.05,1.05)
+		if int(tile_length_edit.text) != tile_controller.arc_len or len(user_controller.linear_user_list) != int(n_user_edit.text):
+			notice_label.text = "[b]Notice:[/b] This operation [b]WILL[/b] remove all users currently on the map. "
+		else:
+			notice_label.text = "[b]Notice:[/b] Applying these configs will [b]NOT[/b] remove the users on the map. "
+			
 		notice_label.visible = true
 	else:
 		self.parent_node.scale = Vector2(1,1)

@@ -65,9 +65,12 @@ func _gui_input(event: InputEvent) -> void:
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.is_pressed() and on_drag:
 		self.on_drag = false
 		
+## set current user by its index in the linear_user_list
 func set_current_user_by_index(index:int):
 	if self.current_user != null:
+		self.current_user.set_boundary_color_default()
 		self.current_user.hide_boundary()
+		self.current_user.redraw_user()
 		
 	if index < 0:
 		self.current_user = null
@@ -76,12 +79,16 @@ func set_current_user_by_index(index:int):
 
 	self.current_user = user_controller.linear_user_list[index]
 	if self.current_user != null:
+		self.current_user.set_boundary_color_red()
 		self.current_user.show_boundary()
+		self.current_user.redraw_user()
+		
 
 func set_current_user_by_id(id:int):
 	if self.current_user != null:
+		self.current_user.set_boundary_color_default()
 		self.current_user.hide_boundary()
-	
+		self.current_user.redraw_user()
 	var index = user_controller.binary_search_user_in_linear_user_list(id)
 	
 	if index != -1:
@@ -90,7 +97,9 @@ func set_current_user_by_id(id:int):
 		self.current_user = null
 		
 	if self.current_user != null:
+		self.current_user.set_boundary_color_red()
 		self.current_user.show_boundary()
+		self.current_user.redraw_user()
 	
 func appear():
 	self.visible = true
@@ -110,13 +119,18 @@ func appear():
 		user_select.initialize(str(0))
 		set_current_user_by_index(-1)
 	if current_user != null:
+		self.current_user.set_boundary_color_red()
 		current_user.show_boundary()
+		self.current_user.redraw_user()
 	await self.animator.animation_finished
 	self.on_work = true
 	
 func disappear():
 	if self.current_user != null:
 		self.current_user.hide_boundary()
+		self.current_user.set_boundary_color_default()
+		self.current_user.redraw_user()
+		
 	self.animator.play("disappear")
 	self.on_work = false
 	mouse_panel.on_analysis_panel_close()

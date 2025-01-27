@@ -1,5 +1,14 @@
 extends Polygon2D
 
+# line edits
+@onready var tile_length_edit = $ContentFrame/GridContainer/TileLengthEdit/LineEdit
+@onready var user_height_edit = $ContentFrame/GridContainer/UserHeightEdit/LineEdit
+@onready var decay_edit = $ContentFrame/GridContainer/DecayEdit/LineEdit
+@onready var freq_n_edit = $ContentFrame/GridContainer/NFrequencyEdit/LineEdit
+@onready var n_user_edit = $ContentFrame/GridContainer/NUserEdit/LineEdit
+@onready var path_width_edit = $ContentFrame/GridContainer/PathWidthEdit/LineEdit
+
+# other nodes
 @onready var config_button = $"../FunctionPanel/ConfigButton"
 @onready var anime_player = $AnimationPlayer
 @onready var user_controller = $"../Controllers/UserController"
@@ -7,12 +16,6 @@ extends Polygon2D
 @onready var over_layer = $"../OverLayer"
 @onready var function_panel = $"../FunctionPanel"
 @onready var station_config_panel = $"../StationConfigPanel"
-@onready var tile_length_edit = $ContentFrame/GridContainer/TileLengthEdit/LineEdit
-@onready var user_height_edit = $ContentFrame/GridContainer/UserHeightEdit/LineEdit
-@onready var decay_edit = $ContentFrame/GridContainer/DecayEdit/LineEdit
-@onready var freq_n_edit = $ContentFrame/GridContainer/NFrequencyEdit/LineEdit
-@onready var n_user_edit = $ContentFrame/GridContainer/NUserEdit/LineEdit
-@onready var path_width_edit = $ContentFrame/GridContainer/PathWidthEdit/LineEdit
 
 signal config_panel_opened
 

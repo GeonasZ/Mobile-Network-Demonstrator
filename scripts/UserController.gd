@@ -8,6 +8,7 @@ extends Control
 @onready var engineer_button = $"../../FunctionPanel/EngineerButton"
 @onready var sampling_timer = $AnalysisSamplingTimer
 @onready var function_panel = $"../../FunctionPanel"
+@onready var path_layer = $"../../PathLayer"
 const sqrt3 = 1.732
 var user_prefab = null
 # initialize in tile controller when hex_list gets initialized
@@ -62,7 +63,7 @@ func add_user(pos,out_of_dead_zone=false):
 	else:
 		user_list[i][j]["disconnected"].append(current_user)
 		current_user.index_k_in_user_list = user_list[i][j]["disconnected"].size() - 1
-	current_user.initialize(mouse_panel, gathered_tiles, path_controller)
+	current_user.initialize(mouse_panel, gathered_tiles, path_controller, path_layer)
 	if obs_button.button_mode == obs_button.Mode.OBSERVER:
 		current_user.enter_observer_mode()
 	if engineer_button.button_mode == engineer_button.Mode.ENGINEER:
