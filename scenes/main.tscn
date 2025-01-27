@@ -1189,7 +1189,7 @@ size_flags_vertical = 3
 layout_mode = 2
 size_flags_horizontal = 2
 theme = SubResource("Theme_7tp5v")
-text = "Initial User Number"
+text = "Number of Users"
 
 [node name="PlaceHolder" type="Control" parent="ConfigPanel/ContentFrame/GridContainer/NUserEdit"]
 custom_minimum_size = Vector2(10, 0)
