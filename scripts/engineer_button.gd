@@ -67,12 +67,12 @@ func set_button_mode(mode):
 	elif previous_mode == self.Mode.ENGINEER and self.button_mode != self.Mode.ENGINEER:
 		self.cross.appear_with_anime()
 		
-	# determine whether the cross on the button should be visible
-	if previous_mode != self.Mode.ENGINEER and self.button_mode == self.Mode.ENGINEER:
-		self.label.disappear_with_anime()
-	elif previous_mode == self.Mode.ENGINEER and self.button_mode != self.Mode.ENGINEER:
-		self.label.appear_with_anime()
-		
+	## determine whether the cross on the button should be visible
+	#if previous_mode != self.Mode.ENGINEER and self.button_mode == self.Mode.ENGINEER:
+		#self.label.disappear_with_anime()
+	#elif previous_mode == self.Mode.ENGINEER and self.button_mode != self.Mode.ENGINEER:
+		#self.label.appear_with_anime()
+		#
 	# determine whether the button itself should be visible
 	if previous_mode != self.Mode.OBSERVER and self.button_mode == self.Mode.OBSERVER:
 		self.smart_disappear()
@@ -165,7 +165,7 @@ func disappear_with_appearing_instr_panel():
 
 func _process(delta):
 	# mouse in button animes
-	if self.is_mouse_in_original_rect():
+	if self.is_mouse_in_original_rect() and not mouse_panel.backgorund_watching_mode:
 		# trigger only at the frame cursor enters button
 		if not is_mouse_in_box and self.visible:
 			if not mouse_panel.is_tracking_station():
@@ -173,10 +173,9 @@ func _process(delta):
 			is_mouse_in_box = true
 		if label.visible == false and self.visible:
 			self.scale = Vector2(1.05,1.05)
-			if self.button_mode != self.Mode.ENGINEER:
-				label.visible == true
-				label.appear_with_anime()
-	else:
+			label.visible == true
+			label.appear_with_anime()
+	elif not mouse_panel.backgorund_watching_mode:
 		# trigger only at the frame cursor leaves button
 		if is_mouse_in_box and self.visible:
 			if not mouse_panel.is_tracking_station():
@@ -184,4 +183,4 @@ func _process(delta):
 			is_mouse_in_box = false
 		if label.visible == true:
 			label.disappear_with_anime()
-		self.scale = Vector2(1,1)
+			self.scale = Vector2(1,1)

@@ -7,8 +7,8 @@ var previous_text = ""
 
 var legal_characters = ["0","1","2","3","4","5","6","7","8","9"]
 
-var max_value = 500
-var min_value = 30
+var max_value = 600
+var min_value = 60
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:

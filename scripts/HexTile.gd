@@ -1,8 +1,10 @@
 extends Polygon2D
 
-var mouse_panel = null
-var station_config_panel = null
+@onready var mouse_panel
+@onready var station_config_panel
 @onready var parent_node = $".."
+@onready var path_conreoller
+@onready var tile_controller
 var AntennaType = ["SINGLE","ARRAY2","ARRAY3","ARRAY4"]
 
 var index_i
@@ -113,14 +115,16 @@ func _draw():
 		print("HexTile ID " + str(id) + ": Unknown Antenna Type, treated as SINGLE as default.")
 	# draw a circle at the center if center is on focus
 	if self.under_tracked and not mouse_panel.keep_invisible or self.under_config:
-		draw_circle(Vector2(0,-station_total_height/2.), station_scale * focus_radius, Color8(50,50,50), false, width*4)
+		draw_circle(Vector2(0,-station_total_height/2.), station_scale * focus_radius, Color8(50,50,50), false, min(6,width*4))
 	elif self.center_on_focus and (not mouse_panel.keep_invisible and empty_display_user_list):
-		draw_circle(Vector2(0,-station_total_height/2.), station_scale * focus_radius, Color8(150,150,150), false, width*4)
+		draw_circle(Vector2(0,-station_total_height/2.), station_scale * focus_radius, Color8(150,150,150), false, min(6,width*4))
 		
 	
-func initialize(mouse_panel,station_config_panel):
+func initialize(mouse_panel,station_config_panel,path_controller,tile_controller):
 	self.mouse_panel = mouse_panel
 	self.station_config_panel = station_config_panel
+	self.path_conreoller = path_controller
+	self.tile_controller = tile_controller
 	
 func set_focus():
 	self.on_focus = true
@@ -141,9 +145,11 @@ func get_antenna_type():
 func get_antenna_type_raw():
 	return self.antenna_type
 
-func eval_signal_pow(angle_from_center, distance, decay):
+# eval signal power to a distance, providing decay is a constant
+func eval_signal_pow(angle_from_center, distance:float, decay):
+	var array_factor
 	if self.antenna_type == "SINGLE":
-		return self.ref_signal_power/pow(distance,decay)
+		array_factor = 1
 	else:
 		var N
 		if self.antenna_type == "ARRAY2": 
@@ -155,21 +161,75 @@ func eval_signal_pow(angle_from_center, distance, decay):
 		else:
 			print("HexTile ID " + str(id) + " eval_signal_pow(): Unknown Antenna Type.")
 			return null
-		var array_factor
 		# the limit of array_factor when angle approaches zero is N.
 		if angle_from_center == 0:
 			# equal to if make angle_from_center very small to evaluate array_factor
 			array_factor = N
 		else:
 			array_factor = sin(0.5*N*angle_from_center)/sin(0.5*angle_from_center)
-		return self.ref_signal_power/pow(distance,decay)*pow(array_factor,2)
+	return self.ref_signal_power*exp(-decay*distance)*pow(array_factor,2)
 
-func eval_signal_pow_to_user(user, decay):
+# eval signal power to a user, automatically detect decay rate
+func eval_signal_power_to_user_with_various_decay(user, max_seg=500):
+	
 	if user.connected_channel == null:
 		return 0
+		
+	var glob_pos = user.global_position
 	var distance = self.position.distance_to(user.position)
 	var angle_from_center = self.signal_direction.angle_to(user.position-self.position)
-	return eval_signal_pow(angle_from_center, distance, decay)
+	
+	var array_factor
+	if self.antenna_type == "SINGLE":
+		array_factor = 1
+	else:
+		var N
+		if self.antenna_type == "ARRAY2": 
+			N = 2
+		elif self.antenna_type == "ARRAY3": 
+			N = 3
+		elif self.antenna_type == "ARRAY4": 
+			N = 4
+		else:
+			print("HexTile ID " + str(id) + " eval_signal_pow(): Unknown Antenna Type.")
+			return null
+		
+		# the limit of array_factor when angle approaches zero is N.
+		if angle_from_center == 0:
+			# equal to if make angle_from_center very small to evaluate array_factor
+			array_factor = N
+		else:
+			array_factor = sin(0.5*N*angle_from_center)/sin(0.5*angle_from_center)
+
+	var n_seg = int(distance)/4
+	if n_seg > max_seg:
+		n_seg = max_seg
+	var seg_len = distance/n_seg
+	
+	var current_signal_pow = self.ref_signal_power * pow(array_factor,2)
+	for i in range(n_seg+1):
+		if i > 0:
+			var sample_glob_pos = lerp(self.global_position,glob_pos,i/(n_seg))
+			var block = path_conreoller.in_which_block(sample_glob_pos)
+			var decay
+			if block.building:
+				decay = tile_controller.building_decay
+			else:
+				decay = tile_controller.decay
+			current_signal_pow = current_signal_pow*exp(-decay*seg_len)
+	return current_signal_pow
+
+# eval signal power to a user, providing decay is a constant
+func eval_signal_pow_to_user(user, decay=null):
+	if user.connected_channel == null:
+		return 0
+		
+	if decay == null:
+		return eval_signal_power_to_user_with_various_decay(user)
+	else:
+		var distance = self.position.distance_to(user.position)
+		var angle_from_center = self.signal_direction.angle_to(user.position-self.position)
+		return eval_signal_pow(angle_from_center, distance, decay)
 
 func start_wait_for_next_signal_proporgation():
 	self.next_proporgation = false

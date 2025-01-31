@@ -134,18 +134,27 @@ func _display_null_data():
 	max_sir_label.text = "Max SIR:\n\tN/A"
 	current_sir_label.text = "Realtime SIR:\n\tN/A"
 
-func make_displayed_content(input,zero_as_inf=false)->String:
+func make_displayed_content(input,do_dBm_transfer=true,zero_as_inf=false)->String:
 	var displayed_content
 	if (input is float or input is int):
 		if input == 0:
 			if zero_as_inf:
-				displayed_content = "-Inf dBm"
+				if do_dBm_transfer:
+					displayed_content = "-Inf dBm"
+				else:
+					displayed_content = "-Inf dB"
 			else:
-				displayed_content = "0"
+				displayed_content = "0 W"
 		elif input != INF:
-			displayed_content = str(truncate_double(dBm(input))) +" dBm"
+			if do_dBm_transfer:
+				displayed_content = str(truncate_double(dBm(input))) +" dBm"
+			else:
+				displayed_content = str(truncate_double(input)) +" dB"
 		else:
-			displayed_content = "Inf dBm"
+			if do_dBm_transfer:
+				displayed_content = "Inf dBm"
+			else:
+				displayed_content = "Inf dB"
 	else:
 		displayed_content = "N/A"
 	return displayed_content
@@ -153,13 +162,13 @@ func make_displayed_content(input,zero_as_inf=false)->String:
 func _display_user_data(data):
 	var current_data = user_controller.eval_user_sir(analysis_panel.current_user)
 	average_signal_label.text = "Avg. Signal Power:\n\t%s" % make_displayed_content(data[0])
-	average_sir_label.text = "Avg. SIR:\n\t%s" % make_displayed_content(data[1])
+	average_sir_label.text = "Avg. SIR:\n\t%s" % make_displayed_content(data[1],false)
 	current_signal_label.text = "Realtime Signal Power\n\t%s" % make_displayed_content(current_data[0])
 	max_signal_label.text = "Max Signal Power:\n\t%s" % make_displayed_content(data[2])
-	max_sir_label.text = "Max SIR:\n\t%s" % make_displayed_content(data[3])
+	max_sir_label.text = "Max SIR:\n\t%s" % make_displayed_content(data[3],false)
 	min_signal_label.text = "Min Signal Power:\n\t%s" % make_displayed_content(data[4])
-	min_sir_label.text = "Min SIR:\n\t%s" % make_displayed_content(data[5])
-	current_sir_label.text = "Realtime SIR:\n\t%s" % make_displayed_content(current_data[2])
+	min_sir_label.text = "Min SIR:\n\t%s" % make_displayed_content(data[5],false)
+	current_sir_label.text = "Realtime SIR:\n\t%s" % make_displayed_content(current_data[2],false)
 
 func display_user_data(user):
 	if user == null:

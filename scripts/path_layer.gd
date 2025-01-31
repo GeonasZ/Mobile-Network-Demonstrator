@@ -3,6 +3,91 @@ extends Node2D
 var background_color = Color(1,1,1,0.3)
 var map_visible = true
 
+func draw_sector(center, radius, start_rad, end_rad, n_points, color):
+	# create a point list for the sector
+	var points = [center]
+	for i in range(n_points + 1):
+		var angle = lerp(start_rad, end_rad, float(i) / float(n_points))
+		var point = center + Vector2(cos(angle), sin(angle)) * radius
+		points.append(point)
+	# draw a sector
+	draw_colored_polygon(points, color)
+
+func cubic_value_limit(current_x,start_x,start_y,end_x,end_y):
+	end_x -= start_x
+	if current_x < start_x:
+		current_x = 0
+	elif current_x > end_x:
+		current_x = end_x
+	else:
+		current_x -= start_x
+		
+	#print("start_x ",start_x,"current ",current_x, "end ", end_x)
+	var a0 = start_y
+	var a1 = 0
+	var a2 = 3/pow(end_x,2)*(end_y-start_y)
+	var a3 = -2/pow(end_x,3)*(end_y-start_y)
+	return a0*pow(current_x,3)+a1*pow(current_x,2)+a2*pow(current_x,1)+a3
+
+# draw a circle, taking the effect of draw_set_transform() into account
+## return [actual max radius of the lake, a list containing all points to draw the lake]
+func draw_circle_lake(origin:Vector2, ref_radius:float, max_radius, min_radius, border_width,noise_factor=35, noise_spread=1e-3):
+	var lake_color = Color8(100,100,220)
+	var lake_border_color = Color8(0,0,255)
+	var noise_obj = FastNoiseLite.new()
+	var start_rad = randf_range(-PI,PI)
+	var max_ref_diff = max_radius - ref_radius
+	var ref_min_diff = ref_radius - min_radius
+	var start_pos = Vector2(randi_range(ref_radius-ref_min_diff*0.5, max_ref_diff*0.5+ref_radius),0).rotated(start_rad)
+	var start_pos_len = start_pos.length()
+	noise_obj.noise_type = FastNoiseLite.TYPE_PERLIN
+	# draw the border of the lake
+	var n_point = 2*PI*ref_radius
+	var elementary_dis_diff = (2*PI*ref_radius)/(n_point)
+	var noise
+	var noise_sum = 0
+	var points = []
+	var current_ref_pos
+	var current_pos
+	var actual_max_radius = 0
+	for i in range(int(n_point)):
+		var current_rad = 2*PI/n_point*i
+		var sq = current_rad * (current_rad-0.5*PI) * (current_rad-1.*PI) * (current_rad-1.5*PI) * (current_rad-2*PI)
+		var limited_sq = sq if sq >= 0 else 0
+		current_ref_pos = Vector2(ref_radius,0).rotated(current_rad+start_rad)
+		
+		noise = noise_obj.get_noise_2dv(noise_spread*current_ref_pos) * noise_factor
+		
+		# limit the radius between max_radius and min_radius by changing the noise generated
+		var intended_radius = ref_radius + (noise_sum+noise) * limited_sq
+		if intended_radius > max_ref_diff*0.5+ref_radius and noise > 0:
+			var modified_noise = noise*cubic_value_limit(intended_radius,ref_radius+0.7*max_ref_diff,1,max_radius,0)
+			noise = randi_range(modified_noise-noise, modified_noise)
+		elif intended_radius < ref_min_diff*0.5+min_radius and noise < 0:
+			var modified_noise = noise*cubic_value_limit(intended_radius,min_radius,0,ref_radius-0.7*ref_min_diff,1)
+			noise = randi_range(modified_noise-noise, modified_noise)
+			
+		noise_sum += noise
+		
+		var current_radius = start_pos_len + noise_sum * limited_sq
+		current_pos = current_radius * Vector2(1,0).rotated(current_rad+start_rad)
+		
+		if current_radius > actual_max_radius:
+			actual_max_radius = current_radius
+		
+		points.append(current_pos)
+	points.append(start_pos)
+	draw_polyline(points,lake_border_color,border_width)
+	draw_colored_polygon(points,lake_color)
+	return [actual_max_radius, points]
+	
+func draw_block_stored_lake(block, border_width):
+	var lake_color = Color8(100,100,220)
+	var lake_border_color = Color8(0,0,255)
+	draw_polyline(block.lake_shape,lake_border_color,border_width)
+	draw_colored_polygon(block.lake_shape,lake_color)
+	
+		
 func _draw() -> void:
 	# draw the background of blocks
 	draw_rect(Rect2(Vector2(0,0),Vector2(1920,1080)),background_color,true)
@@ -17,11 +102,12 @@ func _draw() -> void:
 		var path_line_color = block.path_line_color
 		var no_access_block_color = block.no_access_block_color
 		
-		# highlight the border of each block, for testing usage
-		#draw_rect(Rect2(Vector2(-1.5*block_width,-1.5*block_width),Vector2(block.width,block.width)),Color8(255,0,0),false,2)
-		
 		# set draw transform to default
 		draw_set_transform(block.position,0)
+		
+		# highlight the border of each block, for testing usage
+		draw_rect(Rect2(Vector2(-1.5*block_width,-1.5*block_width),Vector2(block.width,block.width)),Color8(255,0,0),false,2)
+		
 		# fully-spaced block style
 		if block.fully_spaced:
 			if at_least_connected:
@@ -46,6 +132,7 @@ func _draw() -> void:
 								pass
 							else:
 								draw_line(Vector2(-1.5*block_width,-1.5*block_width+0.5*path_line_width),Vector2(1.5*block_width,-1.5*block_width+0.5*path_line_width),path_line_color,path_line_width)
+				
 				for v_key in ["top","bottom"]:
 					for h_key in ["left","right"]:
 						if block.neighbours[v_key] == null or block.neighbours[h_key] == null:
@@ -62,7 +149,18 @@ func _draw() -> void:
 								draw_line(Vector2(1.5*block_width,1.5*block_width-0.5*path_line_width),Vector2(1.5*block_width-path_line_width,1.5*block_width-0.5*path_line_width),path_line_color,path_line_width)
 							else:
 								print("PathBlockPrefab<_draw>: Invalid combination of keys.")
-								
+				## draw a lake
+				if block.lake:
+					var ref_lake_radius = 100
+					var lake_scale = Vector2(block.width/3./ref_lake_radius,block.width/3./ref_lake_radius)
+					draw_set_transform(block.position,0, lake_scale)
+					if block.lake_shape == null:
+						var temp = draw_circle_lake(Vector2(0,0), ref_lake_radius*0.75, ref_lake_radius*1, ref_lake_radius*0.5, 5)
+						block.max_lake_radius = temp[0] * lake_scale.x
+						block.lake_shape = temp[1]
+					else:
+						draw_block_stored_lake(block, 5)
+						
 			# if no access is allowed to the block
 			else:		
 				# draw the whole block as no-access style

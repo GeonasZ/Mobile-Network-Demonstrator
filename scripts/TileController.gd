@@ -5,13 +5,14 @@ const sqrt3 = 1.732
 
 var allowed_freq_pattern = [3,4,7,12]
 
-var arc_len = 150
+var arc_len = 210
 var current_freq_pattern_index = 0
 var total_channel_number = 24
 var station_number = 0
 
 # decay rate of signal power with distance
-var decay = 2
+var decay = 0.1
+var building_decay = 0.1
 
 var tile_color_dict = {"blue":Color8(173,216,230),"green":Color8(152,251,152), 
 "red":Color8(180,248,245), "yellow":Color8(255,255,224), "purple":Color8(230,230,250),
@@ -35,6 +36,7 @@ var hex_tile_prefab = null
 @onready var mouse_controller = $"../../Controllers/MouseController"
 @onready var freq_reuse_button = $"../../FunctionPanel/FreqReuseButton"
 @onready var station_config_panel = $"../../StationConfigPanel"
+@onready var path_controller = $"../PathController"
 var hex_list = []
 
 ## not in use
@@ -173,7 +175,7 @@ func make_tile(pos:Vector2,arc_len:int=0,n_channel:int=7,antenna_type=null):
 	current_hex.set_arc_len(tile_len)
 	current_hex.set_id(station_number)
 	current_hex.set_channel_number(n_channel)
-	current_hex.initialize(self.mouse_panel,self.station_config_panel)
+	current_hex.initialize(self.mouse_panel,self.station_config_panel, self.path_controller, self)
 	if antenna_type == null:
 		var rand_num = randi_range(0,3)
 		current_hex.set_antenna_type(current_hex.AntennaType[rand_num])
@@ -385,15 +387,18 @@ func tile_allocate_channel(i, j, user):
 	user.connect_to_channel(channel)
 	return channel
 
-func initialize_map(tile_length:int=0,total_channel:int=24):
+func initialize_map(tile_length:int=0,total_channel:int=24,init_freq_pattern=true):
 	self.total_channel_number = total_channel
 	# if tile_length larger than 0, change default tile length
 	if tile_length > 0:
 		self.arc_len = tile_length
 	initialize_tile_background(Vector2(-randi_range(-2*arc_len,-2.5*arc_len), -randi_range(-2*arc_len,-2.5*arc_len)),tile_length)
-	self.current_freq_pattern_index = randi_range(0,allowed_freq_pattern.size()-1)
-	initialize_freq_pattern(hex_list, allowed_freq_pattern[current_freq_pattern_index])
 	self.station_number = 0
+	
+	if init_freq_pattern:
+		self.current_freq_pattern_index = randi_range(0,allowed_freq_pattern.size()-1)
+	initialize_freq_pattern(hex_list, allowed_freq_pattern[current_freq_pattern_index])
+	
 	
 # Called when the node enters the scene tree for the first time.
 func _ready():

@@ -7,7 +7,12 @@ var id
 var row
 # column index in the path block list
 var col
+var lake = false
+var lake_shape
+var building = false
+var max_lake_radius
 var fully_spaced = false
+var no_user_spawn = false
 
 var x_sub_pos = ["left","middle","right"]
 var y_sub_pos = ["top","middle","bottom"]
@@ -37,29 +42,29 @@ func in_block(point:Vector2):
 func user_velocity_calc(user):
 	print(self.in_block(user))
 	
-func at_least_connected():
-	for key in path_connectivity:
-		if path_connectivity[key] == true:
+func at_least_connected(block=self):
+	for key in block.path_connectivity:
+		if block.path_connectivity[key] == true:
 			return true
 	return false
 
-func at_least_not_all_connection_null():
-	for key in path_connectivity:
-		if path_connectivity[key] != null:
+func at_least_not_all_connection_null(block=self):
+	for key in block.path_connectivity:
+		if block.path_connectivity[key] != null:
 			return true
 	return false
 
-func connected_direction_count(value = true):
+func connected_direction_count(value = true, block=self):
 	var count = 0
-	for key in path_connectivity:
-		if path_connectivity[key] == value:
+	for key in block.path_connectivity:
+		if block.path_connectivity[key] == value:
 			count += 1
 	return count
 
-func connected_directions(value = true):
+func connected_directions(value = true, block=self):
 	var connected_directions = []
-	for key in path_connectivity:
-		if path_connectivity[key] == value:
+	for key in block.path_connectivity:
+		if block.path_connectivity[key] == value:
 			connected_directions.append(key)
 	return connected_directions
 
@@ -102,6 +107,7 @@ func dir_unit_vec(key):
 		return Vector2(0,0)
 	else:
 		print("PathBlockPrefab<dir_unit_vec>: Invalid Key.")
+
 
 func nearest_connected_block(user):
 	var count: int = 1
@@ -241,7 +247,23 @@ func update_user_acc(user,max_acc: Vector2):
 				unit_acc = user.global_position.direction_to(nearest_connected_block.global_position)
 	# when self is fully spaced and user is around center
 	elif self.fully_spaced and user_pos.distance_to(Vector2(0,0)) < 0.9 * 1.5 * block_width:
-		unit_acc = Vector2(1,0).rotated(randf_range(0,2*PI))
+		if self.lake and self.lake_shape != null and self.lake_shape != []:
+			var user_dis = user_pos.distance_to(Vector2(0,0))
+			var user_angle = user_pos.angle()
+			if user_angle < 0:
+				user_angle += 2 * PI
+			var lake_index = int(user_angle/(2*PI/(len(self.lake_shape)-1)))
+			var max_near_radius = max(self.lake_shape[lake_index].length(),self.lake_shape[lake_index+1].length())
+			if user_dis < max_near_radius * max(1.15*(100/self.width),1.15):
+				unit_acc = user_pos/(user_pos.length()+1e-5)
+				acc_mag_ratio = max(pow((max_near_radius * max(1.15*(100/self.width),1.15))/user_dis,2),2)
+			elif user_dis < max_near_radius * max(1.25*(100/self.width),1.25):
+				var user_dir = user_pos.angle()
+				unit_acc = Vector2(1,0).rotated(randf_range(user_dir-0.5*PI, user_dir+0.5*PI))
+			else:
+				unit_acc = Vector2(1,0).rotated(randf_range(0,2*PI))
+		else:	
+			unit_acc = Vector2(1,0).rotated(randf_range(0,2*PI))
 	# when self is fully spaced and one or more neighbours
 	# are also fully spaced and they are connected.
 	elif user_in_fully_spaced_connection_extra_area(user_pos,x_key,y_key,block_width):

@@ -4,12 +4,15 @@ extends Control
 @onready var tile_controller = $"../TileController"
 @onready var user_controller = $"../UserController"
 
-var block_width = 600
+var block_width = 300
 var start_pos = Vector2(0,0)
 var end_pos = Vector2(1920,1080)
 var path_blocks = []
 
 var path_block_prefab
+
+func user_in_which_block(user):
+	return in_which_block(user.global_position)
 
 # the point should be a global position.
 func in_which_block(point:Vector2):
@@ -369,13 +372,15 @@ func generate_better_connected_paths(bonused_produce_times):
 
 # generate random paths on the map. connectivity throughout the
 # whole map is garenteed.
-func _generate_fully_connected_paths(_block_list,_block_travel_times_list=null,_max_travel_time=4,_block=null):
+func _generate_fully_connected_paths(_block_list,_bonus_count_down=1,_block_travel_times_list=null,_max_travel_time=4,_block=null):
 	# randomly initialize a block as start if the block is not specified
 	if _block == null:
 		var row = randi_range(int(len(self.path_blocks)*0.4),int(len(self.path_blocks)*0.6))
 		var col = randi_range(int(len(self.path_blocks[0])*0.4),int(len(self.path_blocks[0])*0.6))
 		_block = self.path_blocks[row][col]
 		_block.set_connectivity(true,true,true,true)
+		
+	# if there is not a block travel list from input, 
 	# initialize a block travel_times list
 	if _block_travel_times_list == null:
 		_block_travel_times_list = []
@@ -387,6 +392,7 @@ func _generate_fully_connected_paths(_block_list,_block_travel_times_list=null,_
 	if _block_travel_times_list[index] < _max_travel_time:
 		_block_travel_times_list[index] += 1
 		if _block.at_least_connected():
+
 			# update the block itself
 			var n_connections = _block.connected_direction_count()
 			for key in _block.path_connectivity:
@@ -402,13 +408,28 @@ func _generate_fully_connected_paths(_block_list,_block_travel_times_list=null,_
 						if do_connect:
 							_block.neighbours[key].path_connectivity[_block.inverse_key(key)] = true
 						else:
-							_block.neighbours[key].path_connectivity[_block.inverse_key(key)] = false
+							if _bonus_count_down > 0:
+								_block.neighbours[key].path_connectivity[_block.inverse_key(key)] = true
+								_bonus_count_down -= 1
+							else:
+								_block.neighbours[key].path_connectivity[_block.inverse_key(key)] = false
 						if _block.neighbours[key].at_least_connected():
-							_generate_fully_connected_paths(_block_list,_block_travel_times_list,_max_travel_time,_block.neighbours[key])
+							_generate_fully_connected_paths(_block_list,_bonus_count_down,_block_travel_times_list,_max_travel_time,_block.neighbours[key])
 			
 func generate_fully_connected_paths():
 	var blocks = path_layer.get_children()
-	_generate_fully_connected_paths(blocks)
+	while 1:
+		_generate_fully_connected_paths(blocks)
+		# ensure the number of blocked which has connections are not too small
+		var n_connected_block = 0
+		for row in self.path_blocks:
+			for block in row:
+				if block.at_least_not_all_connection_null():
+					n_connected_block += 1
+		if n_connected_block < len(self.path_blocks)*len(self.path_blocks[0]) * 0.25:
+			print("PathController<generate_fully_connected_paths>: There are too few blocks connected in current map. Trying to regenerate another one...")
+		else:
+			break
 
 	for row in self.path_blocks:
 		for block in row:
@@ -416,6 +437,46 @@ func generate_fully_connected_paths():
 			connect_fully_spaced_neighbours(block)
 			
 	globally_maintain_path_map()
+			
+## used to generate lakes from a fully-spaced block
+## after the path generation has been done
+func make_lake():
+	var lakes = []
+	var blocks_with_connection = 0
+	for row in self.path_blocks:
+		for block in row:
+			if block.at_least_connected():
+				blocks_with_connection += 1
+			var neighbour_is_lake = false
+			for key in block.neighbours:
+				if block.neighbours[key] != null and block.neighbours[key].lake:
+					neighbour_is_lake = true
+					break
+			if not neighbour_is_lake and block.at_least_connected() and not block.building:
+				for key in block.neighbours:
+					if block.neighbours[key] != null and block.neighbours[key].at_least_connected():
+						lakes.append(block)
+						block.lake = true
+					break
+					
+	var n_lake = 0
+	if len(lakes) == 0:
+		return
+	
+	while 1:
+		var i = randi_range(0,len(lakes)-1)
+		var block = lakes[i]
+		
+		block.lake = false
+		var thres = (blocks_with_connection * 0.05 - n_lake)/(blocks_with_connection * 0.05) * 100
+		if randi_range(0, 99) < thres:
+			n_lake += 1
+			block.fully_spaced = true
+			block.lake = true
+						
+		lakes.pop_at(i)
+		if len(lakes) == 0:
+			break
 			
 func make_path_block(pos):
 	pass
@@ -466,7 +527,16 @@ func make_map(width,start:Vector2,end:Vector2):
 	#generate_random_paths()
 	#generate_better_connected_paths(10)
 	generate_fully_connected_paths()
+	make_lake()
+	
+	for row2 in self.path_blocks:
+		for block in row2:
+			connect_fully_spaced_neighbours(block)
+	
+
 	path_layer.redraw()
+	#print(len(self.path_blocks)*len(self.path_blocks[0]))
+	#print(path_layer.get_child_count())
 	
 func set_block_width(width):
 	for row in self.path_blocks:

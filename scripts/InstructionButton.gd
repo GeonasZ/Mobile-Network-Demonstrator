@@ -116,7 +116,7 @@ func _process(delta):
 	elif self.button_mode == self.Mode.OBSERVER and not self.analysis_on and not self.visible and not function_panel.analysis_panel_open:
 		self.appear()
 	# mouse in button animes
-	if self.is_mouse_in_original_rect():
+	if self.is_mouse_in_original_rect() and not mouse_panel.backgorund_watching_mode:
 		# trigger only at the frame cursor enters button
 		if not is_mouse_in_box and self.visible:
 			if not mouse_panel.is_tracking_station():
@@ -126,7 +126,7 @@ func _process(delta):
 			self.scale = Vector2(1.05,1.05)
 			label.visible == true
 			label.appear_with_anime()
-	else:
+	elif not mouse_panel.backgorund_watching_mode:
 		# trigger only at the frame cursor leaves button
 		if is_mouse_in_box and self.visible:
 			if not mouse_panel.is_tracking_station():

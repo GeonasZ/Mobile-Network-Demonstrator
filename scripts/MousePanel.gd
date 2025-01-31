@@ -26,6 +26,9 @@ var length = 320
 var width = 220
 var slash_len = 20
 
+# the mose panel and function panel should invisible in this mode
+var backgorund_watching_mode = false
+
 var out_of_window = false
 var set_to_visible = true
 
@@ -102,10 +105,13 @@ func _ready():
 	
 func on_mouse_right_click_on_background(event):
 	if event is InputEventMouseButton and event.button_mask == MOUSE_BUTTON_MASK_RIGHT and event.pressed == true:
-		if self.keep_invisible and not self.analysis_panel_open and not self.station_config_panel_open:
+		if self.keep_invisible and not self.analysis_panel_open and not self.station_config_panel_open and self.backgorund_watching_mode:
+			self.backgorund_watching_mode = false
 			appear_with_anime()
-		else:
+		elif not self.backgorund_watching_mode:
 			disappear_with_anime()
+			self.backgorund_watching_mode = true
+			
 
 func move_to(pos):
 	process_x_motion(pos,0,true)

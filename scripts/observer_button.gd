@@ -42,11 +42,11 @@ func set_button_mode(mode):
 	elif previous_mode == self.Mode.OBSERVER and self.button_mode != self.Mode.OBSERVER:
 		self.cross.appear_with_anime()
 		
-	# determine whether the function label should be visible
-	if previous_mode != self.Mode.OBSERVER and self.button_mode == self.Mode.OBSERVER:
-		self.label.disappear_with_anime()
-	elif previous_mode == self.Mode.OBSERVER and self.button_mode != self.Mode.OBSERVER:
-		self.label.appear_with_anime()
+	## determine whether the function label should be visible
+	#if previous_mode != self.Mode.OBSERVER and self.button_mode == self.Mode.OBSERVER:
+		#self.label.disappear_with_anime()
+	#elif previous_mode == self.Mode.OBSERVER and self.button_mode != self.Mode.OBSERVER:
+		#self.label.appear_with_anime()
 	
 	# determine whether the button itself should be visible
 	if previous_mode != self.Mode.ENGINEER and self.button_mode == self.Mode.ENGINEER:
@@ -147,18 +147,17 @@ func smart_disappear():
 
 func _process(delta):
 	# mouse in button animes
-	if self.is_mouse_in_original_rect():
+	if self.is_mouse_in_original_rect() and  not mouse_panel.backgorund_watching_mode:
 		# trigger only at the frame cursor enters button
 		if not is_mouse_in_box and self.visible:
 			if not mouse_panel.is_tracking_station():
 				mouse_panel.disappear_with_anime()
 			is_mouse_in_box = true
-		if label.visible == false and self.visible:
+		if not label.visible and self.visible:
 			self.scale = Vector2(1.05,1.05)
-			if self.button_mode != self.Mode.OBSERVER or self.analysis_on:
-				label.visible == true
-				label.appear_with_anime()
-	else:
+			label.visible == true
+			label.appear_with_anime()
+	elif  not mouse_panel.backgorund_watching_mode:
 		# trigger only at the frame cursor leaves button
 		if is_mouse_in_box and self.visible:
 			if not mouse_panel.is_tracking_station():

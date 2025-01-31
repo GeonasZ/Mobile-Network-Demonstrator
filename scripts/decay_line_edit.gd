@@ -3,8 +3,10 @@ extends LineEdit
 @onready var tile_controller = $"../../../../../Controllers/TileController"
 @onready var father_node = $".."
 
-var max_value = 5
-var min_value = 2
+var max_value = 2
+
+
+var min_value = 0
 var legal_characters = ["0","1","2","3","4","5","6","7","8","9"]
 
 var previous_text = ""
@@ -33,9 +35,10 @@ func _process(delta: float) -> void:
 		self.text = ""
 		self.previous_text = ""
 		return
-
-	processed_text = float(processed_text)
+	
 	self.text = str(processed_text)
+	processed_text = float(processed_text)
+	
 	if caret_location > self.text.length():
 		self.caret_column = self.text.length()
 	else:

@@ -23,18 +23,19 @@ func _ready() -> void:
 	notice_label.position = Vector2(0.67*ref_pos.x,ref_pos.y)
 	self.set_focus_mode(FocusMode.FOCUS_ALL)
 
-func restart_program(tile_length,user_height,n_channel,n_user,block_width):
+func restart_program(tile_length,user_height,n_channel,n_user,block_width,decay):
 	user_controller.initialize_user_system(user_height)
 	tile_controller.initialize_map(tile_length,n_channel)
 	mouse_panel.initialize_mouse_panel()
 	user_controller.random_add_user(n_user,true)
 	path_controller.set_block_width(block_width)
+	tile_controller.set_decay(decay)
 		
-func apply_config(tile_length,user_height,n_channel,n_user,block_width):
+func apply_config(tile_length,user_height,n_channel,n_user,block_width, decay):
 	if tile_length != tile_controller.arc_len or len(user_controller.linear_user_list) != n_user:
-		user_controller.initialize_user_system(user_height)
-		tile_controller.initialize_map(tile_length,n_channel)
 		mouse_panel.initialize_mouse_panel()
+		user_controller.initialize_user_system(user_height)
+		tile_controller.initialize_map(tile_length,n_channel,false)
 		user_controller.random_add_user(n_user,true)
 	elif tile_controller.total_channel_number != n_channel:
 		tile_controller.total_channel_number = n_channel
@@ -42,6 +43,8 @@ func apply_config(tile_length,user_height,n_channel,n_user,block_width):
 	
 	if path_controller.block_width != block_width:
 		path_controller.set_block_width(block_width)
+	tile_controller.set_decay(decay)
+	
 	
 func _gui_input(event):
 	if event is InputEventMouseButton and event.button_mask == MOUSE_BUTTON_MASK_LEFT and event.pressed:
@@ -53,8 +56,7 @@ func _gui_input(event):
 		var n_user = int(n_user_edit.text)
 		var block_width = int(path_width_edit.text)
 			
-		apply_config(tile_length, user_height,n_freq,n_user,block_width)
-		tile_controller.set_decay(decay)
+		apply_config(tile_length, user_height,n_freq,n_user,block_width, decay)
 		config_panel.close_config_with_anime()
 		
 		await get_tree().create_timer(0.5).timeout

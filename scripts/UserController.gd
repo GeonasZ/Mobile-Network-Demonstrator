@@ -259,13 +259,24 @@ func eval_user_sir(user):
 	var index_i = user.index_i_in_user_list
 	var index_j = user.index_j_in_user_list
 	var user_hex = tile_controller.hex_list[index_i][index_j]
-	var signal_power = user_hex.eval_signal_pow_to_user(user, tile_controller.get_decay())
+	var signal_power = 0
+	if path_layer.map_visible:
+		signal_power = user_hex.eval_signal_pow_to_user(user)
+	else:
+		signal_power = user_hex.eval_signal_pow_to_user(user, tile_controller.get_decay())
+	
+	
 	var interference_power = 0
 	# sum interference power up
 	if user.connected_channel != null:
 		for station in tile_controller.hex_frequency_dict[user_hex.frequency_group]:
 			if station.channel_allocation_list[user.connected_channel] != null:
-									interference_power += station.eval_signal_pow_to_user(user, tile_controller.get_decay())
+				if path_layer.map_visible:
+					interference_power += user_hex.eval_signal_pow_to_user(user)
+				else:
+					print("asd")
+					interference_power += user_hex.eval_signal_pow_to_user(user, tile_controller.get_decay())
+					
 	interference_power -= signal_power
 	var sir
 	if interference_power == 0 and signal_power == 0:
