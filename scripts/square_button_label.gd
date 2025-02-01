@@ -13,6 +13,9 @@ extends Label
 @onready var freq_n_edit = $"../../ContentFrame/GridContainer/NFrequencyEdit/LineEdit"
 @onready var n_user_edit = $"../../ContentFrame/GridContainer/NUserEdit/LineEdit"
 @onready var path_width_edit = $"../../ContentFrame/GridContainer/PathWidthEdit/LineEdit"
+@onready var building_decay_edit = $"../../ContentFrame/GridContainer/BuildingDecayEdit/LineEdit"
+
+
 var on_work = true
 var is_mouse_in = false
 
@@ -23,15 +26,16 @@ func _ready() -> void:
 	notice_label.position = Vector2(0.67*ref_pos.x,ref_pos.y)
 	self.set_focus_mode(FocusMode.FOCUS_ALL)
 
-func restart_program(tile_length,user_height,n_channel,n_user,block_width,decay):
+func restart_program(tile_length,user_height,n_channel,n_user,block_width,decay, building_decay):
 	user_controller.initialize_user_system(user_height)
 	tile_controller.initialize_map(tile_length,n_channel)
 	mouse_panel.initialize_mouse_panel()
 	user_controller.random_add_user(n_user,true)
 	path_controller.set_block_width(block_width)
 	tile_controller.set_decay(decay)
+	tile_controller.set_building_decay(building_decay)
 		
-func apply_config(tile_length,user_height,n_channel,n_user,block_width, decay):
+func apply_config(tile_length,user_height,n_channel,n_user,block_width, decay, building_decay):
 	if tile_length != tile_controller.arc_len or len(user_controller.linear_user_list) != n_user:
 		mouse_panel.initialize_mouse_panel()
 		user_controller.initialize_user_system(user_height)
@@ -44,6 +48,8 @@ func apply_config(tile_length,user_height,n_channel,n_user,block_width, decay):
 	if path_controller.block_width != block_width:
 		path_controller.set_block_width(block_width)
 	tile_controller.set_decay(decay)
+	tile_controller.set_building_decay(building_decay)
+	
 	
 	
 func _gui_input(event):
@@ -55,8 +61,9 @@ func _gui_input(event):
 		var n_freq = int(freq_n_edit.text)
 		var n_user = int(n_user_edit.text)
 		var block_width = int(path_width_edit.text)
+		var building_decay = float(building_decay_edit.text)
 			
-		apply_config(tile_length, user_height,n_freq,n_user,block_width, decay)
+		apply_config(tile_length, user_height,n_freq,n_user,block_width, decay, building_decay)
 		config_panel.close_config_with_anime()
 		
 		await get_tree().create_timer(0.5).timeout

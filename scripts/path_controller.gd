@@ -440,7 +440,7 @@ func generate_fully_connected_paths():
 			
 ## used to generate lakes from a fully-spaced block
 ## after the path generation has been done
-func make_lake():
+func spawn_lakes():
 	var lakes = []
 	var blocks_with_connection = 0
 	for row in self.path_blocks:
@@ -463,7 +463,7 @@ func make_lake():
 	if len(lakes) == 0:
 		return
 	
-	while 1:
+	while len(lakes) > 0:
 		var i = randi_range(0,len(lakes)-1)
 		var block = lakes[i]
 		
@@ -473,10 +473,36 @@ func make_lake():
 			n_lake += 1
 			block.fully_spaced = true
 			block.lake = true
-						
 		lakes.pop_at(i)
-		if len(lakes) == 0:
-			break
+			
+			
+func spawn_buildings():
+	var buildings = []
+	var blocks_with_connection = 0
+	for row in self.path_blocks:
+		for block in row:
+			if block.at_least_connected():
+				blocks_with_connection += 1
+			var neighbour_is_building = false
+			if block.at_least_connected() and not block.lake:
+				block.building = true
+				buildings.append(block)
+					
+	var n_building = 0
+	if len(buildings) == 0:
+		return
+	
+	while len(buildings) > 0:
+		var i = randi_range(0,len(buildings)-1)
+		var block = buildings[i]
+		
+		block.building = false
+		var thres = (blocks_with_connection * 0.3 - n_building)/(blocks_with_connection * 0.05) * 100
+		if randi_range(0, 99) < thres:
+			n_building += 1
+			block.fully_spaced = true
+			block.building = true
+		buildings.pop_at(i)
 			
 func make_path_block(pos):
 	pass
@@ -527,7 +553,8 @@ func make_map(width,start:Vector2,end:Vector2):
 	#generate_random_paths()
 	#generate_better_connected_paths(10)
 	generate_fully_connected_paths()
-	make_lake()
+	spawn_lakes()
+	spawn_buildings()
 	
 	for row2 in self.path_blocks:
 		for block in row2:

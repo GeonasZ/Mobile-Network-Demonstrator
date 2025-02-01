@@ -171,11 +171,10 @@ func eval_signal_pow(angle_from_center, distance:float, decay):
 
 # eval signal power to a user, automatically detect decay rate
 func eval_signal_power_to_user_with_various_decay(user, max_seg=500):
-	
 	if user.connected_channel == null:
 		return 0
 		
-	var glob_pos = user.global_position
+	var user_glob_pos = user.global_position
 	var distance = self.position.distance_to(user.position)
 	var angle_from_center = self.signal_direction.angle_to(user.position-self.position)
 	
@@ -201,7 +200,7 @@ func eval_signal_power_to_user_with_various_decay(user, max_seg=500):
 		else:
 			array_factor = sin(0.5*N*angle_from_center)/sin(0.5*angle_from_center)
 
-	var n_seg = int(distance)/4
+	var n_seg = int(distance)
 	if n_seg > max_seg:
 		n_seg = max_seg
 	var seg_len = distance/n_seg
@@ -209,14 +208,16 @@ func eval_signal_power_to_user_with_various_decay(user, max_seg=500):
 	var current_signal_pow = self.ref_signal_power * pow(array_factor,2)
 	for i in range(n_seg+1):
 		if i > 0:
-			var sample_glob_pos = lerp(self.global_position,glob_pos,i/(n_seg))
+			var sample_glob_pos = lerp(self.global_position,user_glob_pos,float(i)/float(n_seg))
 			var block = path_conreoller.in_which_block(sample_glob_pos)
 			var decay
 			if block.building:
 				decay = tile_controller.building_decay
 			else:
+				#print("asd")
 				decay = tile_controller.decay
-			current_signal_pow = current_signal_pow*exp(-decay*seg_len)
+			if decay > 0:
+				current_signal_pow = current_signal_pow*exp(-decay*seg_len)
 	return current_signal_pow
 
 # eval signal power to a user, providing decay is a constant

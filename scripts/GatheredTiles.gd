@@ -18,6 +18,8 @@ var zoom_out_ratio = 0.95
 var max_scale = 2
 var min_scale = 1
 
+var pos_after_zoom = Vector2(0,0)
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	self.pivot_offset = Vector2(0,0)
@@ -37,6 +39,10 @@ func zoom(zoom_ratio, zoom_to_mouse=false, subject=self):
 		var center_pos = get_viewport_rect().size/2
 		subject.position = center_pos - (center_pos - subject.position)/old_scale * new_scale
 		subject.scale = subject.scale * zoom_ratio
+
+func back_to_position_after_zoom():
+	for subject in zoom_list:
+		subject.position = self.pos_after_zoom
 
 func on_mouse_left_click_on_background(event):
 	# if analysis panel open, do not react to left click
@@ -70,10 +76,10 @@ func _gui_input(event):
 			self.on_mouse_right_click_on_background(event)
 		# zoom in
 		elif event.button_index == MOUSE_BUTTON_WHEEL_UP:
-			
 			if self.scale < Vector2(max_scale,max_scale):
 				for obj in zoom_list:
 					zoom(zoom_in_ratio, true, obj)
+				self.pos_after_zoom = self.position
 		# zoom out
 		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 			var viewport_size = get_viewport_rect().size
@@ -99,6 +105,8 @@ func _gui_input(event):
 			if self.position.y + rect_size.y < viewport_size.y:
 				for obj in zoom_list:
 					obj.position.y = viewport_size.y - rect_size.y
+					
+			self.pos_after_zoom = self.position
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):

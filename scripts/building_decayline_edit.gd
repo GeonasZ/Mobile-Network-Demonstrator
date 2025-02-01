@@ -65,7 +65,7 @@ func _input(event: InputEvent) -> void:
 		focus_exited.emit()
 
 func initialize():
-	self.text = str(tile_controller.get_decay())
+	self.text = str(tile_controller.get_building_decay())
 	
 	
 

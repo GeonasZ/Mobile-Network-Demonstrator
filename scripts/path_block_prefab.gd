@@ -20,8 +20,10 @@ var y_sub_pos = ["top","middle","bottom"]
 var neighbours = {"right":null,"left":null,
 	 			  "top":null,"bottom":null}
 var width = 240
-var no_access_block_color = Color(0.74,0.74,0.74,1)
-var path_line_color = Color(0.5,0.5,0.5,1)
+var building_color = Color(0.5,0.5,0.5,0.6)
+var building_wall_color = Color(0.3,0.3,0.3,0.8)
+var lawn_color = Color(0.4,0.8,0.4,0.5)
+var lawn_edge_color = Color(0.,0.2,0.,0.6)
 var path_line_width = 5
 # each value should be either true, false or null
 var path_connectivity = {"right":null,"left":null,
@@ -162,19 +164,19 @@ func fully_spaced_connection(block):
 				fully_spaced_connected_neighbours.append(key)
 	return fully_spaced_connected_neighbours
 	
-func user_in_fully_spaced_connection_extra_area(user_pos:Vector2,x_key,y_key,block_width:float):
-		
+func user_in_fully_spaced_connection_extra_area(user_relative_pos:Vector2,x_key,y_key,block_width:float):
 	# get the keys of fully sapced conenctions of the block
 	var fully_spaced_connections = self.fully_spaced_connection(self)
 	var x_key_fitted = x_key in fully_spaced_connections
 	var y_key_fitted = y_key in fully_spaced_connections
 	if len(fully_spaced_connections) > 0:
-		if x_key_fitted:
-			if abs(user_pos.y) < 1.2 * block_width:
+		if x_key_fitted and self.neighbours[x_key].building == self.building:
+			if abs(user_relative_pos.y) < 1.2 * block_width:
 				return true
-		elif y_key_fitted:
-			if abs(user_pos.x) < 1.2 * block_width:
+		if y_key_fitted and self.neighbours[y_key].building == self.building:
+			if abs(user_relative_pos.x) < 1.2 * block_width:
 				return true
+	return false
 		
 func rotate_user_acc_from_station(user, unit_acc, dis_ratio, penalty_add_ratio):
 	var dir_from_station = user.direction_from_station
@@ -265,7 +267,8 @@ func update_user_acc(user,max_acc: Vector2):
 		else:	
 			unit_acc = Vector2(1,0).rotated(randf_range(0,2*PI))
 	# when self is fully spaced and one or more neighbours
-	# are also fully spaced and they are connected.
+	# are also fully spaced and they are connected and 
+	# they are both or both not buildings
 	elif user_in_fully_spaced_connection_extra_area(user_pos,x_key,y_key,block_width):
 		unit_acc = Vector2(1,0).rotated(randf_range(0,2*PI))
 	# when the user is in the corner blocks

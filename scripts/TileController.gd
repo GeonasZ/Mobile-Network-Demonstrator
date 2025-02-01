@@ -5,25 +5,25 @@ const sqrt3 = 1.732
 
 var allowed_freq_pattern = [3,4,7,12]
 
-var arc_len = 210
+var arc_len = 150
 var current_freq_pattern_index = 0
 var total_channel_number = 24
 var station_number = 0
 
 # decay rate of signal power with distance
 var decay = 0.1
-var building_decay = 0.1
+var building_decay = 2
 
-var tile_color_dict = {"blue":Color8(173,216,230),"green":Color8(152,251,152), 
+var tile_color_dict = {"blue":Color8(173,216,230),"violet":Color8(198,164,232), 
 "red":Color8(180,248,245), "yellow":Color8(255,255,224), "purple":Color8(230,230,250),
 "mint_mist":Color8(230,255,230),"gray":Color8(211,211,211), "cyan": Color8(224,255,255),
-"coral":Color8(250,209,175),"gold": Color8(240,230,140),"violet":Color8(198,164,232),
+"coral":Color8(250,209,175),"gold": Color8(240,230,140),"green":Color8(152,251,152),
 "lavender":Color8(255,240,245)}
 
-var tile_color_list = [Color8(173,216,230),Color8(152,251,152), 
+var tile_color_list = [Color8(173,216,230),Color8(198,164,232),
 Color8(255,182,193), Color8(255,255,224),Color8(230,230,250), 
 Color8(230,255,230), Color8(211,211,211),Color8(224,255,255),
-Color8(250,209,175),Color8(240,230,140),Color8(198,164,232),
+Color8(250,209,175),Color8(240,230,140),Color8(152,251,152), 
 Color8(255,240,245)]
 
 var frequency_group = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"]
@@ -307,6 +307,12 @@ func set_decay(value):
 func get_decay():
 	return self.decay
 
+func set_building_decay(value):
+	self.building_decay = value
+
+func get_building_decay():
+	return self.building_decay
+
 func next_freq_pattern():
 	current_freq_pattern_index += 1
 	if current_freq_pattern_index == allowed_freq_pattern.size():
@@ -371,7 +377,7 @@ func get_current_hex(pos):
 	for i in range(hex_list.size()):
 		for j in range(hex_list[i].size()):
 			# evalute the distance from mouse to the station
-			var current_dis = (hex_list[i][j].position).distance_to(pos)
+			var current_dis = (hex_list[i][j].global_position).distance_to(pos)
 			if least_distance == -1 or current_dis < least_distance:
 				least_distance = current_dis
 				least_distance_hex = hex_list[i][j]

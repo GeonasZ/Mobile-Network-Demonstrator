@@ -98,7 +98,7 @@ func _ready():
 	self.visible = true
 	self.scale = Vector2(0,0)
 	# set alpha to 0.5 (make the panel transparent)
-	(self.material as ShaderMaterial).set_shader_parameter("alpha",0.75)
+	(self.material as ShaderMaterial).set_shader_parameter("alpha",0.9)
 	# initialize info_label
 	info_label.text = "[center]Loading...[/center]"
 	keep_invisible = true
@@ -371,7 +371,7 @@ func _process(delta):
 			"Connected to Channel:  "+str(displayed_user[-1].connection_status())
 		# if user is connected to station, show sir
 		if displayed_user[-1].connected_channel != null:
-			info_label.text += "\nSignal Power: " + str(truncate_double(10*log(signal_power/1e-3)/log(10))) + " dBm"
+			info_label.text += "\nSignal Power: " + (str(truncate_double(10*log(signal_power/1e-3)/log(10))) + " dBm" if signal_power > 0 else "0 W")
 			info_label.text += "\nSIR:  "+str(eval_sir(signal_power,interference_power))
 		else:
 			info_label.text += "\nSignal Power: Not Connected"
@@ -401,7 +401,7 @@ func _process(delta):
 			
 		# if user is connected to station, show sir
 		if tracked_user.connected_channel != null:
-			info_label.text += "\nSignal Power: " + str(truncate_double(10*log(signal_power/1e-3)/log(10))) + " dBm"
+			info_label.text += "\nSignal Power: " + (str(truncate_double(10*log(signal_power/1e-3)/log(10))) + " dBm" if signal_power > 0 else "0 W")
 			info_label.text += "\nSIR:  "+str(eval_sir(signal_power,interference_power))
 		else:
 			info_label.text += "\nSignal Power: Not Connected"

@@ -7,6 +7,7 @@ extends Polygon2D
 @onready var freq_n_edit = $ContentFrame/GridContainer/NFrequencyEdit/LineEdit
 @onready var n_user_edit = $ContentFrame/GridContainer/NUserEdit/LineEdit
 @onready var path_width_edit = $ContentFrame/GridContainer/PathWidthEdit/LineEdit
+@onready var building_decay_edit = $ContentFrame/GridContainer/BuildingDecayEdit/LineEdit
 
 # other nodes
 @onready var config_button = $"../FunctionPanel/ConfigButton"
@@ -17,6 +18,7 @@ extends Polygon2D
 @onready var function_panel = $"../FunctionPanel"
 @onready var station_config_panel = $"../StationConfigPanel"
 @onready var mouse_panel = $"../MousePanel"
+@onready var gathered_tiles = $"../GatheredTiles"
 
 signal config_panel_opened
 
@@ -33,7 +35,7 @@ func _ready() -> void:
 	title_label.position = Vector2(0,0)
 	title_label.size = Vector2(1920,200)
 	edit_list = [tile_length_edit, user_height_edit, decay_edit, freq_n_edit, 
-				 n_user_edit, path_width_edit]
+				 n_user_edit, path_width_edit, building_decay_edit]
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -65,6 +67,7 @@ func close_config_with_anime():
 		user_controller.resume_all_user()
 		anime_player.play("config_disappear")
 		await anime_player.animation_finished
+		gathered_tiles.back_to_position_after_zoom()
 		over_layer.make_visible()
 		self.visible = false
 		on_work = true
