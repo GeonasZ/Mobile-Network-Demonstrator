@@ -298,11 +298,12 @@ func _draw() -> void:
 					draw_set_transform(block.position,0)
 					draw_rect(Rect2(Vector2(-1.5*block_width-path_line_width,-1.5*block_width-path_line_width),Vector2(2*path_line_width,2*path_line_width)),building_color,path_line_width)
 							
-	# highlight the border of each block, for testing usage
-	for block in self.get_children():
-		var block_width = int(block.width/3.)
-		draw_set_transform(block.position,0)
-		draw_rect(Rect2(Vector2(-1.5*block_width,-1.5*block_width),Vector2(block.width,block.width)),Color8(255,0,0),false,2)
+	## For debug usage
+	## highlight the border of each block. 
+	#for block in self.get_children():
+		#var block_width = int(block.width/3.)
+		#draw_set_transform(block.position,0)
+		#draw_rect(Rect2(Vector2(-1.5*block_width,-1.5*block_width),Vector2(block.width,block.width)),Color8(255,0,0),false,2)
 		
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
