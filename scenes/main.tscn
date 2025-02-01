@@ -1,4 +1,4 @@
-[gd_scene load_steps=126 format=3 uid="uid://dp7br0wc03w8r"]
+[gd_scene load_steps=127 format=3 uid="uid://dp7br0wc03w8r"]
 
 [ext_resource type="Script" path="res://scripts/UserController.gd" id="1_18gww"]
 [ext_resource type="Script" path="res://scripts/TileController.gd" id="1_fg5v7"]
@@ -44,6 +44,7 @@
 [ext_resource type="Script" path="res://scripts/decay_line_edit.gd" id="19_qoxea"]
 [ext_resource type="Script" path="res://scripts/frequency_number_edit.gd" id="20_sn5w8"]
 [ext_resource type="Script" path="res://scripts/n_user_line_edit.gd" id="22_0pki8"]
+[ext_resource type="Script" path="res://scripts/config_panel_animation_player.gd" id="23_vg8qi"]
 [ext_resource type="Script" path="res://scripts/add_user_button.gd" id="24_037pr"]
 [ext_resource type="Script" path="res://scripts/config_panel.gd" id="24_ok7yp"]
 [ext_resource type="Theme" uid="uid://gsrgqfr8u6nt" path="res://fonts/pre_set_theme/button_median_font.tres" id="25_x1dja"]
@@ -1009,6 +1010,7 @@ root_node = NodePath("../..")
 libraries = {
 "": SubResource("AnimationLibrary_ak4qm")
 }
+script = ExtResource("23_vg8qi")
 
 [node name="ConfirmButton" type="Polygon2D" parent="ConfigPanel"]
 script = ExtResource("10_ejbur")

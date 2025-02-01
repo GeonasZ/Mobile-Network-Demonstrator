@@ -54,6 +54,11 @@ func add_user(pos,out_of_dead_zone=false):
 	var j = temp[3]
 	current_user.index_i_in_user_list = i
 	current_user.index_j_in_user_list = j
+	if randi_range(1,0):
+		current_user.x_key_first = true
+	else:
+		current_user.x_key_first = false
+		
 	current_user.set_station(temp[0])
 	var channel = tile_controller.tile_allocate_channel(i,j, current_user)
 	if channel != null:

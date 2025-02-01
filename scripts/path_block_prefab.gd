@@ -110,7 +110,64 @@ func dir_unit_vec(key):
 	else:
 		print("PathBlockPrefab<dir_unit_vec>: Invalid Key.")
 
-
+func avoid_user_hitting_building_walls_from_outside(user):
+	
+	if self.building:
+		return
+	var block_width = self.width/3.
+	var user_pos = self.get_global_transform().affine_inverse()*user.global_position
+	var x_key
+	var y_key
+	# find its x position
+	if user_pos.x < -0.5*block_width:
+		x_key = "left"
+	elif user_pos.x > 0.5*block_width:
+		x_key = "right"
+	else:
+		x_key = "middle"
+	# find its y position
+	if user_pos.y < -0.5*block_width:
+		y_key = "top"
+	elif user_pos.y > 0.5*block_width:
+		y_key = "bottom"
+	else:
+		y_key = "middle"
+	if x_key != "middle" and y_key != "middle":
+		if self.neighbours[x_key] != null and self.neighbours[x_key].building and abs(user_pos.x) > 1.4 * block_width:
+			if self.dir_unit_vec(x_key).x * user.velocity.x > 0:
+				user.velocity.x = -user.velocity.x
+				
+		if self.neighbours[y_key] != null and self.neighbours[y_key].building and abs(user_pos.y) > 1.4 * block_width:
+			if self.dir_unit_vec(y_key).y * user.velocity.y > 0:
+				user.velocity.y = -user.velocity.y
+				
+	elif x_key != "middle" or y_key != "middle":
+		if x_key != "middle":
+			if self.neighbours[x_key] != null and self.neighbours[x_key].building and abs(user_pos.x) > 1.4 * block_width:
+						if self.path_connectivity[x_key] == null:
+							if self.dir_unit_vec(x_key).x * user.velocity.x > 0:
+								user.velocity.x = -user.velocity.x
+								
+		if y_key != "middle":
+			if self.neighbours[y_key] != null and self.neighbours[y_key].building and abs(user_pos.y) > 1.4 * block_width:
+						if self.path_connectivity[y_key] == null:
+							if self.dir_unit_vec(y_key).y * user.velocity.y > 0:
+								user.velocity.y = -user.velocity.y
+			
+func avoid_user_walk_in_lake(user,speed):
+	if self.lake:
+		var block_width = self.width/3.
+		var user_pos = self.get_global_transform().affine_inverse()*user.global_position
+		if self.lake and self.lake_shape != null and self.lake_shape != []:
+			var user_dis = user_pos.distance_to(Vector2(0,0))
+			var user_angle = user_pos.angle()
+			if user_angle < 0:
+				user_angle += 2 * PI
+			var lake_index = int(user_angle/(2*PI/(len(self.lake_shape)-1)))
+			var max_near_radius = max(self.lake_shape[lake_index].length(),self.lake_shape[lake_index+1].length())
+			if user_dis < max_near_radius + 2:
+				user.velocity = Vector2(0,0).direction_to(user_pos) * speed * randf_range(0.95,1.05)
+				
 func nearest_connected_block(user):
 	var count: int = 1
 	var max_row = len(path_controller.path_blocks)-1
@@ -151,10 +208,20 @@ func nearest_connected_block(user):
 			return nearest_block
 		
 func block_with_connection():
+	var connected_block_list = []
 	for row in path_controller.path_blocks:
 		for block in row:
 			if block.at_least_connected():
-				return block
+				connected_block_list.append(block)
+	return connected_block_list[randi_range(0,len(connected_block_list)-1)]
+	
+func block_with_not_null_connection():
+	var connected_block_list = []
+	for row in path_controller.path_blocks:
+		for block in row:
+			if block.at_least_not_all_connection_null():
+				connected_block_list.append(block)
+	return connected_block_list[randi_range(0,len(connected_block_list)-1)]
 	
 func fully_spaced_connection(block):
 	var fully_spaced_connected_neighbours = []
@@ -184,8 +251,8 @@ func rotate_user_acc_from_station(user, unit_acc, dis_ratio, penalty_add_ratio):
 	if user.distance_from_station/user.station.arc_len < dis_ratio:
 		dir_from_station = dir_from_station.rotated(randf_range(-dis_ratio*PI,dis_ratio*PI)/dis_ratio*user.distance_from_station/user.station.arc_len)
 		unit_acc += dir_from_station * penalty_add_ratio
-	
-	unit_acc = unit_acc/unit_acc.length()
+	if unit_acc.length() > 0:
+		unit_acc = unit_acc/unit_acc.length()
 	
 	return unit_acc
 		
@@ -220,9 +287,18 @@ func update_user_acc(user,max_acc: Vector2):
 		# if there is at least one false connection
 		if len(false_connections) > 0:
 			var key = false_connections[randi_range(0,len(false_connections)-1)]
-			if x_key in false_connections or y_key in false_connections:
-				unit_acc = dir_unit_vec(x_key)+dir_unit_vec(y_key)
-			elif key == "left":
+			
+			if x_key in false_connections and y_key in false_connections:
+				if user.x_key_first:
+					key = x_key
+				else:
+					key = y_key
+			elif x_key in false_connections:
+				key = x_key
+			elif y_key in false_connections:
+				key = y_key
+			
+			if key == "left":
 				unit_acc = user_pos.direction_to(Vector2(-1.5*block_width,0))
 			elif key == "right":
 				unit_acc = user_pos.direction_to(Vector2(1.5*block_width,0))
@@ -233,20 +309,85 @@ func update_user_acc(user,max_acc: Vector2):
 			else:
 				print("PathBlockPrefab<update_user_acc>: Invalid Key.")
 		else:
-			var nearest_connected_block = self.nearest_connected_block(user)
-			# if failed to find a nearest connected block, try to find a block with connection
-			if nearest_connected_block == null:
-				print("PathBlockPrefab<update_user_acc>: Failed to find a nearest connected block. Trying to find a block with connection...")
-				nearest_connected_block = self.block_with_connection()
-				# if no block is connected, re-generate a path map
-				if nearest_connected_block == null:
-					print("PathBlockPrefab<update_user_acc>: Cannot find a block with path connection. Regenerating a new path map for use...")
-					# re-generate a path map
-					path_controller.set_path_width(path_controller.path_width)
+			var nearest_connected_block
+			if not user.try_other_connected_path_blocks:
+				if user.navigate_to_block == null:
+					nearest_connected_block = self.nearest_connected_block(user)
+					# if failed to find a nearest connected block, try to find a block with connection
+					if nearest_connected_block == null:
+						print("PathBlockPrefab<update_user_acc>: Failed to find a nearest connected block. Trying to find a block with connection...")
+						nearest_connected_block = self.block_with_connection()
+						# if no block is connected, re-generate a path map
+						if nearest_connected_block == null:
+							print("PathBlockPrefab<update_user_acc>: Cannot find a block with path connection. Regenerating a new path map for use...")
+							# re-generate a path map
+							path_controller.set_path_width(path_controller.path_width)
+						else:
+							unit_acc = user.global_position.direction_to(nearest_connected_block.global_position)
+					else:
+						unit_acc = user.global_position.direction_to(nearest_connected_block.global_position)
 				else:
-					unit_acc = user.global_position.direction_to(nearest_connected_block.global_position)
+					unit_acc = user.global_position.direction_to(user.navigate_to_block.global_position)
 			else:
-				unit_acc = user.global_position.direction_to(nearest_connected_block.global_position)
+				nearest_connected_block = self.block_with_not_null_connection()
+				user.navigate_to_block = nearest_connected_block
+				user.try_other_connected_path_blocks = false
+				user.try_block_count_down = 300
+				#print(nearest_connected_block)
+
+			# avoid to walk into the walls of the buildings
+			if x_key == "middle" or y_key == "middle":
+				# change unit acc if the neighbour is a building with no connection to current block
+				if (x_key == "middle" and abs(user_pos.y) > 1.3 * block_width or y_key == "middle" and abs(user_pos.x) > 1.3 * block_width) and self.neighbours[x_key if x_key != "middle" else y_key].building:
+					var vec = dir_unit_vec(self.inverse_key(x_key if x_key != "middle" else y_key))
+					if x_key == "middle" and vec.y * user.velocity.y < 0 or y_key == "middle" and vec.x * user.velocity.x < 0:
+						#unit_acc = vec.rotated(randf_range(-0.5*PI,0.5*PI)) + 2 * vec.rotated(0.5*PI) * randf_range(-2,2)
+						#unit_acc = unit_acc/(unit_acc.length()+1e-5)
+						#
+						#acc_mag_ratio = max(abs(user_pos.x)-1.2 * block_width,abs(user_pos.y)-1.2 * block_width)/0.3*block_width * 3
+						if user.try_block_count_down <= 0:
+							user.try_other_connected_path_blocks = true
+							user.navigate_to_block = null
+						else:
+							user.try_block_count_down -= 1
+					
+			elif x_key != "middle" and y_key != "middle":
+				if self.neighbours[x_key] != null and self.neighbours[x_key].building and self.neighbours[y_key] != null and self.neighbours[y_key].building:
+					if abs(user_pos.x) > 1.3 * block_width or abs(user_pos.y) > 1.3 * block_width:
+						## change unit acc if both sidesare building walls
+						#unit_acc = user_pos.direction_to(Vector2(0,0)).rotated(randf_range(-PI*0.25,PI*0.25))
+						#acc_mag_ratio = max(abs(user_pos.x)-1.2 * block_width,abs(user_pos.y)-1.2 * block_width)/0.3*block_width * 3
+						if user.try_block_count_down <= 0:
+							user.try_other_connected_path_blocks = true
+							user.navigate_to_block = null
+						else:
+							user.try_block_count_down -= 1
+						
+						
+				elif self.neighbours[x_key] != null and self.neighbours[x_key].building:
+					#var vec = dir_unit_vec(self.inverse_key(x_key))
+					#unit_acc = vec.rotated(randf_range(-0.5*PI,0.5*PI)) + 2 * vec.rotated(0.5*PI) * randf_range(-2,2)
+					#unit_acc = unit_acc/(unit_acc.length()+1e-5)
+					#acc_mag_ratio = max(abs(user_pos.x)-1.2 * block_width,abs(user_pos.y)-1.2 * block_width)/0.3*block_width * 3
+					if abs(user_pos.x) > 1.3 * block_width:
+						if user.try_block_count_down <= 0:
+							user.try_other_connected_path_blocks = true
+							user.navigate_to_block = null
+						else:
+							user.try_block_count_down -= 1
+					
+				elif self.neighbours[y_key] != null and self.neighbours[y_key].building:
+					#var vec = dir_unit_vec(self.inverse_key(y_key))
+					#unit_acc = vec.rotated(randf_range(-0.5*PI,0.5*PI)) + 2 * vec.rotated(0.5*PI) * randf_range(-2,2)
+					#unit_acc = unit_acc/(unit_acc.length()+1e-5)
+					#acc_mag_ratio = max(abs(user_pos.x)-1.2 * block_width,abs(user_pos.y)-1.2 * block_width)/0.3*block_width * 3
+					if abs(user_pos.y) > 1.3 * block_width:
+						if user.try_block_count_down <= 0:
+							user.try_other_connected_path_blocks = true
+							user.navigate_to_block = null
+						else:
+							user.try_block_count_down -= 1
+						
 	# when self is fully spaced and user is around center
 	elif self.fully_spaced and user_pos.distance_to(Vector2(0,0)) < 0.9 * 1.5 * block_width:
 		if self.lake and self.lake_shape != null and self.lake_shape != []:
@@ -256,10 +397,10 @@ func update_user_acc(user,max_acc: Vector2):
 				user_angle += 2 * PI
 			var lake_index = int(user_angle/(2*PI/(len(self.lake_shape)-1)))
 			var max_near_radius = max(self.lake_shape[lake_index].length(),self.lake_shape[lake_index+1].length())
-			if user_dis < max_near_radius * max(1.15*(100/self.width),1.15):
+			if user_dis < max_near_radius * max(1.1*(100/self.width),1.1):
 				unit_acc = user_pos/(user_pos.length()+1e-5)
 				acc_mag_ratio = max(pow((max_near_radius * max(1.15*(100/self.width),1.15))/user_dis,2),2)
-			elif user_dis < max_near_radius * max(1.25*(100/self.width),1.25):
+			elif user_dis < max_near_radius * max(1.1*(100/self.width),1.1):
 				var user_dir = user_pos.angle()
 				unit_acc = Vector2(1,0).rotated(randf_range(user_dir-0.5*PI, user_dir+0.5*PI))
 			else:
@@ -383,10 +524,11 @@ func update_user_acc(user,max_acc: Vector2):
 	unit_acc += noise * Vector2(1,0).rotated(randf_range(0,2*PI))
 	
 	# normalize the unit acceleration vector
-	unit_acc = unit_acc / unit_acc.length()
+	if unit_acc.length() > 0:
+		unit_acc = unit_acc / unit_acc.length()
 	
 	# make a magnitude for tne accleration
-	var acc = unit_acc * randi_range(0,acc_mag_ratio*max_acc.length())
+	var acc = unit_acc * randf_range(0,acc_mag_ratio*max_acc.length())
 	
 	# limit acceleration to a specific range
 	if acc.length() > max_acc.length():

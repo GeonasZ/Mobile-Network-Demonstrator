@@ -263,12 +263,16 @@ func connect_true_false_path(path_block):
 				path_block.path_connectivity[key] = true
 				return
 		
-func connect_fully_spaced_neighbours(path_block):
+func connect_fully_spaced_neighbours(path_block, ignore_building_diff=true):
 	# dont do anything if the block is not connected at all.
 	if not path_block.at_least_connected():
 		return
 	# try to connect the block with its fully-spaced neighbours
 	for key in path_block.path_connectivity:
+		# do not connect the two blocks if one block is building but its neighbour is not,
+		# and vice versa.
+		if not ignore_building_diff and path_block.neighbours[key] != null and path_block.building != path_block.neighbours[key].building:
+			continue
 		if path_block.fully_spaced and path_block.neighbours[key] != null and path_block.neighbours[key].fully_spaced:
 			path_block.path_connectivity[key] = true
 			path_block.neighbours[key].path_connectivity[path_block.inverse_key(key)] = true
@@ -285,6 +289,7 @@ func globally_maintain_path_map():
 						path_block.path_connectivity[key] = null
 					elif path_block.neighbours[key] != null and path_block.neighbours[key].fully_spaced and path_block.neighbours[key].path_connectivity[path_block.inverse_key(key)] != true:
 						path_block.path_connectivity[key] = null
+						path_block.neighbours[key].path_connectivity[path_block.inverse_key(key)] = null
 				elif path_block.path_connectivity[key] == false:
 					if path_block.neighbours[key] != null and path_block.neighbours[key].path_connectivity[path_block.inverse_key(key)] == false or path_block.neighbours[key] == null:
 						path_block.path_connectivity[key] = null
@@ -502,6 +507,17 @@ func spawn_buildings():
 			n_building += 1
 			block.fully_spaced = true
 			block.building = true
+			for key in block.path_connectivity:
+				if block.path_connectivity[key] == false:
+					if randi_range(0,99) < 10:
+						block.path_connectivity[key] = true
+						block.neighbours[key].path_connectivity[block.inverse_key(key)] = true
+					else:
+						block.path_connectivity[key] = null
+						block.neighbours[key].path_connectivity[block.inverse_key(key)] = null
+					
+			
+			
 		buildings.pop_at(i)
 			
 func make_path_block(pos):
@@ -558,8 +574,9 @@ func make_map(width,start:Vector2,end:Vector2):
 	
 	for row2 in self.path_blocks:
 		for block in row2:
-			connect_fully_spaced_neighbours(block)
-	
+			connect_fully_spaced_neighbours(block,false)
+			
+	globally_maintain_path_map()
 
 	path_layer.redraw()
 	#print(len(self.path_blocks)*len(self.path_blocks[0]))

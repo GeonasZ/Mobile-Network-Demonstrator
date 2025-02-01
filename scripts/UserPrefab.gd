@@ -68,6 +68,11 @@ var previous_under_analysis = false
 var signal_power_hist = []
 var sir_hist = []
 
+var try_other_connected_path_blocks = false
+var navigate_to_block = null
+var try_block_count_down = 100
+var x_key_first = true
+
 func _draw():
 	# draw body
 	draw_line(Vector2(0,-feet_height), Vector2(0,-height), Color8(0,0,0), width)
@@ -249,13 +254,21 @@ func user_speed_protect(with_buffer_space = false):
 	# x speed check
 	if self.position.x < x_lim[0] and self.velocity.x < 0:
 		self.velocity.x = -self.velocity.x
+		if try_block_count_down > 0:
+			self.try_block_count_down -= 1
 	elif self.position.x > x_lim[1] and self.velocity.x > 0:
 		self.velocity.x = -self.velocity.x
+		if try_block_count_down > 0:
+			self.try_block_count_down -= 1
 	# y speed check
 	if self.position.y < y_lim[0] and self.velocity.y < 0:
 		self.velocity.y = -self.velocity.y
+		if try_block_count_down > 0:
+			self.try_block_count_down -= 1
 	elif self.position.y > y_lim[1] and self.velocity.y > 0:
 		self.velocity.y = -self.velocity.y
+		if try_block_count_down > 0:
+			self.try_block_count_down -= 1
 
 func random_move(delta):
 	boundary.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -287,21 +300,31 @@ func random_move(delta):
 	self.velocity += self.penalty_lr * self.eval_motion_penalty()
 
 func path_move(delta):
+	var do_penalty = true
 	var block = self.path_controller.in_which_block(self.global_position)
-		
 	var acc = block.update_user_acc(self,self.max_acc)
 	self.velocity += acc
+
+	self.user_speed_protect(true)
+	# move a step
+	#self.position += (self.velocity) * delta
+	
+	block.avoid_user_hitting_building_walls_from_outside(self)
+	block.avoid_user_walk_in_lake(self,max(self.velocity.length(),10))
+	
 	# limit the speed within a specific range
 	if self.velocity.length() > self.max_velocity * self.height/ref_height:
 		self.velocity = self.velocity / self.velocity.length() * self.max_velocity * self.height/ref_height
 	
-	self.user_speed_protect(true)
-	# move a step
-	#self.position += (self.velocity) * delta
-	self.position += (self.velocity+self.eval_motion_penalty()) * delta
+	if do_penalty:
+		self.position += (self.velocity+self.eval_motion_penalty()) * delta
+	else:
+		self.position += self.velocity * delta
 	
 	# learn from penalty
 	self.velocity += self.penalty_lr * self.eval_motion_penalty()
+	
+	
 	
 func set_boundary_color_red():
 	boundary.rect_color = Color8(255,0,0)

@@ -46,6 +46,7 @@ func initialize():
 		edit.initialize()
 
 func open_config_with_anime():
+	anime_player.set_animation_init_pos()
 	function_panel.disable_all_keyboard_input()
 	if station_config_panel.visible:
 		await station_config_panel.disappear(true)
