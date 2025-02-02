@@ -166,7 +166,10 @@ func avoid_user_walk_in_lake(user,speed):
 			var lake_index = int(user_angle/(2*PI/(len(self.lake_shape)-1)))
 			var max_near_radius = max(self.lake_shape[lake_index].length(),self.lake_shape[lake_index+1].length())
 			if user_dis < max_near_radius + 2:
-				user.velocity = Vector2(0,0).direction_to(user_pos) * speed * randf_range(0.95,1.05)
+				if abs(user_pos.angle_to(user.velocity)) < PI/10:
+					user.velocity = user.velocity.rotated(randf_range(-PI/10,PI/10))
+				else:
+					user.velocity = Vector2(0,0).direction_to(user_pos) * speed * randf_range(0.95,1.05)
 				
 func nearest_connected_block(user):
 	var count: int = 1
