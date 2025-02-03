@@ -167,7 +167,8 @@ func avoid_user_walk_in_lake(user,speed):
 			var max_near_radius = max(self.lake_shape[lake_index].length(),self.lake_shape[lake_index+1].length())
 			if user_dis < max_near_radius + 2:
 				if abs(user_pos.angle_to(user.velocity)) < PI/10:
-					user.velocity = user.velocity.rotated(randf_range(-PI/10,PI/10))
+					var bonus = (PI/10-abs(user_pos.angle_to(user.velocity)))*0.7
+					user.velocity = user.velocity.rotated(randf_range(-PI/360-bonus,PI/360+bonus))
 				else:
 					user.velocity = Vector2(0,0).direction_to(user_pos) * speed * randf_range(0.95,1.05)
 				
