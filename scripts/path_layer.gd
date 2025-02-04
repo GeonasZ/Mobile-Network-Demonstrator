@@ -35,7 +35,7 @@ func cubic_value_limit(current_x,start_x,start_y,end_x,end_y):
 ## return [actual max radius of the lake, a list containing all points to draw the lake]
 func draw_circle_lake(origin:Vector2, ref_radius:float, max_radius, min_radius, border_width,noise_factor=35, noise_spread=1e-3):
 	var lake_color = Color8(100,100,220,170)
-	var lake_border_color = Color8(0,0,255,170)
+	var lake_border_color = Color(0.3,0.3,0.3,0.8)#Color8(0,0,255,170)
 	var noise_obj = FastNoiseLite.new()
 	var start_rad = randf_range(-PI,PI)
 	var max_ref_diff = max_radius - ref_radius

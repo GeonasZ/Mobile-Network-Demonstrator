@@ -3,7 +3,7 @@ extends LineEdit
 @onready var tile_controller = $"../../../../../Controllers/TileController"
 @onready var father_node = $".."
 
-var max_value = 100
+var max_value = 1000
 var min_value = 1
 
 var legal_characters = ["0","1","2","3","4","5","6","7","8","9"]
