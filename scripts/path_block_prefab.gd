@@ -23,7 +23,7 @@ var width = 240
 var building_color = Color(0.5,0.5,0.5,0.6)
 var building_wall_color = Color(0.3,0.3,0.3,0.8)
 var lawn_color = Color(0.4,0.8,0.4,0.5)
-var lawn_edge_color = Color(0.,0.2,0.,0.6)
+var lawn_edge_color = Color(0.05,0.25,0.05,0.6)
 var path_line_width = 5
 # each value should be either true, false or null
 var path_connectivity = {"right":null,"left":null,

@@ -47,6 +47,7 @@ func _draw():
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	self.visible = false
 	self.size = Vector2(self.length,self.width)
 	self.pivot_offset = Vector2(self.length/2,self.width/2)
 	self.position = Vector2((1920-self.length)/2,(1080-self.width)/2)

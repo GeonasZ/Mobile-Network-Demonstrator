@@ -40,17 +40,21 @@ func _ready():
 					Vector2(-length/2, width/2 - slash_len),
 					Vector2(-length/2, -width/2 + slash_len)]
 	self.color = Color(255,255,255)
-	title_label.position = Vector2(-title_label.size.x/2, -0.44*width)
-	content_label.position = Vector2(-title_label.size.x/2, -0.3*width)
+	title_label.position = Vector2(-title_label.size.x/2, -0.46*width)
+	content_label.position = Vector2(-title_label.size.x/2, -0.36*width)
 	content_label.text = "[center][b]Welcome to the mobile network demonstrator[/b][/center]
-Here are some basic instructions to help you get familiar with this program.
-[b]Left Click[/b] on the main page to add a user to the field.
-[b]Right Click[/b] on the main page to show /hide the panel following your mouse.
-[b]Left Click[/b] on the instruction panel button to open this page again.
+[u]Here are some basic instructions to help you start with this program.[/u]
+[b]Left Click[/b] on the map to add a user to the field.
+[b]Right Click[/b] on the map to show /hide the panel following your mouse.
+[b]Hover[/b] on the buttons on the righthand side to see their functions.
+[b]Left Click[/b] on the buttons to use.
 [b]Left Click[/b] on the observer mode button to enter observer mode.
-[b]Observer Mode:[/b] In this mode, the users do not move and you can see their information
-by move the cursor to them. Also, you can left click on any user to contineously illustrate the user's information "
-"even out of this mode. Right click anywhere to quit this function."
+[b]Hover[/b] on the base station to see its detailed information.
+[b]Left Click[/b] on the base station to track the realtime station information.
+[b]Hover[/b] on the user to see their detailed information in observer mode.
+[b]Left Click[/b] on the user to track their realtime information in observer mode.
+
+[center][b]More functionalities to be found......[/b][/center]"
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
