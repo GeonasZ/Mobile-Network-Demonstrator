@@ -12,6 +12,7 @@ var anime_indicate_line_color = Color8(70,70,70,200)
 @onready var user_controller = $"../Controllers/UserController"
 @onready var analysis_panel = $"../AnalysisPanel"
 @onready var station_config_panel = $"../StationConfigPanel"
+@onready var ui_config_panel = $"../UIConfigPanel"
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -30,7 +31,7 @@ func _draw() -> void:
 		var station_scale = mouse_controller.current_hex.station_scale
 		if not keep_invisible:
 			# draw a line for mouse and closest station
-			if not analysis_panel.visible and not station_config_panel.visible:
+			if not analysis_panel.visible and not station_config_panel.visible and not ui_config_panel:
 				draw_dashed_line(hex_center, get_local_mouse_position(),dash_line_color,5*station_scale,10*station_scale)
 			# draw directions for each station
 			var station_global_transform

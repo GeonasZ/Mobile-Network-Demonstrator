@@ -9,21 +9,30 @@ var row
 var col
 var lake = false
 var lake_shape
+var lake_rotation
 var building = false
 var max_lake_radius
 var fully_spaced = false
 var no_user_spawn = false
+var width = 240
 
 var x_sub_pos = ["left","middle","right"]
 var y_sub_pos = ["top","middle","bottom"]
 
 var neighbours = {"right":null,"left":null,
 	 			  "top":null,"bottom":null}
-var width = 240
-var building_color = Color(0.5,0.5,0.5,0.6)
-var building_wall_color = Color(0.3,0.3,0.3,0.8)
-var lawn_color = Color(0.4,0.8,0.4,0.5)
-var lawn_edge_color = Color(0.05,0.25,0.05,0.6)
+# toy-like color style
+#var building_color = Color(0.5,0.5,0.5,0.6)
+#var building_wall_color = Color(0.3,0.3,0.3,0.8)
+#var lawn_color = Color(0.4,0.8,0.4,0.5)
+#var lawn_edge_color = Color(0.05,0.25,0.05,0.6)
+# professional color style
+var building_color = Color8(128,128,128,204)
+var building_wall_color = Color8(77,77,77,204)
+var lawn_color = Color8(102,204,102,179)
+var lawn_edge_color = Color8(13,13,13,204)
+var lake_color = Color8(100,100,220)
+var lake_border_color = Color8(0,0,255)
 var path_line_width = 5
 # each value should be either true, false or null
 var path_connectivity = {"right":null,"left":null,
@@ -82,8 +91,8 @@ func inverse_key(key):
 	else:
 		print("PathBlockPrefab<invserse_key>: Invalid Key.")
 	
-func _draw() -> void:
-	pass
+#func _draw() -> void:
+	#pass
 	
 func set_connectivity(right,left,top,bottom):
 	self.path_connectivity["right"] = right
@@ -338,7 +347,6 @@ func update_user_acc(user,max_acc: Vector2):
 				user.navigate_to_block = nearest_connected_block
 				user.try_other_connected_path_blocks = false
 				user.try_block_count_down = 300
-				#print(nearest_connected_block)
 
 			# avoid to walk into the walls of the buildings
 			if x_key == "middle" or y_key == "middle":
@@ -541,8 +549,8 @@ func update_user_acc(user,max_acc: Vector2):
 	
 	return acc
 	
-func redraw():
-	self.queue_redraw()
+#func redraw():
+	#self.queue_redraw()
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:

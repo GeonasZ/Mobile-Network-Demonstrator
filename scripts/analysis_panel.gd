@@ -75,7 +75,6 @@ func set_current_user_by_index(index:int):
 		
 	if index < 0:
 		self.current_user = null
-		# print("AnalysisPanel <set_current_user_by_index>: Negative Index Assignment")
 		return
 
 	self.current_user = user_controller.linear_user_list[index]

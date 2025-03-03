@@ -1,0 +1,114 @@
+[gd_scene load_steps=6 format=3 uid="uid://cfs4htu6cqhvh"]
+
+[ext_resource type="Script" path="res://scripts/color_option_prefab.gd" id="1_c6n5u"]
+[ext_resource type="FontFile" uid="uid://mcshd5gym8b" path="res://fonts/HanSan/SimplifiedCN/SourceHanSansCN-Bold.otf" id="2_i3byy"]
+[ext_resource type="Theme" uid="uid://dwi5koewofdph" path="res://themes/line_edit_color_option_theme.tres" id="3_dmslj"]
+[ext_resource type="Script" path="res://scripts/color_option_edit.gd" id="4_uriic"]
+
+[sub_resource type="Theme" id="Theme_7tp5v"]
+Label/colors/font_color = Color(0, 0, 0, 1)
+Label/font_sizes/font_size = 32
+Label/fonts/font = ExtResource("2_i3byy")
+
+[node name="ColorOptionPrefab" type="HBoxContainer"]
+size_flags_horizontal = 2
+script = ExtResource("1_c6n5u")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 2
+size_flags_horizontal = 0
+theme = SubResource("Theme_7tp5v")
+text = "Undefined Text"
+
+[node name="PlaceHolder" type="Control" parent="."]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="RLabel" type="Label" parent="."]
+layout_mode = 2
+size_flags_horizontal = 0
+theme = SubResource("Theme_7tp5v")
+text = "R"
+
+[node name="REdit" type="LineEdit" parent="."]
+custom_minimum_size = Vector2(70, 60)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+theme = ExtResource("3_dmslj")
+max_length = 3
+expand_to_text_length = true
+context_menu_enabled = false
+virtual_keyboard_enabled = false
+shortcut_keys_enabled = false
+select_all_on_focus = true
+caret_blink = true
+script = ExtResource("4_uriic")
+
+[node name="GLabel" type="Label" parent="."]
+layout_mode = 2
+size_flags_horizontal = 0
+theme = SubResource("Theme_7tp5v")
+text = "G"
+
+[node name="GEdit" type="LineEdit" parent="."]
+custom_minimum_size = Vector2(70, 60)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+theme = ExtResource("3_dmslj")
+max_length = 3
+expand_to_text_length = true
+context_menu_enabled = false
+virtual_keyboard_enabled = false
+shortcut_keys_enabled = false
+select_all_on_focus = true
+caret_blink = true
+script = ExtResource("4_uriic")
+
+[node name="BLabel" type="Label" parent="."]
+layout_mode = 2
+size_flags_horizontal = 0
+theme = SubResource("Theme_7tp5v")
+text = "B"
+
+[node name="BEdit" type="LineEdit" parent="."]
+custom_minimum_size = Vector2(70, 60)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+theme = ExtResource("3_dmslj")
+max_length = 3
+expand_to_text_length = true
+context_menu_enabled = false
+virtual_keyboard_enabled = false
+shortcut_keys_enabled = false
+select_all_on_focus = true
+caret_blink = true
+script = ExtResource("4_uriic")
+
+[node name="ALabel" type="Label" parent="."]
+layout_mode = 2
+size_flags_horizontal = 0
+theme = SubResource("Theme_7tp5v")
+text = "A"
+
+[node name="AEdit" type="LineEdit" parent="."]
+custom_minimum_size = Vector2(70, 60)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+theme = ExtResource("3_dmslj")
+max_length = 3
+expand_to_text_length = true
+context_menu_enabled = false
+virtual_keyboard_enabled = false
+shortcut_keys_enabled = false
+select_all_on_focus = true
+caret_blink = true
+script = ExtResource("4_uriic")
+
+[connection signal="focus_exited" from="REdit" to="REdit" method="_on_focus_exited"]
+[connection signal="focus_exited" from="GEdit" to="GEdit" method="_on_focus_exited"]
+[connection signal="focus_exited" from="BEdit" to="BEdit" method="_on_focus_exited"]
+[connection signal="focus_exited" from="AEdit" to="AEdit" method="_on_focus_exited"]

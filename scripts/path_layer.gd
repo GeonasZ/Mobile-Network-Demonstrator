@@ -1,9 +1,12 @@
 extends Node2D
 
-var background_color = Color(1,1,1,0.3)
+@onready var ui_controller = $"../Controllers/UIStyleController"
+
+var background_color
 
 var lake
 var map_visible = true
+var do_map_shading
 
 func draw_sector(center, radius, start_rad, end_rad, n_points, color):
 	# create a point list for the sector
@@ -84,15 +87,16 @@ func draw_circle_lake(origin:Vector2, ref_radius:float, max_radius, min_radius, 
 	return [actual_max_radius, points]
 	
 func draw_block_stored_lake(block, border_width):
-	var lake_color = Color8(100,100,220)
-	var lake_border_color = Color8(0,0,255)
+	var lake_color = block.lake_color
+	var lake_border_color = block.lake_border_color
 	draw_polyline(block.lake_shape,lake_border_color,border_width)
 	draw_colored_polygon(block.lake_shape,lake_color)
 	
 		
 func _draw() -> void:
 	# draw the background of blocks
-	draw_rect(Rect2(Vector2(0,0),Vector2(1920,1080)),background_color,true)
+	if self.do_map_shading:
+		draw_rect(Rect2(Vector2(0,0),Vector2(1920,1080)),background_color,true)
 	if not map_visible:
 		return
 	# draw all children
@@ -112,7 +116,6 @@ func _draw() -> void:
 		# set draw transform to default
 		draw_set_transform(block.position,0)
 		
-
 		# fully-spaced block style
 		if block.fully_spaced:
 			pass
@@ -179,12 +182,15 @@ func _draw() -> void:
 				if block.lake:
 					var ref_lake_radius = 100
 					var lake_scale = Vector2(block.width/3./ref_lake_radius,block.width/3./ref_lake_radius)
-					draw_set_transform(block.position,randf_range(0,2*PI), lake_scale)
 					if block.lake_shape == null:
+						var lake_rotation = randf_range(0,2*PI)
+						block.lake_rotation = lake_rotation
+						draw_set_transform(block.position,lake_rotation, lake_scale)
 						var temp = draw_circle_lake(Vector2(0,0), ref_lake_radius*0.75, ref_lake_radius*1, ref_lake_radius*0.5, 5)
 						block.max_lake_radius = temp[0] * lake_scale.x
 						block.lake_shape = temp[1]
 					else:
+						draw_set_transform(block.position,block.lake_rotation, lake_scale)
 						draw_block_stored_lake(block, 5)
 						
 			# if no access is allowed to the block
@@ -307,7 +313,8 @@ func _draw() -> void:
 		
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass # Replace with function body.
+	self.background_color = ui_controller.map_shading_color
+	self.do_map_shading = ui_controller.default_map_shading
 
 func redraw():
 	self.queue_redraw()

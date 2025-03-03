@@ -1,5 +1,15 @@
 extends Control
 
+@onready var station_config = $"../../StationConfigPanel"
+@onready var gathered_tiles = $"../../GatheredTiles"
+@onready var user_controller = $"../UserController"
+@onready var mouse_panel = $"../../MousePanel"
+@onready var mouse_controller = $"../../Controllers/MouseController"
+@onready var freq_reuse_button = $"../../FunctionPanel/FreqReuseButton"
+@onready var station_config_panel = $"../../StationConfigPanel"
+@onready var path_controller = $"../PathController"
+@onready var ui_controller = $"../UIStyleController"
+
 const network_type = ["GSM","UMTS","HSPA","LTE","NR"]
 const sqrt3 = 1.732
 
@@ -14,29 +24,15 @@ var station_number = 0
 var decay = 0.1
 var building_decay = 2
 
-var tile_color_dict = {"blue":Color8(173,216,230),"violet":Color8(198,164,232), 
-"red":Color8(180,248,245), "yellow":Color8(255,255,224), "purple":Color8(230,230,250),
-"mint_mist":Color8(230,255,230),"gray":Color8(211,211,211), "cyan": Color8(224,255,255),
-"coral":Color8(250,209,175),"gold": Color8(240,230,140),"green":Color8(152,251,152),
-"lavender":Color8(255,240,245)}
-
-var tile_color_list = [Color8(173,216,230),Color8(198,164,232),
-Color8(255,182,193), Color8(255,255,224),Color8(230,230,250), 
-Color8(230,255,230), Color8(211,211,211),Color8(224,255,255),
-Color8(250,209,175),Color8(240,230,140),Color8(152,251,152), 
-Color8(255,240,245)]
+# store the colors of the cells
+var tile_color_list = []
+var tile_border_color
 
 var frequency_group = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"]
+var frequency_group_dict = {"A":0, "B":1, "C":2, "D":3, "E":4, "F":5, "G":6, "H":7, "I":8, "J":9, "K":10, "L":11}
 var hex_frequency_dict = {}
 var hex_tile_prefab = null
-@onready var station_config = $"../../StationConfigPanel"
-@onready var gathered_tiles = $"../../GatheredTiles"
-@onready var user_controller = $"../UserController"
-@onready var mouse_panel = $"../../MousePanel"
-@onready var mouse_controller = $"../../Controllers/MouseController"
-@onready var freq_reuse_button = $"../../FunctionPanel/FreqReuseButton"
-@onready var station_config_panel = $"../../StationConfigPanel"
-@onready var path_controller = $"../PathController"
+
 var hex_list = []
 
 ## not in use
@@ -82,6 +78,12 @@ func all_tile_safely_reallocate_channels():
 			else:
 				tile_safely_reallocate_channels(current_hex,int(self.total_channel_number / freq_reuse_button.current_pattern)+self.total_channel_number%freq_reuse_button.current_pattern)
 
+func all_tile_update_color():
+	for row in self.hex_list:
+		for station in row:
+			station.color = tile_color_list[self.frequency_group_dict[station.frequency_group]]
+			station.set_border_color(self.tile_border_color)
+			station.redraw_tile()
 
 ## evaluate the signal angle of a station which contains the most users
 ## within a given angle size.
@@ -175,6 +177,7 @@ func make_tile(pos:Vector2,arc_len:int=0,n_channel:int=7,antenna_type=null):
 	current_hex.set_arc_len(tile_len)
 	current_hex.set_id(station_number)
 	current_hex.set_channel_number(n_channel)
+	current_hex.set_border_color(self.tile_border_color)
 	current_hex.initialize(self.mouse_panel,self.station_config_panel, self.path_controller, self)
 	if antenna_type == null:
 		var rand_num = randi_range(0,3)
@@ -409,6 +412,8 @@ func initialize_map(tile_length:int=0,total_channel:int=24,init_freq_pattern=tru
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	hex_tile_prefab = preload("res://scenes/hex_tile.tscn")
+	self.tile_color_list = ui_controller.default_tile_color_list
+	self.tile_border_color = ui_controller.default_cell_border_color
 	# randomly initialize a network map
 	initialize_map(arc_len)
 

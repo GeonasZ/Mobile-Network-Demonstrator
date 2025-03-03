@@ -1,4 +1,4 @@
-[gd_scene load_steps=127 format=3 uid="uid://dp7br0wc03w8r"]
+[gd_scene load_steps=160 format=3 uid="uid://dp7br0wc03w8r"]
 
 [ext_resource type="Script" path="res://scripts/UserController.gd" id="1_18gww"]
 [ext_resource type="Script" path="res://scripts/TileController.gd" id="1_fg5v7"]
@@ -10,6 +10,7 @@
 [ext_resource type="Script" path="res://scripts/GatheredTiles.gd" id="4_6s6fj"]
 [ext_resource type="Theme" uid="uid://c47dh1lxfotbp" path="res://themes/rich_text_title.tres" id="4_e7qlr"]
 [ext_resource type="Script" path="res://scripts/path_controller.gd" id="4_fefr6"]
+[ext_resource type="Script" path="res://scripts/ui_style_controller.gd" id="5_2anvb"]
 [ext_resource type="Script" path="res://scripts/FunctionLabel.gd" id="6_0kpw6"]
 [ext_resource type="Shader" path="res://shader/path_map.gdshader" id="6_0rd32"]
 [ext_resource type="Script" path="res://scripts/InstructionPanel_AnimationPlayer.gd" id="6_65c8k"]
@@ -59,6 +60,7 @@
 [ext_resource type="Script" path="res://scripts/path_width_line_edit.gd" id="34_lhma1"]
 [ext_resource type="Script" path="res://scripts/analysis_mode_button.gd" id="41_hdmb4"]
 [ext_resource type="Script" path="res://scripts/analysis_panel_button.gd" id="42_ijebh"]
+[ext_resource type="Theme" uid="uid://c2adg56u5r570" path="res://fonts/pre_set_theme/button_median_large_font.tres" id="47_2idwk"]
 [ext_resource type="Script" path="res://scripts/generate_map_button.gd" id="48_rxbyv"]
 [ext_resource type="Script" path="res://scripts/analysis_panel.gd" id="49_07ke4"]
 [ext_resource type="Script" path="res://scripts/results_panel.gd" id="50_dmgx5"]
@@ -73,6 +75,11 @@
 [ext_resource type="Script" path="res://scripts/n_plot_data_edit.gd" id="57_11oek"]
 [ext_resource type="Script" path="res://scripts/plot_select_button.gd" id="57_pr2yt"]
 [ext_resource type="Script" path="res://scripts/analysis_panel_analysis_button.gd" id="60_dcd47"]
+[ext_resource type="Script" path="res://scripts/ui_style_button.gd" id="60_oocks"]
+[ext_resource type="Script" path="res://scripts/ui_config_panel.gd" id="76_g0ii2"]
+[ext_resource type="Script" path="res://scripts/ui_config_panel_scroll_container.gd" id="78_fkqif"]
+[ext_resource type="Script" path="res://scripts/ui_config_confirm_button.gd" id="79_dxic1"]
+[ext_resource type="Script" path="res://scripts/ui_config_undo_button.gd" id="80_ao6gy"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_u15il"]
 shader = ExtResource("6_0rd32")
@@ -798,6 +805,289 @@ _data = {
 "panel_disappear": SubResource("Animation_tjct7")
 }
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_gqjw2"]
+shader = ExtResource("54_kk55c")
+
+[sub_resource type="Animation" id="Animation_86gsj"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_fvffc"]
+resource_name = "appear"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(0.203063, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_ie7er"]
+resource_name = "disappear"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(5.09824, 1),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_7bpxu"]
+_data = {
+"RESET": SubResource("Animation_86gsj"),
+"appear": SubResource("Animation_fvffc"),
+"disappear": SubResource("Animation_ie7er")
+}
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_04r2x"]
+bg_color = Color(1, 1, 1, 0)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+expand_margin_left = 5.0
+expand_margin_top = 5.0
+expand_margin_right = 5.0
+expand_margin_bottom = 5.0
+
+[sub_resource type="Theme" id="Theme_jsg38"]
+Panel/styles/panel = SubResource("StyleBoxFlat_04r2x")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_k3sph"]
+bg_color = Color(1, 1, 1, 0)
+border_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bf210"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h13i4"]
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8njxj"]
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cw2uh"]
+bg_color = Color(0.848905, 0.848906, 0.848905, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_otrbc"]
+bg_color = Color(0.769432, 0.769432, 0.769432, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="Theme" id="Theme_et2rq"]
+ScrollContainer/styles/panel = SubResource("StyleBoxFlat_k3sph")
+VScrollBar/styles/grabber = SubResource("StyleBoxFlat_bf210")
+VScrollBar/styles/grabber_highlight = SubResource("StyleBoxFlat_h13i4")
+VScrollBar/styles/grabber_pressed = SubResource("StyleBoxFlat_8njxj")
+VScrollBar/styles/scroll = SubResource("StyleBoxFlat_cw2uh")
+VScrollBar/styles/scroll_focus = SubResource("StyleBoxFlat_otrbc")
+
+[sub_resource type="Theme" id="Theme_7ytme"]
+GridContainer/constants/h_separation = 80
+GridContainer/constants/v_separation = 40
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_o1bjy"]
+bg_color = Color(0.710741, 0.710741, 0.710741, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ejihp"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0djqu"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8381c"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_n1oeq"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nca6j"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="Theme" id="Theme_teoj2"]
+Button/styles/disabled = SubResource("StyleBoxFlat_o1bjy")
+Button/styles/focus = SubResource("StyleBoxFlat_ejihp")
+Button/styles/hover = SubResource("StyleBoxFlat_0djqu")
+Button/styles/normal = SubResource("StyleBoxFlat_8381c")
+Button/styles/pressed = SubResource("StyleBoxFlat_n1oeq")
+Panel/styles/panel = SubResource("StyleBoxFlat_nca6j")
+
+[sub_resource type="Animation" id="Animation_liw5r"]
+resource_name = "appear"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(0.203063, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_ibyx5"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_3onv6"]
+resource_name = "disappear"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(5.09824, 1),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(1e-05, 1e-05)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_6m2a3"]
+_data = {
+"RESET": SubResource("Animation_ibyx5"),
+"appear": SubResource("Animation_liw5r"),
+"disappear": SubResource("Animation_3onv6")
+}
+
 [node name="MainRoot" type="Control"]
 layout_mode = 3
 anchors_preset = 0
@@ -828,6 +1118,12 @@ anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 script = ExtResource("4_fefr6")
+
+[node name="UIStyleController" type="Control" parent="Controllers"]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("5_2anvb")
 
 [node name="GatheredTiles" type="Control" parent="."]
 anchors_preset = 0
@@ -1885,6 +2181,56 @@ libraries = {
 "": SubResource("AnimationLibrary_i6iwl")
 }
 
+[node name="UIStyleButton" type="Control" parent="FunctionPanel"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+scale = Vector2(1e-05, 1e-05)
+script = ExtResource("60_oocks")
+
+[node name="Char" type="Label" parent="FunctionPanel/UIStyleButton"]
+layout_mode = 0
+offset_right = 47.0
+offset_bottom = 88.0
+pivot_offset = Vector2(0, 40)
+theme = ExtResource("47_2idwk")
+text = "UI"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("13_wkp48")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="FunctionPanel/UIStyleButton"]
+libraries = {
+"": SubResource("AnimationLibrary_it6wr")
+}
+
+[node name="FunctionLabel" type="Control" parent="FunctionPanel/UIStyleButton"]
+anchors_preset = 0
+offset_left = -20.0
+offset_top = 48.0
+offset_right = 20.0
+offset_bottom = 88.0
+scale = Vector2(1e-05, 1e-05)
+script = ExtResource("6_0kpw6")
+
+[node name="Label" type="Label" parent="FunctionPanel/UIStyleButton/FunctionLabel"]
+layout_mode = 0
+offset_left = 1.696e+08
+offset_top = 1.43e+07
+offset_right = 1.696e+08
+offset_bottom = 1.43001e+07
+theme = ExtResource("11_8l076")
+theme_override_font_sizes/font_size = 26
+text = "UI Style Config"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="FunctionPanel/UIStyleButton/FunctionLabel"]
+libraries = {
+"": SubResource("AnimationLibrary_i6iwl")
+}
+
 [node name="AnalysisPanel" type="Control" parent="."]
 visible = false
 z_index = 2
@@ -1917,7 +2263,7 @@ script = ExtResource("52_t6j7q")
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 23.0
-theme = ExtResource("25_x1dja")
+theme = ExtResource("47_2idwk")
 text = "Unexistent User ID"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -2188,6 +2534,84 @@ offset_left = -1000.0
 offset_top = -600.0
 offset_right = 1000.0
 offset_bottom = 480.0
+
+[node name="UIConfigPanel" type="Control" parent="."]
+material = SubResource("ShaderMaterial_gqjw2")
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("76_g0ii2")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="UIConfigPanel"]
+libraries = {
+"": SubResource("AnimationLibrary_7bpxu")
+}
+
+[node name="Title" type="Label" parent="UIConfigPanel"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+theme = ExtResource("13_22qid")
+text = "UI Style Configuration"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ScrollContainerBorder" type="Panel" parent="UIConfigPanel"]
+layout_mode = 2
+theme = SubResource("Theme_jsg38")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="UIConfigPanel"]
+layout_mode = 0
+offset_right = 12.0
+offset_bottom = 12.0
+mouse_filter = 0
+theme = SubResource("Theme_et2rq")
+horizontal_scroll_mode = 0
+script = ExtResource("78_fkqif")
+
+[node name="GridContainer" type="GridContainer" parent="UIConfigPanel/ScrollContainer"]
+layout_mode = 2
+theme = SubResource("Theme_7ytme")
+columns = 2
+
+[node name="ConfirmButton" type="Panel" parent="UIConfigPanel"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+theme = SubResource("Theme_teoj2")
+script = ExtResource("79_dxic1")
+
+[node name="Label" type="Label" parent="UIConfigPanel/ConfirmButton"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+theme = ExtResource("25_x1dja")
+theme_override_font_sizes/font_size = 40
+text = "Confirm"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="UndoButton" type="Panel" parent="UIConfigPanel"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+theme = SubResource("Theme_teoj2")
+script = ExtResource("80_ao6gy")
+
+[node name="Label" type="Label" parent="UIConfigPanel/UndoButton"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+theme = ExtResource("25_x1dja")
+theme_override_font_sizes/font_size = 40
+text = "Undo"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="UIConfigPanel/UndoButton"]
+libraries = {
+"": SubResource("AnimationLibrary_6m2a3")
+}
 
 [connection signal="timeout" from="Controllers/UserController/AnalysisSamplingTimer" to="Controllers/UserController" method="_on_analysis_sampling_timer_timeout"]
 [connection signal="mouse_left_click_on_background" from="GatheredTiles" to="StationConfigPanel" method="_on_gathered_tiles_mouse_left_click_on_background"]

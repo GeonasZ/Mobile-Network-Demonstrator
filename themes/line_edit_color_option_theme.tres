@@ -1,6 +1,6 @@
-[gd_resource type="Theme" load_steps=4 format=3 uid="uid://d02m7xdisdkhi"]
+[gd_resource type="Theme" load_steps=4 format=3 uid="uid://dwi5koewofdph"]
 
-[ext_resource type="FontFile" uid="uid://mcshd5gym8b" path="res://fonts/HanSan/SimplifiedCN/SourceHanSansCN-Bold.otf" id="1_j45q1"]
+[ext_resource type="FontFile" uid="uid://mcshd5gym8b" path="res://fonts/HanSan/SimplifiedCN/SourceHanSansCN-Bold.otf" id="1_5whrt"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5tryi"]
 bg_color = Color(1, 1, 1, 1)
@@ -15,6 +15,7 @@ corner_radius_bottom_right = 16
 corner_radius_bottom_left = 16
 expand_margin_left = 4.0
 expand_margin_top = 2.0
+expand_margin_right = 2.0
 expand_margin_bottom = 2.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vy4eu"]
@@ -30,15 +31,16 @@ corner_radius_bottom_right = 16
 corner_radius_bottom_left = 16
 expand_margin_left = 4.0
 expand_margin_top = 2.0
+expand_margin_right = 2.0
 expand_margin_bottom = 2.0
 
 [resource]
 LineEdit/colors/caret_color = Color(0, 0, 0, 1)
 LineEdit/colors/font_color = Color(0, 0, 0, 1)
 LineEdit/colors/selection_color = Color(0.346569, 0.346569, 0.346569, 1)
-LineEdit/constants/caret_width = 2
-LineEdit/constants/minimum_character_width = 4
+LineEdit/constants/caret_width = 4
+LineEdit/constants/minimum_character_width = 2
 LineEdit/font_sizes/font_size = 32
-LineEdit/fonts/font = ExtResource("1_j45q1")
+LineEdit/fonts/font = ExtResource("1_5whrt")
 LineEdit/styles/focus = SubResource("StyleBoxFlat_5tryi")
 LineEdit/styles/normal = SubResource("StyleBoxFlat_vy4eu")

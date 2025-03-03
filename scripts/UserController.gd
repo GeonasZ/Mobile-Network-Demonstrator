@@ -9,6 +9,7 @@ extends Control
 @onready var sampling_timer = $AnalysisSamplingTimer
 @onready var function_panel = $"../../FunctionPanel"
 @onready var path_layer = $"../../PathLayer"
+@onready var ui_config_panel = $"../../UIConfigPanel"
 const sqrt3 = 1.732
 var user_prefab = null
 # initialize in tile controller when hex_list gets initialized
@@ -37,8 +38,8 @@ func initialize_user_system(user_height):
 	current_available_user_id = 0
 	self.user_height = user_height
 
-func add_user(pos,out_of_dead_zone=false):
-	if obs_button.analysis_on or engineer_button.button_mode == engineer_button.Mode.ENGINEER:
+func add_user(pos,out_of_dead_zone=false, force=false):
+	if not force and (obs_button.analysis_on or engineer_button.button_mode == engineer_button.Mode.ENGINEER or ui_config_panel.visible):
 		return
 	
 	var current_user = user_prefab.instantiate()
@@ -82,7 +83,7 @@ func random_add_user(n_user:int,out_of_dead_zone=false):
 	var user_pos
 	for i in range(n_user):
 		user_pos = Vector2(randi_range(0.05*1920,0.95*1920),randi_range(0.05*1080,0.95*1080))
-		self.add_user(user_pos, out_of_dead_zone)
+		self.add_user(user_pos, out_of_dead_zone, true)
 
 func remove_user(user,index_in_linear_user_list=null):
 	var user_connection_stat = "connected" if user.connected_channel != null else "disconnected"
@@ -279,7 +280,6 @@ func eval_user_sir(user):
 				if path_layer.map_visible:
 					interference_power += user_hex.eval_signal_pow_to_user(user)
 				else:
-					print("asd")
 					interference_power += user_hex.eval_signal_pow_to_user(user, tile_controller.get_decay())
 					
 	interference_power -= signal_power

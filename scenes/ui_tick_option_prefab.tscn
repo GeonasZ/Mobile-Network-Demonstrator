@@ -1,0 +1,56 @@
+[gd_scene load_steps=8 format=3 uid="uid://dtt05eom67rv5"]
+
+[ext_resource type="Script" path="res://scripts/ui_config_panel_tick_option_prefab.gd" id="1_fos2o"]
+[ext_resource type="FontFile" uid="uid://mcshd5gym8b" path="res://fonts/HanSan/SimplifiedCN/SourceHanSansCN-Bold.otf" id="2_p5wog"]
+[ext_resource type="Script" path="res://scripts/ui_config_panel_tick_button.gd" id="3_s4l4f"]
+[ext_resource type="Theme" uid="uid://gsrgqfr8u6nt" path="res://fonts/pre_set_theme/button_median_font.tres" id="4_m3shd"]
+
+[sub_resource type="Theme" id="Theme_4wb87"]
+Label/colors/font_color = Color(0, 0, 0, 1)
+Label/font_sizes/font_size = 32
+Label/fonts/font = ExtResource("2_p5wog")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_n8sf2"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="Theme" id="Theme_3vvsg"]
+Panel/styles/panel = SubResource("StyleBoxFlat_n8sf2")
+
+[node name="TickOptionPrefab" type="HBoxContainer"]
+script = ExtResource("1_fos2o")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 2
+size_flags_horizontal = 0
+theme = SubResource("Theme_4wb87")
+text = "Undefined Text"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PlaceHolder" type="Control" parent="."]
+layout_mode = 2
+
+[node name="Button" type="Panel" parent="."]
+layout_mode = 2
+size_flags_horizontal = 4
+theme = SubResource("Theme_3vvsg")
+script = ExtResource("3_s4l4f")
+
+[node name="Label" type="Label" parent="Button"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+theme = ExtResource("4_m3shd")
+theme_override_font_sizes/font_size = 40
+text = "ON"
+horizontal_alignment = 1
+vertical_alignment = 1

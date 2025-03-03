@@ -15,6 +15,7 @@ var network_type = ""
 var n_available_channel = 7
 var station_scale = 1
 var id
+var border_color  = Color8(40,40,40)
 # used to decide the mouse position respect to the tile itself
 
 var mouse_position_in_tile = Vector2(0,0)
@@ -57,12 +58,12 @@ var next_proporgation = true
 func _draw():
 	var width = int(arc_len / 100.)
 	# draw hexagon
-	draw_line(Vector2(-1./2*arc_len,-sqrt(3)/2*arc_len),Vector2(1./2*arc_len,-sqrt(3)/2*arc_len), Color8(210,210,210), width, true)
-	draw_line(Vector2(1./2*arc_len,-sqrt(3)/2*arc_len),Vector2(arc_len,0), Color8(210,210,210), width, true)
-	draw_line(Vector2(arc_len,0),Vector2(1./2*arc_len,sqrt(3)/2*arc_len), Color8(210,210,210), width, true)
-	draw_line(Vector2(1./2*arc_len,sqrt(3)/2*arc_len),Vector2(-1./2*arc_len,sqrt(3)/2*arc_len), Color8(210,210,210), width, true)
-	draw_line(Vector2(-1./2*arc_len,sqrt(3)/2*arc_len),Vector2(-arc_len, 0), Color8(210,210,210), width, true)
-	draw_line(Vector2(-arc_len, 0),Vector2(-1./2*arc_len,-sqrt(3)/2*arc_len), Color8(210,210,210), width, true)
+	draw_line(Vector2(-1./2*arc_len,-sqrt(3)/2*arc_len),Vector2(1./2*arc_len,-sqrt(3)/2*arc_len), border_color, width, true)
+	draw_line(Vector2(1./2*arc_len,-sqrt(3)/2*arc_len),Vector2(arc_len,0), border_color, width, true)
+	draw_line(Vector2(arc_len,0),Vector2(1./2*arc_len,sqrt(3)/2*arc_len), border_color, width, true)
+	draw_line(Vector2(1./2*arc_len,sqrt(3)/2*arc_len),Vector2(-1./2*arc_len,sqrt(3)/2*arc_len), border_color, width, true)
+	draw_line(Vector2(-1./2*arc_len,sqrt(3)/2*arc_len),Vector2(-arc_len, 0), border_color, width, true)
+	draw_line(Vector2(-arc_len, 0),Vector2(-1./2*arc_len,-sqrt(3)/2*arc_len), border_color, width, true)
 	# draw signal station
 	if self.antenna_type =="SINGLE":
 		# draw station body
@@ -125,6 +126,9 @@ func initialize(mouse_panel,station_config_panel,path_controller,tile_controller
 	self.station_config_panel = station_config_panel
 	self.path_conreoller = path_controller
 	self.tile_controller = tile_controller
+	
+func set_border_color(c8:Color):
+	self.border_color = c8
 	
 func set_focus():
 	self.on_focus = true

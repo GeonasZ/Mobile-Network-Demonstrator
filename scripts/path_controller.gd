@@ -3,6 +3,7 @@ extends Control
 @onready var path_layer = $"../../PathLayer"
 @onready var tile_controller = $"../TileController"
 @onready var user_controller = $"../UserController"
+@onready var ui_controller = $"../UIStyleController"
 
 var block_width = 300
 var start_pos = Vector2(0,0)
@@ -520,8 +521,16 @@ func spawn_buildings():
 			
 		buildings.pop_at(i)
 			
-func make_path_block(pos):
-	pass
+func update_all_path_block_color_style():
+	for row in path_blocks:
+		for current_path_block in row:
+			current_path_block.building_color = ui_controller.ui_style_history[-1][ui_controller.UISubject.BUILDING_COLOR]
+			current_path_block.building_wall_color = ui_controller.ui_style_history[-1][ui_controller.UISubject.BUILDING_BORDER]
+			current_path_block.lawn_color = ui_controller.ui_style_history[-1][ui_controller.UISubject.LAWN_COLOR]
+			current_path_block.lawn_edge_color = ui_controller.ui_style_history[-1][ui_controller.UISubject.LAWN_BORDER]
+			current_path_block.lake_color = ui_controller.ui_style_history[-1][ui_controller.UISubject.LAKE_COLOR]
+			current_path_block.lake_border_color = ui_controller.ui_style_history[-1][ui_controller.UISubject.LAKE_BORDER]
+	path_layer.redraw()
 			
 func make_map(width,start:Vector2,end:Vector2):
 	var current_pos = start
@@ -537,6 +546,12 @@ func make_map(width,start:Vector2,end:Vector2):
 			current_path_block.position = current_pos
 			current_path_block.set_width(width)
 			self.path_blocks[-1].append(current_path_block)
+			current_path_block.building_color = ui_controller.ui_style_history[-1][ui_controller.UISubject.BUILDING_COLOR]
+			current_path_block.building_wall_color = ui_controller.ui_style_history[-1][ui_controller.UISubject.BUILDING_BORDER]
+			current_path_block.lawn_color = ui_controller.ui_style_history[-1][ui_controller.UISubject.LAWN_COLOR]
+			current_path_block.lawn_edge_color = ui_controller.ui_style_history[-1][ui_controller.UISubject.LAWN_BORDER]
+			current_path_block.lake_color = ui_controller.ui_style_history[-1][ui_controller.UISubject.LAKE_COLOR]
+			current_path_block.lake_border_color = ui_controller.ui_style_history[-1][ui_controller.UISubject.LAKE_BORDER]
 			current_pos.x += width
 			id += 1
 			col += 1
