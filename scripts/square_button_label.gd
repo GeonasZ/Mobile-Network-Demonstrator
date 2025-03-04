@@ -14,7 +14,9 @@ extends Label
 @onready var n_user_edit = $"../../ContentFrame/GridContainer/NUserEdit/LineEdit"
 @onready var path_width_edit = $"../../ContentFrame/GridContainer/PathWidthEdit/LineEdit"
 @onready var building_decay_edit = $"../../ContentFrame/GridContainer/BuildingDecayEdit/LineEdit"
+@onready var blocking_attenuation_edit = $"../../ContentFrame/GridContainer/BlockingAttenuationEdit/LineEdit"
 
+@onready var building_decay_option = $"../../ContentFrame/GridContainer/BuildingDecayEdit"
 
 var on_work = true
 var is_mouse_in = false
@@ -35,7 +37,7 @@ func restart_program(tile_length,user_height,n_channel,n_user,block_width,decay,
 	tile_controller.set_decay(decay)
 	tile_controller.set_building_decay(building_decay)
 		
-func apply_config(tile_length,user_height,n_channel,n_user,block_width, decay, building_decay):
+func apply_config(tile_length,user_height,n_channel,n_user,block_width, decay, building_decay, blocking_attenuation):
 	if tile_length != tile_controller.arc_len or len(user_controller.linear_user_list) != n_user:
 		mouse_panel.initialize_mouse_panel()
 		user_controller.initialize_user_system(user_height)
@@ -49,6 +51,7 @@ func apply_config(tile_length,user_height,n_channel,n_user,block_width, decay, b
 		path_controller.set_block_width(block_width)
 	tile_controller.set_decay(decay)
 	tile_controller.set_building_decay(building_decay)
+	path_controller.set_blocking_attenuation(blocking_attenuation)
 	
 	
 	
@@ -61,9 +64,9 @@ func _gui_input(event):
 		var n_freq = int(freq_n_edit.text)
 		var n_user = int(n_user_edit.text)
 		var block_width = int(path_width_edit.text)
-		var building_decay = float(building_decay_edit.text)
-			
-		apply_config(tile_length, user_height,n_freq,n_user,block_width, decay, building_decay)
+		var building_decay = float(building_decay_edit.text) if building_decay_option.visible else float(decay_edit.text)
+		var blocking_attenuation = float(blocking_attenuation_edit.text)
+		apply_config(tile_length, user_height,n_freq,n_user,block_width, decay, building_decay, blocking_attenuation)
 		config_panel.close_config_with_anime()
 		
 		await get_tree().create_timer(0.5).timeout

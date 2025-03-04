@@ -1,10 +1,9 @@
 extends LineEdit
 
-@onready var tile_controller = $"../../../../../Controllers/TileController"
+@onready var path_controller = $"../../../../../Controllers/PathController"
 @onready var father_node = $".."
 
 var max_value = 10
-
 var min_value = 0
 var legal_characters = ["0","1","2","3","4","5","6","7","8","9"]
 
@@ -64,7 +63,7 @@ func _input(event: InputEvent) -> void:
 		focus_exited.emit()
 
 func initialize():
-	self.text = str(tile_controller.get_decay())
+	self.text = str(path_controller.get_blocking_attenuation())
 	
 	
 

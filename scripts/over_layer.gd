@@ -31,7 +31,7 @@ func _draw() -> void:
 		var station_scale = mouse_controller.current_hex.station_scale
 		if not keep_invisible:
 			# draw a line for mouse and closest station
-			if not analysis_panel.visible and not station_config_panel.visible and not ui_config_panel:
+			if not analysis_panel.visible and not station_config_panel.visible and not ui_config_panel.visible:
 				draw_dashed_line(hex_center, get_local_mouse_position(),dash_line_color,5*station_scale,10*station_scale)
 			# draw directions for each station
 			var station_global_transform

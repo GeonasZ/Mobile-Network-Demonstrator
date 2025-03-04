@@ -3,7 +3,7 @@ extends Polygon2D
 @onready var mouse_panel
 @onready var station_config_panel
 @onready var parent_node = $".."
-@onready var path_conreoller
+@onready var path_controller
 @onready var tile_controller
 var AntennaType = ["SINGLE","ARRAY2","ARRAY3","ARRAY4"]
 
@@ -124,7 +124,7 @@ func _draw():
 func initialize(mouse_panel,station_config_panel,path_controller,tile_controller):
 	self.mouse_panel = mouse_panel
 	self.station_config_panel = station_config_panel
-	self.path_conreoller = path_controller
+	self.path_controller = path_controller
 	self.tile_controller = tile_controller
 	
 func set_border_color(c8:Color):
@@ -149,9 +149,11 @@ func get_antenna_type():
 func get_antenna_type_raw():
 	return self.antenna_type
 
-# eval signal power to a distance, providing decay is a constant
-func eval_signal_pow(angle_from_center, distance:float, decay):
+# not in use
+ #eval signal power to a distance, providing decay is a constant
+func eval_signal_pow(angle_from_center, distance:float, decay, hyperbolic_method=true):
 	var array_factor
+	
 	if self.antenna_type == "SINGLE":
 		array_factor = 1
 	else:
@@ -171,17 +173,19 @@ func eval_signal_pow(angle_from_center, distance:float, decay):
 			array_factor = N
 		else:
 			array_factor = sin(0.5*N*angle_from_center)/sin(0.5*angle_from_center)
-	return self.ref_signal_power*exp(-decay*distance)*pow(array_factor,2)
+	if not hyperbolic_method:
+		return self.ref_signal_power*pow(exp(-decay*distance),2)*pow(array_factor,2)
+	else:
+		return self.ref_signal_power/pow(distance,decay)*pow(array_factor,2)
 
 # eval signal power to a user, automatically detect decay rate
-func eval_signal_power_to_user_with_various_decay(user, max_seg=500):
+func eval_signal_power_to_user_with_various_decay(user, hyperbolic_method=true, blocking_attenuation=0, max_seg=40):
 	if user.connected_channel == null:
 		return 0
-		
 	var user_glob_pos = user.global_position
 	var distance = self.position.distance_to(user.position)
 	var angle_from_center = self.signal_direction.angle_to(user.position-self.position)
-	
+	var wall_count = 0
 	var array_factor
 	if self.antenna_type == "SINGLE":
 		array_factor = 1
@@ -204,37 +208,58 @@ func eval_signal_power_to_user_with_various_decay(user, max_seg=500):
 		else:
 			array_factor = sin(0.5*N*angle_from_center)/sin(0.5*angle_from_center)
 
-	var n_seg = int(distance)
+	var n_seg = max(int(distance)/path_controller.block_width,1)
 	if n_seg > max_seg:
 		n_seg = max_seg
 	var seg_len = distance/n_seg
-	
 	var current_signal_pow = self.ref_signal_power * pow(array_factor,2)
-	for i in range(n_seg+1):
-		if i > 0:
+	var last_point_block
+	# exponential method
+	if not hyperbolic_method:
+		for i in range(n_seg+1):
+			if i > 0:
+				var sample_glob_pos = lerp(self.global_position,user_glob_pos,float(i)/float(n_seg))
+				var block = path_controller.in_which_block(sample_glob_pos)
+				var decay
+				if block.building:
+					decay = tile_controller.building_decay
+				else:
+					#print("asd")
+					decay = tile_controller.decay
+				if decay > 0:
+					current_signal_pow = current_signal_pow*exp(-decay*seg_len)
+				if last_point_block != null and block.building != last_point_block.building:
+					wall_count += 1
+				last_point_block = block
+	# hyperbolic method
+	else:
+		# sum the decays
+		for i in range(n_seg+1):
 			var sample_glob_pos = lerp(self.global_position,user_glob_pos,float(i)/float(n_seg))
-			var block = path_conreoller.in_which_block(sample_glob_pos)
-			var decay
-			if block.building:
-				decay = tile_controller.building_decay
-			else:
-				#print("asd")
-				decay = tile_controller.decay
-			if decay > 0:
-				current_signal_pow = current_signal_pow*exp(-decay*seg_len)
+			var block = path_controller.in_which_block(sample_glob_pos)
+			if last_point_block != null and block.building != last_point_block.building:
+				wall_count += 1
+			last_point_block = block
+		# hyperbolic method siganl power evaluation
+		current_signal_pow = self.ref_signal_power/pow(distance,tile_controller.decay)*pow(array_factor,2)
+	current_signal_pow *= pow(10,-blocking_attenuation*0.1*wall_count)
 	return current_signal_pow
 
-# eval signal power to a user, providing decay is a constant
-func eval_signal_pow_to_user(user, decay=null):
+# eval signal power to a user
+func eval_signal_pow_to_user(user, decay=null, hyperbolic_method=true, blocking_attenuation=0):
+	if hyperbolic_method and decay == null:
+		print("HexTile<eval_signal_pow>: Hyperbolic method only support power evaluation with a cosntant decay.")
+		return
 	if user.connected_channel == null:
 		return 0
-		
-	if decay == null:
-		return eval_signal_power_to_user_with_various_decay(user)
-	else:
-		var distance = self.position.distance_to(user.position)
-		var angle_from_center = self.signal_direction.angle_to(user.position-self.position)
-		return eval_signal_pow(angle_from_center, distance, decay)
+	return eval_signal_power_to_user_with_various_decay(user,hyperbolic_method,blocking_attenuation)
+	#if decay == null:
+		#return eval_signal_power_to_user_with_various_decay(user,hyperbolic_method,blocking_attenuation)
+	#else:
+		#
+		#var distance = self.position.distance_to(user.position)
+		#var angle_from_center = self.signal_direction.angle_to(user.position-self.position)
+		#return eval_signal_pow(angle_from_center, distance, decay)
 
 func start_wait_for_next_signal_proporgation():
 	self.next_proporgation = false

@@ -21,7 +21,7 @@ var total_channel_number = 24
 var station_number = 0
 
 # decay rate of signal power with distance
-var decay = 0.1
+var decay = 2
 var building_decay = 2
 
 # store the colors of the cells
@@ -422,4 +422,5 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
+	#print(self.decay, self.building_decay)
 	pass

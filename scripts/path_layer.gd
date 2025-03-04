@@ -6,7 +6,7 @@ var background_color
 
 var lake
 var map_visible = true
-var do_map_shading
+var do_map_shading = true
 
 func draw_sector(center, radius, start_rad, end_rad, n_points, color):
 	# create a point list for the sector

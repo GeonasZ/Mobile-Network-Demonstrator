@@ -8,6 +8,7 @@ extends Polygon2D
 @onready var n_user_edit = $ContentFrame/GridContainer/NUserEdit/LineEdit
 @onready var path_width_edit = $ContentFrame/GridContainer/PathWidthEdit/LineEdit
 @onready var building_decay_edit = $ContentFrame/GridContainer/BuildingDecayEdit/LineEdit
+@onready var blocking_attenuation_edit = $ContentFrame/GridContainer/BlockingAttenuationEdit/LineEdit
 
 # other nodes
 @onready var config_button = $"../FunctionPanel/ConfigButton"
@@ -35,7 +36,7 @@ func _ready() -> void:
 	title_label.position = Vector2(0,0)
 	title_label.size = Vector2(1920,200)
 	edit_list = [tile_length_edit, user_height_edit, decay_edit, freq_n_edit, 
-				 n_user_edit, path_width_edit, building_decay_edit]
+				 n_user_edit, path_width_edit, building_decay_edit, blocking_attenuation_edit]
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:

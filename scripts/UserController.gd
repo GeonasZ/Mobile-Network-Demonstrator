@@ -18,6 +18,8 @@ var linear_user_list = []
 var current_available_user_id = 0
 var show_popup = false
 
+var analysis_sampling_interval = 0.2
+
 var user_height = 10
 
 # Called when the node enters the scene tree for the first time.
@@ -261,15 +263,15 @@ func redirect_user(current_user, station_i, station_j, user_k) -> Array:
 
 ## return a list consists of 
 ## [signal power, interference power, sir]
-func eval_user_sir(user):
+func eval_user_sir(user, inf_thresd=1e4):
 	var index_i = user.index_i_in_user_list
 	var index_j = user.index_j_in_user_list
 	var user_hex = tile_controller.hex_list[index_i][index_j]
 	var signal_power = 0
 	if path_layer.map_visible:
-		signal_power = user_hex.eval_signal_pow_to_user(user)
+		signal_power = user_hex.eval_signal_pow_to_user(user, tile_controller.get_decay(), true, path_controller.get_blocking_attenuation())
 	else:
-		signal_power = user_hex.eval_signal_pow_to_user(user, tile_controller.get_decay())
+		signal_power = user_hex.eval_signal_pow_to_user(user, tile_controller.get_decay(), true, 0)
 	
 	
 	var interference_power = 0
@@ -278,9 +280,10 @@ func eval_user_sir(user):
 		for station in tile_controller.hex_frequency_dict[user_hex.frequency_group]:
 			if station.channel_allocation_list[user.connected_channel] != null:
 				if path_layer.map_visible:
-					interference_power += user_hex.eval_signal_pow_to_user(user)
+					# hyperbolic method with constant decay
+					interference_power += station.eval_signal_pow_to_user(user, tile_controller.get_decay(), true, path_controller.get_blocking_attenuation())
 				else:
-					interference_power += user_hex.eval_signal_pow_to_user(user, tile_controller.get_decay())
+					interference_power += station.eval_signal_pow_to_user(user, tile_controller.get_decay(), true, 0)
 					
 	interference_power -= signal_power
 	var sir
@@ -290,7 +293,15 @@ func eval_user_sir(user):
 		sir = INF
 	else:
 		sir = signal_power/interference_power
+		
+	if signal_power > inf_thresd:
+		signal_power = INF
+	if interference_power > inf_thresd:
+		interference_power = INF
+	if sir is String or sir > inf_thresd:
+		sir = "N/A"
 
+		
 	return [signal_power, interference_power, sir]
 
 func all_user_enter_observer_mode():
@@ -394,7 +405,7 @@ func _process(delta):
 	if obs_button.analysis_on:
 		if sampling_timer.is_stopped():
 			_on_analysis_sampling_timer_timeout()
-			sampling_timer.start(0.2)
+			sampling_timer.start(analysis_sampling_interval)
 	elif not sampling_timer.is_stopped():
 		sampling_timer.stop()
 

@@ -10,10 +10,18 @@ var start_pos = Vector2(0,0)
 var end_pos = Vector2(1920,1080)
 var path_blocks = []
 
+var blocking_attenuation = 1
+
 var path_block_prefab
+
+func get_blocking_attenuation():
+	return self.blocking_attenuation
 
 func user_in_which_block(user):
 	return in_which_block(user.global_position)
+
+func set_blocking_attenuation(atten):
+	self.blocking_attenuation = atten
 
 # the point should be a global position.
 func in_which_block(point:Vector2):

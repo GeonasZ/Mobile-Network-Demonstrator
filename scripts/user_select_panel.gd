@@ -12,7 +12,6 @@ func _ready() -> void:
 	analysis_panel.set_focus_mode(FocusMode.FOCUS_ALL)
 	
 func set_caret_location(caret_location,to_end=false):
-	print(caret_location)
 	if to_end or caret_location > self.text.length():
 		self.caret_column = self.text.length()
 	else:

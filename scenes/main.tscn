@@ -1,4 +1,4 @@
-[gd_scene load_steps=160 format=3 uid="uid://dp7br0wc03w8r"]
+[gd_scene load_steps=161 format=3 uid="uid://dp7br0wc03w8r"]
 
 [ext_resource type="Script" path="res://scripts/UserController.gd" id="1_18gww"]
 [ext_resource type="Script" path="res://scripts/TileController.gd" id="1_fg5v7"]
@@ -58,6 +58,7 @@
 [ext_resource type="Script" path="res://scripts/engineer_button.gd" id="33_c02q0"]
 [ext_resource type="Script" path="res://scripts/building_decayline_edit.gd" id="34_amls1"]
 [ext_resource type="Script" path="res://scripts/path_width_line_edit.gd" id="34_lhma1"]
+[ext_resource type="Script" path="res://scripts/blocking_attenuation_line_edit.gd" id="39_pfslo"]
 [ext_resource type="Script" path="res://scripts/analysis_mode_button.gd" id="41_hdmb4"]
 [ext_resource type="Script" path="res://scripts/analysis_panel_button.gd" id="42_ijebh"]
 [ext_resource type="Theme" uid="uid://c2adg56u5r570" path="res://fonts/pre_set_theme/button_median_large_font.tres" id="47_2idwk"]
@@ -1034,6 +1035,21 @@ Button/styles/normal = SubResource("StyleBoxFlat_8381c")
 Button/styles/pressed = SubResource("StyleBoxFlat_n1oeq")
 Panel/styles/panel = SubResource("StyleBoxFlat_nca6j")
 
+[sub_resource type="Animation" id="Animation_ibyx5"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+
 [sub_resource type="Animation" id="Animation_liw5r"]
 resource_name = "appear"
 length = 0.2
@@ -1048,21 +1064,6 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(0.203063, 1),
 "update": 0,
 "values": [Vector2(0, 0), Vector2(1, 1)]
-}
-
-[sub_resource type="Animation" id="Animation_ibyx5"]
-length = 0.001
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath(".:scale")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(1, 1)]
 }
 
 [sub_resource type="Animation" id="Animation_3onv6"]
@@ -1115,8 +1116,6 @@ script = ExtResource("3_l7yp2")
 
 [node name="PathController" type="Control" parent="Controllers"]
 anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
 script = ExtResource("4_fefr6")
 
 [node name="UIStyleController" type="Control" parent="Controllers"]
@@ -1481,6 +1480,7 @@ caret_blink = true
 script = ExtResource("34_lhma1")
 
 [node name="BuildingDecayEdit" type="HBoxContainer" parent="ConfigPanel/ContentFrame/GridContainer"]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 3
@@ -1549,7 +1549,7 @@ size_flags_vertical = 3
 layout_mode = 2
 size_flags_horizontal = 2
 theme = SubResource("Theme_7tp5v")
-text = "Decay Constant Outside Building"
+text = "Decay Constant"
 
 [node name="PlaceHolder" type="Control" parent="ConfigPanel/ContentFrame/GridContainer/DecayEdit"]
 custom_minimum_size = Vector2(10, 0)
@@ -1569,6 +1569,42 @@ shortcut_keys_enabled = false
 select_all_on_focus = true
 caret_blink = true
 script = ExtResource("19_qoxea")
+
+[node name="BlockingAttenuationEdit" type="HBoxContainer" parent="ConfigPanel/ContentFrame/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="ConfigPanel/ContentFrame/GridContainer/BlockingAttenuationEdit"]
+layout_mode = 2
+size_flags_horizontal = 2
+theme = SubResource("Theme_7tp5v")
+text = "Blocking Attenuation"
+
+[node name="PlaceHolder" type="Control" parent="ConfigPanel/ContentFrame/GridContainer/BlockingAttenuationEdit"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="LineEdit" type="LineEdit" parent="ConfigPanel/ContentFrame/GridContainer/BlockingAttenuationEdit"]
+custom_minimum_size = Vector2(70, 60)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 4
+theme = ExtResource("26_bgssn")
+max_length = 4
+expand_to_text_length = true
+context_menu_enabled = false
+virtual_keyboard_enabled = false
+shortcut_keys_enabled = false
+select_all_on_focus = true
+caret_blink = true
+script = ExtResource("39_pfslo")
+
+[node name="Label2" type="Label" parent="ConfigPanel/ContentFrame/GridContainer/BlockingAttenuationEdit"]
+layout_mode = 2
+size_flags_horizontal = 2
+theme = SubResource("Theme_7tp5v")
+text = "dB"
 
 [node name="FunctionPanel" type="Control" parent="."]
 z_index = 1
@@ -2629,3 +2665,4 @@ libraries = {
 [connection signal="focus_exited" from="ConfigPanel/ContentFrame/GridContainer/BuildingDecayEdit/LineEdit" to="ConfigPanel/ContentFrame/GridContainer/BuildingDecayEdit/LineEdit" method="_on_focus_exited"]
 [connection signal="focus_exited" from="ConfigPanel/ContentFrame/GridContainer/NUserEdit/LineEdit" to="ConfigPanel/ContentFrame/GridContainer/NUserEdit/LineEdit" method="_on_focus_exited"]
 [connection signal="focus_exited" from="ConfigPanel/ContentFrame/GridContainer/DecayEdit/LineEdit" to="ConfigPanel/ContentFrame/GridContainer/DecayEdit/LineEdit" method="_on_focus_exited"]
+[connection signal="focus_exited" from="ConfigPanel/ContentFrame/GridContainer/BlockingAttenuationEdit/LineEdit" to="ConfigPanel/ContentFrame/GridContainer/BlockingAttenuationEdit/LineEdit" method="_on_focus_exited"]
