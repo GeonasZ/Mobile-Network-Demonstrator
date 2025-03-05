@@ -268,10 +268,18 @@ func eval_user_sir(user, inf_thresd=1e4):
 	var index_j = user.index_j_in_user_list
 	var user_hex = tile_controller.hex_list[index_i][index_j]
 	var signal_power = 0
-	if path_layer.map_visible:
-		signal_power = user_hex.eval_signal_pow_to_user(user, tile_controller.get_decay(), true, path_controller.get_blocking_attenuation())
-	else:
-		signal_power = user_hex.eval_signal_pow_to_user(user, tile_controller.get_decay(), true, 0)
+	# inverse sqaure model
+	if tile_controller.current_model == tile_controller.DecayModel.INVERSE_SQUARE:
+		if path_layer.map_visible:
+			signal_power = user_hex.eval_signal_pow_to_user(user, tile_controller.get_decay(), true, path_controller.get_blocking_attenuation())
+		else:
+			signal_power = user_hex.eval_signal_pow_to_user(user, tile_controller.get_decay(), true, 0)
+	# exponent model
+	elif tile_controller.current_model == tile_controller.DecayModel.EXPONENT:
+		if path_layer.map_visible:
+			signal_power = user_hex.eval_signal_pow_to_user(user, null, false, path_controller.get_blocking_attenuation())
+		else:
+			signal_power = user_hex.eval_signal_pow_to_user(user, tile_controller.get_decay(), false, 0)
 	
 	
 	var interference_power = 0
@@ -279,11 +287,19 @@ func eval_user_sir(user, inf_thresd=1e4):
 	if user.connected_channel != null:
 		for station in tile_controller.hex_frequency_dict[user_hex.frequency_group]:
 			if station.channel_allocation_list[user.connected_channel] != null:
-				if path_layer.map_visible:
-					# hyperbolic method with constant decay
-					interference_power += station.eval_signal_pow_to_user(user, tile_controller.get_decay(), true, path_controller.get_blocking_attenuation())
-				else:
-					interference_power += station.eval_signal_pow_to_user(user, tile_controller.get_decay(), true, 0)
+				if tile_controller.current_model == tile_controller.DecayModel.INVERSE_SQUARE:
+					if path_layer.map_visible:
+						# hyperbolic method with constant decay
+						interference_power += station.eval_signal_pow_to_user(user, tile_controller.get_decay(), true, path_controller.get_blocking_attenuation())
+					else:
+						interference_power += station.eval_signal_pow_to_user(user, tile_controller.get_decay(), true, 0)
+				elif tile_controller.current_model == tile_controller.DecayModel.EXPONENT:
+					if path_layer.map_visible:
+						# hyperbolic method with constant decay
+						interference_power += station.eval_signal_pow_to_user(user, null, false, path_controller.get_blocking_attenuation())
+					else:
+						interference_power += station.eval_signal_pow_to_user(user, tile_controller.get_decay(), false, 0)
+					
 					
 	interference_power -= signal_power
 	var sir

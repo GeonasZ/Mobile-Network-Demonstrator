@@ -2,8 +2,7 @@ extends Panel
 
 @onready var parent = $".."
 @onready var label = $Label
-@onready var ui_config_panel = $".."
-@onready var ui_controller = $"../../Controllers/UIStyleController"
+@onready var tile_controller = $"../../../../../Controllers/TileController"
 
 signal value_changed
 
@@ -12,7 +11,7 @@ var on_work = true
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass
+	self.pivot_offset = self.size/2
 
 	
 func init_label():
@@ -21,14 +20,10 @@ func init_label():
 
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed and self.on_work:
-			self.on_work = false
-			if self.parent.tick_on:
-				self.parent.button_set_false()
-			else:
-				self.parent.button_set_true()
-			value_changed.emit(parent.id)
-			await self.get_tree().create_timer(0.2).timeout
-			self.on_work = true
+		if parent.model == tile_controller.DecayModel.EXPONENT:
+			parent.set_inverse_decay_model()
+		elif parent.model == tile_controller.DecayModel.INVERSE_SQUARE:
+			parent.set_exp_decay_model()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:

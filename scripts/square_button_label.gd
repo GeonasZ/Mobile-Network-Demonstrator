@@ -15,6 +15,7 @@ extends Label
 @onready var path_width_edit = $"../../ContentFrame/GridContainer/PathWidthEdit/LineEdit"
 @onready var building_decay_edit = $"../../ContentFrame/GridContainer/BuildingDecayEdit/LineEdit"
 @onready var blocking_attenuation_edit = $"../../ContentFrame/GridContainer/BlockingAttenuationEdit/LineEdit"
+@onready var decay_model_edit = $"../../ContentFrame/GridContainer/DecayModelEdit"
 
 @onready var building_decay_option = $"../../ContentFrame/GridContainer/BuildingDecayEdit"
 
@@ -25,10 +26,10 @@ var is_mouse_in = false
 func _ready() -> void:
 	notice_label.size = Vector2(1200,50)
 	var ref_pos = Vector2(-1.7*self.get_rect().size)
-	notice_label.position = Vector2(0.67*ref_pos.x,ref_pos.y)
+	notice_label.position = Vector2(0.77*ref_pos.x,ref_pos.y*1.6)
 	self.set_focus_mode(FocusMode.FOCUS_ALL)
 
-func restart_program(tile_length,user_height,n_channel,n_user,block_width,decay, building_decay):
+func restart_program(tile_length,user_height,n_channel,n_user,block_width,decay, building_decay,blocking_attenuation):
 	user_controller.initialize_user_system(user_height)
 	tile_controller.initialize_map(tile_length,n_channel)
 	mouse_panel.initialize_mouse_panel()
@@ -36,6 +37,9 @@ func restart_program(tile_length,user_height,n_channel,n_user,block_width,decay,
 	path_controller.set_block_width(block_width)
 	tile_controller.set_decay(decay)
 	tile_controller.set_building_decay(building_decay)
+	tile_controller.set_decay_model(decay_model_edit.model)
+	path_controller.set_blocking_attenuation(blocking_attenuation)
+	
 		
 func apply_config(tile_length,user_height,n_channel,n_user,block_width, decay, building_decay, blocking_attenuation):
 	if tile_length != tile_controller.arc_len or len(user_controller.linear_user_list) != n_user:
@@ -51,6 +55,7 @@ func apply_config(tile_length,user_height,n_channel,n_user,block_width, decay, b
 		path_controller.set_block_width(block_width)
 	tile_controller.set_decay(decay)
 	tile_controller.set_building_decay(building_decay)
+	tile_controller.set_decay_model(decay_model_edit.model)
 	path_controller.set_blocking_attenuation(blocking_attenuation)
 	
 	

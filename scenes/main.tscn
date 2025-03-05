@@ -1,4 +1,4 @@
-[gd_scene load_steps=161 format=3 uid="uid://dp7br0wc03w8r"]
+[gd_scene load_steps=167 format=3 uid="uid://dp7br0wc03w8r"]
 
 [ext_resource type="Script" path="res://scripts/UserController.gd" id="1_18gww"]
 [ext_resource type="Script" path="res://scripts/TileController.gd" id="1_fg5v7"]
@@ -59,6 +59,8 @@
 [ext_resource type="Script" path="res://scripts/building_decayline_edit.gd" id="34_amls1"]
 [ext_resource type="Script" path="res://scripts/path_width_line_edit.gd" id="34_lhma1"]
 [ext_resource type="Script" path="res://scripts/blocking_attenuation_line_edit.gd" id="39_pfslo"]
+[ext_resource type="Script" path="res://scripts/decay_model_edit.gd" id="40_6m36k"]
+[ext_resource type="Script" path="res://scripts/decay_model_edit_button.gd" id="41_aak25"]
 [ext_resource type="Script" path="res://scripts/analysis_mode_button.gd" id="41_hdmb4"]
 [ext_resource type="Script" path="res://scripts/analysis_panel_button.gd" id="42_ijebh"]
 [ext_resource type="Theme" uid="uid://c2adg56u5r570" path="res://fonts/pre_set_theme/button_median_large_font.tres" id="47_2idwk"]
@@ -444,6 +446,35 @@ _data = {
 "config_disappear": SubResource("Animation_h1ype")
 }
 
+[sub_resource type="Theme" id="Theme_m3axu"]
+GridContainer/constants/h_separation = 30
+GridContainer/constants/v_separation = 60
+
+[sub_resource type="Theme" id="Theme_7tp5v"]
+Label/colors/font_color = Color(0, 0, 0, 1)
+Label/font_sizes/font_size = 32
+Label/fonts/font = ExtResource("11_i26m1")
+
+[sub_resource type="Theme" id="Theme_4wb87"]
+Label/colors/font_color = Color(0, 0, 0, 1)
+Label/font_sizes/font_size = 32
+Label/fonts/font = ExtResource("11_i26m1")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_n8sf2"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="Theme" id="Theme_3vvsg"]
+Panel/styles/panel = SubResource("StyleBoxFlat_n8sf2")
+
 [sub_resource type="Theme" id="Theme_dq8b8"]
 Label/colors/font_color = Color(0, 0, 0, 1)
 Label/font_sizes/font_size = 50
@@ -455,11 +486,6 @@ RichTextLabel/font_sizes/bold_font_size = 40
 RichTextLabel/font_sizes/normal_font_size = 32
 RichTextLabel/fonts/bold_font = ExtResource("11_i26m1")
 RichTextLabel/fonts/normal_font = ExtResource("11_acrdp")
-
-[sub_resource type="Theme" id="Theme_7tp5v"]
-Label/colors/font_color = Color(0, 0, 0, 1)
-Label/font_sizes/font_size = 32
-Label/fonts/font = ExtResource("11_i26m1")
 
 [sub_resource type="Animation" id="Animation_jvnch"]
 resource_name = "button_appear"
@@ -1307,6 +1333,298 @@ libraries = {
 }
 script = ExtResource("23_vg8qi")
 
+[node name="ContentFrame" type="Polygon2D" parent="ConfigPanel"]
+script = ExtResource("13_tbf6g")
+
+[node name="GridContainer" type="GridContainer" parent="ConfigPanel/ContentFrame"]
+offset_right = 40.0
+offset_bottom = 40.0
+size_flags_vertical = 0
+theme = SubResource("Theme_m3axu")
+columns = 2
+
+[node name="TileLengthEdit" type="HBoxContainer" parent="ConfigPanel/ContentFrame/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 2
+size_flags_vertical = 0
+
+[node name="Label" type="Label" parent="ConfigPanel/ContentFrame/GridContainer/TileLengthEdit"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme = SubResource("Theme_7tp5v")
+text = "Tile Length    "
+
+[node name="PlaceHolder" type="Control" parent="ConfigPanel/ContentFrame/GridContainer/TileLengthEdit"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="LineEdit" type="LineEdit" parent="ConfigPanel/ContentFrame/GridContainer/TileLengthEdit"]
+custom_minimum_size = Vector2(70, 60)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+theme = ExtResource("26_bgssn")
+max_length = 4
+expand_to_text_length = true
+context_menu_enabled = false
+virtual_keyboard_enabled = false
+shortcut_keys_enabled = false
+select_all_on_focus = true
+caret_blink = true
+script = ExtResource("15_kcj7q")
+
+[node name="UserHeightEdit" type="HBoxContainer" parent="ConfigPanel/ContentFrame/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 2
+size_flags_vertical = 0
+
+[node name="Label" type="Label" parent="ConfigPanel/ContentFrame/GridContainer/UserHeightEdit"]
+layout_mode = 2
+size_flags_horizontal = 2
+theme = SubResource("Theme_7tp5v")
+text = "User Height"
+
+[node name="PlaceHolder" type="Control" parent="ConfigPanel/ContentFrame/GridContainer/UserHeightEdit"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="LineEdit" type="LineEdit" parent="ConfigPanel/ContentFrame/GridContainer/UserHeightEdit"]
+custom_minimum_size = Vector2(70, 60)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 4
+theme = ExtResource("26_bgssn")
+max_length = 4
+expand_to_text_length = true
+context_menu_enabled = false
+virtual_keyboard_enabled = false
+shortcut_keys_enabled = false
+select_all_on_focus = true
+caret_blink = true
+script = ExtResource("16_i0h6j")
+
+[node name="NFrequencyEdit" type="HBoxContainer" parent="ConfigPanel/ContentFrame/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 2
+size_flags_vertical = 0
+
+[node name="Label" type="Label" parent="ConfigPanel/ContentFrame/GridContainer/NFrequencyEdit"]
+layout_mode = 2
+size_flags_horizontal = 2
+theme = SubResource("Theme_7tp5v")
+text = "Total Channel Number"
+
+[node name="PlaceHolder" type="Control" parent="ConfigPanel/ContentFrame/GridContainer/NFrequencyEdit"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="LineEdit" type="LineEdit" parent="ConfigPanel/ContentFrame/GridContainer/NFrequencyEdit"]
+custom_minimum_size = Vector2(70, 60)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 4
+theme = ExtResource("26_bgssn")
+max_length = 4
+expand_to_text_length = true
+context_menu_enabled = false
+virtual_keyboard_enabled = false
+shortcut_keys_enabled = false
+select_all_on_focus = true
+caret_blink = true
+script = ExtResource("20_sn5w8")
+
+[node name="PathWidthEdit" type="HBoxContainer" parent="ConfigPanel/ContentFrame/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 2
+size_flags_vertical = 0
+
+[node name="Label" type="Label" parent="ConfigPanel/ContentFrame/GridContainer/PathWidthEdit"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme = SubResource("Theme_7tp5v")
+text = "Path Width    "
+
+[node name="PlaceHolder" type="Control" parent="ConfigPanel/ContentFrame/GridContainer/PathWidthEdit"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="LineEdit" type="LineEdit" parent="ConfigPanel/ContentFrame/GridContainer/PathWidthEdit"]
+custom_minimum_size = Vector2(70, 60)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+theme = ExtResource("26_bgssn")
+max_length = 4
+expand_to_text_length = true
+context_menu_enabled = false
+virtual_keyboard_enabled = false
+shortcut_keys_enabled = false
+select_all_on_focus = true
+caret_blink = true
+script = ExtResource("34_lhma1")
+
+[node name="NUserEdit" type="HBoxContainer" parent="ConfigPanel/ContentFrame/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 2
+size_flags_vertical = 0
+
+[node name="Label" type="Label" parent="ConfigPanel/ContentFrame/GridContainer/NUserEdit"]
+layout_mode = 2
+size_flags_horizontal = 2
+theme = SubResource("Theme_7tp5v")
+text = "Number of Users"
+
+[node name="PlaceHolder" type="Control" parent="ConfigPanel/ContentFrame/GridContainer/NUserEdit"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="LineEdit" type="LineEdit" parent="ConfigPanel/ContentFrame/GridContainer/NUserEdit"]
+custom_minimum_size = Vector2(70, 60)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 4
+theme = ExtResource("26_bgssn")
+max_length = 4
+expand_to_text_length = true
+context_menu_enabled = false
+virtual_keyboard_enabled = false
+shortcut_keys_enabled = false
+select_all_on_focus = true
+caret_blink = true
+script = ExtResource("22_0pki8")
+
+[node name="BlockingAttenuationEdit" type="HBoxContainer" parent="ConfigPanel/ContentFrame/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 2
+size_flags_vertical = 0
+
+[node name="Label" type="Label" parent="ConfigPanel/ContentFrame/GridContainer/BlockingAttenuationEdit"]
+layout_mode = 2
+size_flags_horizontal = 2
+theme = SubResource("Theme_7tp5v")
+text = "Blocking Attenuation"
+
+[node name="PlaceHolder" type="Control" parent="ConfigPanel/ContentFrame/GridContainer/BlockingAttenuationEdit"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="LineEdit" type="LineEdit" parent="ConfigPanel/ContentFrame/GridContainer/BlockingAttenuationEdit"]
+custom_minimum_size = Vector2(70, 60)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 4
+theme = ExtResource("26_bgssn")
+max_length = 4
+expand_to_text_length = true
+context_menu_enabled = false
+virtual_keyboard_enabled = false
+shortcut_keys_enabled = false
+select_all_on_focus = true
+caret_blink = true
+script = ExtResource("39_pfslo")
+
+[node name="Label2" type="Label" parent="ConfigPanel/ContentFrame/GridContainer/BlockingAttenuationEdit"]
+layout_mode = 2
+size_flags_horizontal = 2
+theme = SubResource("Theme_7tp5v")
+text = "dB"
+
+[node name="DecayModelEdit" type="HBoxContainer" parent="ConfigPanel/ContentFrame/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+script = ExtResource("40_6m36k")
+
+[node name="Label" type="Label" parent="ConfigPanel/ContentFrame/GridContainer/DecayModelEdit"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme = SubResource("Theme_4wb87")
+text = "Decay Model"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PlaceHolder" type="Control" parent="ConfigPanel/ContentFrame/GridContainer/DecayModelEdit"]
+custom_minimum_size = Vector2(20, 0)
+layout_mode = 2
+
+[node name="Button" type="Panel" parent="ConfigPanel/ContentFrame/GridContainer/DecayModelEdit"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme = SubResource("Theme_3vvsg")
+script = ExtResource("41_aak25")
+
+[node name="Label" type="Label" parent="ConfigPanel/ContentFrame/GridContainer/DecayModelEdit/Button"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+theme = ExtResource("25_x1dja")
+theme_override_fonts/font = ExtResource("11_i26m1")
+theme_override_font_sizes/font_size = 30
+text = "ON"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DecayEdit" type="HBoxContainer" parent="ConfigPanel/ContentFrame/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 2
+size_flags_vertical = 0
+
+[node name="Label" type="Label" parent="ConfigPanel/ContentFrame/GridContainer/DecayEdit"]
+layout_mode = 2
+size_flags_horizontal = 2
+theme = SubResource("Theme_7tp5v")
+text = "Decay Constant"
+
+[node name="PlaceHolder" type="Control" parent="ConfigPanel/ContentFrame/GridContainer/DecayEdit"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="LineEdit" type="LineEdit" parent="ConfigPanel/ContentFrame/GridContainer/DecayEdit"]
+custom_minimum_size = Vector2(70, 60)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 4
+theme = ExtResource("26_bgssn")
+max_length = 4
+expand_to_text_length = true
+context_menu_enabled = false
+virtual_keyboard_enabled = false
+shortcut_keys_enabled = false
+select_all_on_focus = true
+caret_blink = true
+script = ExtResource("19_qoxea")
+
+[node name="BuildingDecayEdit" type="HBoxContainer" parent="ConfigPanel/ContentFrame/GridContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 2
+size_flags_vertical = 0
+
+[node name="Label" type="Label" parent="ConfigPanel/ContentFrame/GridContainer/BuildingDecayEdit"]
+layout_mode = 2
+size_flags_horizontal = 2
+theme = SubResource("Theme_7tp5v")
+text = "Decay Constant in Building"
+
+[node name="PlaceHolder" type="Control" parent="ConfigPanel/ContentFrame/GridContainer/BuildingDecayEdit"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="LineEdit" type="LineEdit" parent="ConfigPanel/ContentFrame/GridContainer/BuildingDecayEdit"]
+custom_minimum_size = Vector2(70, 60)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 4
+theme = ExtResource("26_bgssn")
+max_length = 4
+expand_to_text_length = true
+context_menu_enabled = false
+virtual_keyboard_enabled = false
+shortcut_keys_enabled = false
+select_all_on_focus = true
+caret_blink = true
+script = ExtResource("34_amls1")
+
 [node name="ConfirmButton" type="Polygon2D" parent="ConfigPanel"]
 script = ExtResource("10_ejbur")
 
@@ -1348,263 +1666,9 @@ offset_bottom = 23.0
 mouse_filter = 2
 theme = SubResource("Theme_os7gk")
 bbcode_enabled = true
-text = "Quit to the main page without any operation."
+text = "[b]QUIT[/b] to the main page without any operation."
 fit_content = true
 scroll_active = false
-
-[node name="ContentFrame" type="Polygon2D" parent="ConfigPanel"]
-script = ExtResource("13_tbf6g")
-
-[node name="GridContainer" type="GridContainer" parent="ConfigPanel/ContentFrame"]
-offset_right = 40.0
-offset_bottom = 40.0
-columns = 2
-
-[node name="TileLengthEdit" type="HBoxContainer" parent="ConfigPanel/ContentFrame/GridContainer"]
-layout_mode = 2
-size_flags_horizontal = 2
-
-[node name="Label" type="Label" parent="ConfigPanel/ContentFrame/GridContainer/TileLengthEdit"]
-layout_mode = 2
-size_flags_horizontal = 0
-theme = SubResource("Theme_7tp5v")
-text = "Tile Length    "
-
-[node name="PlaceHolder" type="Control" parent="ConfigPanel/ContentFrame/GridContainer/TileLengthEdit"]
-custom_minimum_size = Vector2(10, 0)
-layout_mode = 2
-
-[node name="LineEdit" type="LineEdit" parent="ConfigPanel/ContentFrame/GridContainer/TileLengthEdit"]
-custom_minimum_size = Vector2(70, 60)
-layout_mode = 2
-size_flags_horizontal = 0
-size_flags_vertical = 4
-theme = ExtResource("26_bgssn")
-max_length = 4
-expand_to_text_length = true
-context_menu_enabled = false
-virtual_keyboard_enabled = false
-shortcut_keys_enabled = false
-select_all_on_focus = true
-caret_blink = true
-script = ExtResource("15_kcj7q")
-
-[node name="UserHeightEdit" type="HBoxContainer" parent="ConfigPanel/ContentFrame/GridContainer"]
-layout_mode = 2
-size_flags_horizontal = 0
-size_flags_vertical = 3
-
-[node name="Label" type="Label" parent="ConfigPanel/ContentFrame/GridContainer/UserHeightEdit"]
-layout_mode = 2
-size_flags_horizontal = 2
-theme = SubResource("Theme_7tp5v")
-text = "User Height"
-
-[node name="PlaceHolder" type="Control" parent="ConfigPanel/ContentFrame/GridContainer/UserHeightEdit"]
-custom_minimum_size = Vector2(10, 0)
-layout_mode = 2
-
-[node name="LineEdit" type="LineEdit" parent="ConfigPanel/ContentFrame/GridContainer/UserHeightEdit"]
-custom_minimum_size = Vector2(70, 60)
-layout_mode = 2
-size_flags_horizontal = 8
-size_flags_vertical = 4
-theme = ExtResource("26_bgssn")
-max_length = 4
-expand_to_text_length = true
-context_menu_enabled = false
-virtual_keyboard_enabled = false
-shortcut_keys_enabled = false
-select_all_on_focus = true
-caret_blink = true
-script = ExtResource("16_i0h6j")
-
-[node name="NFrequencyEdit" type="HBoxContainer" parent="ConfigPanel/ContentFrame/GridContainer"]
-layout_mode = 2
-size_flags_horizontal = 0
-size_flags_vertical = 3
-
-[node name="Label" type="Label" parent="ConfigPanel/ContentFrame/GridContainer/NFrequencyEdit"]
-layout_mode = 2
-size_flags_horizontal = 2
-theme = SubResource("Theme_7tp5v")
-text = "Total Channel Number"
-
-[node name="PlaceHolder" type="Control" parent="ConfigPanel/ContentFrame/GridContainer/NFrequencyEdit"]
-custom_minimum_size = Vector2(10, 0)
-layout_mode = 2
-
-[node name="LineEdit" type="LineEdit" parent="ConfigPanel/ContentFrame/GridContainer/NFrequencyEdit"]
-custom_minimum_size = Vector2(70, 60)
-layout_mode = 2
-size_flags_horizontal = 8
-size_flags_vertical = 4
-theme = ExtResource("26_bgssn")
-max_length = 4
-expand_to_text_length = true
-context_menu_enabled = false
-virtual_keyboard_enabled = false
-shortcut_keys_enabled = false
-select_all_on_focus = true
-caret_blink = true
-script = ExtResource("20_sn5w8")
-
-[node name="PathWidthEdit" type="HBoxContainer" parent="ConfigPanel/ContentFrame/GridContainer"]
-layout_mode = 2
-size_flags_horizontal = 2
-size_flags_vertical = 3
-
-[node name="Label" type="Label" parent="ConfigPanel/ContentFrame/GridContainer/PathWidthEdit"]
-layout_mode = 2
-size_flags_horizontal = 0
-theme = SubResource("Theme_7tp5v")
-text = "Path Width    "
-
-[node name="PlaceHolder" type="Control" parent="ConfigPanel/ContentFrame/GridContainer/PathWidthEdit"]
-custom_minimum_size = Vector2(10, 0)
-layout_mode = 2
-
-[node name="LineEdit" type="LineEdit" parent="ConfigPanel/ContentFrame/GridContainer/PathWidthEdit"]
-custom_minimum_size = Vector2(70, 60)
-layout_mode = 2
-size_flags_horizontal = 0
-size_flags_vertical = 4
-theme = ExtResource("26_bgssn")
-max_length = 4
-expand_to_text_length = true
-context_menu_enabled = false
-virtual_keyboard_enabled = false
-shortcut_keys_enabled = false
-select_all_on_focus = true
-caret_blink = true
-script = ExtResource("34_lhma1")
-
-[node name="BuildingDecayEdit" type="HBoxContainer" parent="ConfigPanel/ContentFrame/GridContainer"]
-visible = false
-layout_mode = 2
-size_flags_horizontal = 0
-size_flags_vertical = 3
-
-[node name="Label" type="Label" parent="ConfigPanel/ContentFrame/GridContainer/BuildingDecayEdit"]
-layout_mode = 2
-size_flags_horizontal = 2
-theme = SubResource("Theme_7tp5v")
-text = "Decay Constant in Building"
-
-[node name="PlaceHolder" type="Control" parent="ConfigPanel/ContentFrame/GridContainer/BuildingDecayEdit"]
-custom_minimum_size = Vector2(10, 0)
-layout_mode = 2
-
-[node name="LineEdit" type="LineEdit" parent="ConfigPanel/ContentFrame/GridContainer/BuildingDecayEdit"]
-custom_minimum_size = Vector2(70, 60)
-layout_mode = 2
-size_flags_horizontal = 8
-size_flags_vertical = 4
-theme = ExtResource("26_bgssn")
-max_length = 4
-expand_to_text_length = true
-context_menu_enabled = false
-virtual_keyboard_enabled = false
-shortcut_keys_enabled = false
-select_all_on_focus = true
-caret_blink = true
-script = ExtResource("34_amls1")
-
-[node name="NUserEdit" type="HBoxContainer" parent="ConfigPanel/ContentFrame/GridContainer"]
-layout_mode = 2
-size_flags_horizontal = 0
-size_flags_vertical = 3
-
-[node name="Label" type="Label" parent="ConfigPanel/ContentFrame/GridContainer/NUserEdit"]
-layout_mode = 2
-size_flags_horizontal = 2
-theme = SubResource("Theme_7tp5v")
-text = "Number of Users"
-
-[node name="PlaceHolder" type="Control" parent="ConfigPanel/ContentFrame/GridContainer/NUserEdit"]
-custom_minimum_size = Vector2(10, 0)
-layout_mode = 2
-
-[node name="LineEdit" type="LineEdit" parent="ConfigPanel/ContentFrame/GridContainer/NUserEdit"]
-custom_minimum_size = Vector2(70, 60)
-layout_mode = 2
-size_flags_horizontal = 8
-size_flags_vertical = 4
-theme = ExtResource("26_bgssn")
-max_length = 4
-expand_to_text_length = true
-context_menu_enabled = false
-virtual_keyboard_enabled = false
-shortcut_keys_enabled = false
-select_all_on_focus = true
-caret_blink = true
-script = ExtResource("22_0pki8")
-
-[node name="DecayEdit" type="HBoxContainer" parent="ConfigPanel/ContentFrame/GridContainer"]
-layout_mode = 2
-size_flags_horizontal = 0
-size_flags_vertical = 3
-
-[node name="Label" type="Label" parent="ConfigPanel/ContentFrame/GridContainer/DecayEdit"]
-layout_mode = 2
-size_flags_horizontal = 2
-theme = SubResource("Theme_7tp5v")
-text = "Decay Constant"
-
-[node name="PlaceHolder" type="Control" parent="ConfigPanel/ContentFrame/GridContainer/DecayEdit"]
-custom_minimum_size = Vector2(10, 0)
-layout_mode = 2
-
-[node name="LineEdit" type="LineEdit" parent="ConfigPanel/ContentFrame/GridContainer/DecayEdit"]
-custom_minimum_size = Vector2(70, 60)
-layout_mode = 2
-size_flags_horizontal = 8
-size_flags_vertical = 4
-theme = ExtResource("26_bgssn")
-max_length = 4
-expand_to_text_length = true
-context_menu_enabled = false
-virtual_keyboard_enabled = false
-shortcut_keys_enabled = false
-select_all_on_focus = true
-caret_blink = true
-script = ExtResource("19_qoxea")
-
-[node name="BlockingAttenuationEdit" type="HBoxContainer" parent="ConfigPanel/ContentFrame/GridContainer"]
-layout_mode = 2
-size_flags_horizontal = 0
-size_flags_vertical = 3
-
-[node name="Label" type="Label" parent="ConfigPanel/ContentFrame/GridContainer/BlockingAttenuationEdit"]
-layout_mode = 2
-size_flags_horizontal = 2
-theme = SubResource("Theme_7tp5v")
-text = "Blocking Attenuation"
-
-[node name="PlaceHolder" type="Control" parent="ConfigPanel/ContentFrame/GridContainer/BlockingAttenuationEdit"]
-custom_minimum_size = Vector2(10, 0)
-layout_mode = 2
-
-[node name="LineEdit" type="LineEdit" parent="ConfigPanel/ContentFrame/GridContainer/BlockingAttenuationEdit"]
-custom_minimum_size = Vector2(70, 60)
-layout_mode = 2
-size_flags_horizontal = 8
-size_flags_vertical = 4
-theme = ExtResource("26_bgssn")
-max_length = 4
-expand_to_text_length = true
-context_menu_enabled = false
-virtual_keyboard_enabled = false
-shortcut_keys_enabled = false
-select_all_on_focus = true
-caret_blink = true
-script = ExtResource("39_pfslo")
-
-[node name="Label2" type="Label" parent="ConfigPanel/ContentFrame/GridContainer/BlockingAttenuationEdit"]
-layout_mode = 2
-size_flags_horizontal = 2
-theme = SubResource("Theme_7tp5v")
-text = "dB"
 
 [node name="FunctionPanel" type="Control" parent="."]
 z_index = 1
@@ -2662,7 +2726,7 @@ libraries = {
 [connection signal="focus_exited" from="ConfigPanel/ContentFrame/GridContainer/UserHeightEdit/LineEdit" to="ConfigPanel/ContentFrame/GridContainer/UserHeightEdit/LineEdit" method="_on_focus_exited"]
 [connection signal="focus_exited" from="ConfigPanel/ContentFrame/GridContainer/NFrequencyEdit/LineEdit" to="ConfigPanel/ContentFrame/GridContainer/NFrequencyEdit/LineEdit" method="_on_focus_exited"]
 [connection signal="focus_exited" from="ConfigPanel/ContentFrame/GridContainer/PathWidthEdit/LineEdit" to="ConfigPanel/ContentFrame/GridContainer/PathWidthEdit/LineEdit" method="_on_focus_exited"]
-[connection signal="focus_exited" from="ConfigPanel/ContentFrame/GridContainer/BuildingDecayEdit/LineEdit" to="ConfigPanel/ContentFrame/GridContainer/BuildingDecayEdit/LineEdit" method="_on_focus_exited"]
 [connection signal="focus_exited" from="ConfigPanel/ContentFrame/GridContainer/NUserEdit/LineEdit" to="ConfigPanel/ContentFrame/GridContainer/NUserEdit/LineEdit" method="_on_focus_exited"]
-[connection signal="focus_exited" from="ConfigPanel/ContentFrame/GridContainer/DecayEdit/LineEdit" to="ConfigPanel/ContentFrame/GridContainer/DecayEdit/LineEdit" method="_on_focus_exited"]
 [connection signal="focus_exited" from="ConfigPanel/ContentFrame/GridContainer/BlockingAttenuationEdit/LineEdit" to="ConfigPanel/ContentFrame/GridContainer/BlockingAttenuationEdit/LineEdit" method="_on_focus_exited"]
+[connection signal="focus_exited" from="ConfigPanel/ContentFrame/GridContainer/DecayEdit/LineEdit" to="ConfigPanel/ContentFrame/GridContainer/DecayEdit/LineEdit" method="_on_focus_exited"]
+[connection signal="focus_exited" from="ConfigPanel/ContentFrame/GridContainer/BuildingDecayEdit/LineEdit" to="ConfigPanel/ContentFrame/GridContainer/BuildingDecayEdit/LineEdit" method="_on_focus_exited"]

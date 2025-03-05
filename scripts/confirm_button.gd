@@ -28,7 +28,7 @@ func _ready() -> void:
 				Vector2(-length/2, width/2 - slash_len),
 				Vector2(-length/2, -width/2 + slash_len)]
 	self.color = Color(255,255,255)
-	self.position = Vector2(1920/2-1.3*length,1080*6/7)
+	self.position = Vector2(1920/2-1.3*length,1080*9/10)
 	self.label.size = Vector2(self.length, self.width)
 	self.label.position = Vector2(-1./2.*length,-1./2.*width)
 

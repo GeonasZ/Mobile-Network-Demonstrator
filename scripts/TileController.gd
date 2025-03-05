@@ -13,8 +13,10 @@ extends Control
 const network_type = ["GSM","UMTS","HSPA","LTE","NR"]
 const sqrt3 = 1.732
 
-var allowed_freq_pattern = [3,4,7,12]
+enum DecayModel {EXPONENT,INVERSE_SQUARE}
 
+var allowed_freq_pattern = [3,4,7,12]
+var current_model = DecayModel.INVERSE_SQUARE
 var arc_len = 150
 var current_freq_pattern_index = 0
 var total_channel_number = 24
@@ -51,6 +53,15 @@ var hex_list = []
 			#users[j].angle_to_station = users[j-1].angle_to_station
 	#return users
 
+func set_decay_model(model):
+	self.current_model = model
+
+func set_exp_decay_model():
+	self.current_model = self.DecayModel.EXPONENT
+	
+func set_inverse_decay_model():
+	self.current_model = self.DecayModel.INVERSE_SQUARE
+	
 # reallocate channels for a station, properly tackle the users
 # being connected or disconnected
 func tile_safely_reallocate_channels(current_hex, channel_number):
@@ -422,5 +433,6 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
+	#print(self.decay)
 	#print(self.decay, self.building_decay)
 	pass

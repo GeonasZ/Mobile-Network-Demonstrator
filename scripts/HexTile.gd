@@ -149,7 +149,7 @@ func get_antenna_type():
 func get_antenna_type_raw():
 	return self.antenna_type
 
-# not in use
+## not in use
  #eval signal power to a distance, providing decay is a constant
 func eval_signal_pow(angle_from_center, distance:float, decay, hyperbolic_method=true):
 	var array_factor
@@ -185,7 +185,6 @@ func eval_signal_power_to_user_with_various_decay(user, hyperbolic_method=true, 
 	var user_glob_pos = user.global_position
 	var distance = self.position.distance_to(user.position)
 	var angle_from_center = self.signal_direction.angle_to(user.position-self.position)
-	var wall_count = 0
 	var array_factor
 	if self.antenna_type == "SINGLE":
 		array_factor = 1
@@ -216,6 +215,10 @@ func eval_signal_power_to_user_with_various_decay(user, hyperbolic_method=true, 
 	var last_point_block
 	# exponential method
 	if not hyperbolic_method:
+		# take more sample points, exponential method need more points
+		n_seg *= path_controller.block_width
+		seg_len = distance/n_seg
+		
 		for i in range(n_seg+1):
 			if i > 0:
 				var sample_glob_pos = lerp(self.global_position,user_glob_pos,float(i)/float(n_seg))
@@ -229,10 +232,11 @@ func eval_signal_power_to_user_with_various_decay(user, hyperbolic_method=true, 
 				if decay > 0:
 					current_signal_pow = current_signal_pow*exp(-decay*seg_len)
 				if last_point_block != null and block.building != last_point_block.building:
-					wall_count += 1
+					current_signal_pow *= pow(10,-blocking_attenuation*0.1)
 				last_point_block = block
 	# hyperbolic method
 	else:
+		var wall_count = 0
 		# sum the decays
 		for i in range(n_seg+1):
 			var sample_glob_pos = lerp(self.global_position,user_glob_pos,float(i)/float(n_seg))
@@ -242,7 +246,7 @@ func eval_signal_power_to_user_with_various_decay(user, hyperbolic_method=true, 
 			last_point_block = block
 		# hyperbolic method siganl power evaluation
 		current_signal_pow = self.ref_signal_power/pow(distance,tile_controller.decay)*pow(array_factor,2)
-	current_signal_pow *= pow(10,-blocking_attenuation*0.1*wall_count)
+		current_signal_pow *= pow(10,-blocking_attenuation*0.1*wall_count)
 	return current_signal_pow
 
 # eval signal power to a user
@@ -253,6 +257,7 @@ func eval_signal_pow_to_user(user, decay=null, hyperbolic_method=true, blocking_
 	if user.connected_channel == null:
 		return 0
 	return eval_signal_power_to_user_with_various_decay(user,hyperbolic_method,blocking_attenuation)
+		
 	#if decay == null:
 		#return eval_signal_power_to_user_with_various_decay(user,hyperbolic_method,blocking_attenuation)
 	#else:

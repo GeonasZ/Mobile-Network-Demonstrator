@@ -15,7 +15,8 @@ var is_mouse_in = false
 func _ready() -> void:
 	notice_label.size = Vector2(1200,50)
 	var ref_pos = Vector2(-1.7*self.get_rect().size)
-	notice_label.position = Vector2(2.2*ref_pos.x,ref_pos.y)
+	notice_label.position = Vector2(2.3*ref_pos.x,ref_pos.y*1.6)
+
 
 func restart_program(tile_length,user_height):
 	user_controller.initialize_user_system(user_height)

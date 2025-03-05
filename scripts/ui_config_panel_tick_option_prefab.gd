@@ -59,7 +59,7 @@ func set_button_size(size):
 	self.tick_button.custom_minimum_size = size
 	self.tick_button_label.position = Vector2(0,0)
 	self.tick_button_label.size = size
-	self.tick_button.pivot_offset = self.tick_button.size/2
+	self.tick_button.pivot_offset = size/2
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
