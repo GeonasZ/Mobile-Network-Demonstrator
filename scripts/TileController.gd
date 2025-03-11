@@ -145,7 +145,6 @@ func eval_station_direction(tile_list, user_list, index_i, index_j):
 				dir_with_max_neg_diff = users[i].direction_to_station
 				#dir_with_max_neg_diff = current_dir_with_max_neg_diff
 			station_direction = (dir_with_max_pos_diff + dir_with_max_neg_diff).normalized()
-		print(maximum_user_num)
 	elif users.size() == 1:
 		station_direction = users[0].direction_to_station
 	else:
