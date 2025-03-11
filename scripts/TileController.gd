@@ -106,43 +106,52 @@ func eval_station_direction(tile_list, user_list, index_i, index_j):
 	angle_size = tile.get_divergence_angle()
 	# angle size and orientation is not applicable for this tile
 	if angle_size == null:
-		return null
+		return Vector2(0,0)
+	var station_direction
 	
-	if users.size() > 0:
-		for k in range(users.size()):
+	# update the direction of all users under it
+	for k in range(users.size()):
 			users[k].direction_to_station = tile.position.direction_to(users[k].position)
+	
+	if users.size() > 1:
 		# users = order_users_by_angle(users)
 		var maximum_user_num = 0
 		var dir_with_max_pos_diff = users[0].direction_to_station
 		var dir_with_max_neg_diff = users[0].direction_to_station
 		for i in range(users.size()):
-			var current_user_num = 0
+			var current_user_num = 1
 			var current_max_pos_angle_diff = 0
 			var current_max_neg_angle_diff = 0
 			var user_diff_angle = 0
 			var current_dir_with_max_pos_diff = users[i].direction_to_station
-			var current_dir_with_max_neg_diff = users[i].direction_to_station
+			#var current_dir_with_max_neg_diff = users[i].direction_to_station
 			for j in range(users.size()):
 				if i != j:
 					user_diff_angle = users[i].direction_to_station.angle_to(users[j].direction_to_station)
-					if user_diff_angle > 0 and user_diff_angle > current_max_pos_angle_diff \
-					and user_diff_angle-current_max_neg_angle_diff < angle_size:
-						current_max_pos_angle_diff = user_diff_angle
-						current_dir_with_max_pos_diff = users[j].direction_to_station
+					
+					if user_diff_angle > 0 and user_diff_angle < angle_size:
 						current_user_num += 1
-					elif user_diff_angle < 0 and user_diff_angle < current_max_neg_angle_diff \
-					and current_max_pos_angle_diff-user_diff_angle < angle_size:
-						current_max_neg_angle_diff = user_diff_angle
-						current_dir_with_max_neg_diff = users[j].direction_to_station
-						current_user_num += 1
+						if user_diff_angle > current_max_pos_angle_diff:
+							current_max_pos_angle_diff = user_diff_angle
+							current_dir_with_max_pos_diff = users[j].direction_to_station
+					#elif user_diff_angle < 0 and user_diff_angle < current_max_neg_angle_diff \
+					#and current_max_pos_angle_diff-user_diff_angle < angle_size:
+						#current_max_neg_angle_diff = user_diff_angle
+						#current_dir_with_max_neg_diff = users[j].direction_to_station
 						
 			if current_user_num > maximum_user_num:
 				maximum_user_num = current_user_num
 				dir_with_max_pos_diff = current_dir_with_max_pos_diff
-				dir_with_max_neg_diff = current_dir_with_max_neg_diff
-		var station_direction = (dir_with_max_pos_diff + dir_with_max_neg_diff).normalized()
-		tile.signal_direction = station_direction
-		return station_direction
+				dir_with_max_neg_diff = users[i].direction_to_station
+				#dir_with_max_neg_diff = current_dir_with_max_neg_diff
+			station_direction = (dir_with_max_pos_diff + dir_with_max_neg_diff).normalized()
+		print(maximum_user_num)
+	elif users.size() == 1:
+		station_direction = users[0].direction_to_station
+	else:
+		station_direction = Vector2(0,0)
+		
+	return station_direction
 
 func all_tile_set_antenna_type(mode:String):
 	## mode: Choose from "Single", "Array2", "Array3", "Array4", "Random" and "Custom"
@@ -234,13 +243,11 @@ func initialize_freq_pattern(tile_list ,n_freq):
 					else:
 						current_hex.set_channel_number(int(self.total_channel_number / n_freq)+self.total_channel_number%n_freq)
 	elif n_freq == 4:
-		var frequency_group_y_start_index = 0
 		var freuqnecy_group_index = 0
 		for i in range(tile_list.size()):
-			frequency_group_y_start_index += 1
 			for j in range(tile_list[i].size()):
 				var current_hex = tile_list[i][j]
-				freuqnecy_group_index = (frequency_group_y_start_index + 2*j) % 4
+				freuqnecy_group_index = (i + 2*j) % 4
 				# assign group to station
 				current_hex.frequency_group = frequency_group[freuqnecy_group_index]
 				# change tile color
@@ -256,7 +263,6 @@ func initialize_freq_pattern(tile_list ,n_freq):
 		var frequency_group_y_start_index = 0
 		var freuqnecy_group_index = 0
 		for i in range(tile_list.size()):
-			frequency_group_y_start_index += (i%2+1)
 			for j in range(tile_list[i].size()):
 				var current_hex = tile_list[i][j]
 				freuqnecy_group_index = (frequency_group_y_start_index + j) % 7
@@ -271,13 +277,12 @@ func initialize_freq_pattern(tile_list ,n_freq):
 						current_hex.set_channel_number(int(self.total_channel_number / n_freq))
 					else:
 						current_hex.set_channel_number(int(self.total_channel_number / n_freq)+self.total_channel_number%n_freq)
+			frequency_group_y_start_index += (2-i%2)
 	elif n_freq == 12:
 		var frequency_group_y_start_index = 0
 		var freuqnecy_group_index = 0
 		var inverse_allocate = false
 		for i in range(tile_list.size()):
-			frequency_group_y_start_index = frequency_group_y_start_index+2
-			
 			# take inverse index and return the y index to 0
 			if frequency_group_y_start_index == 12:
 				inverse_allocate = !inverse_allocate
@@ -286,15 +291,9 @@ func initialize_freq_pattern(tile_list ,n_freq):
 			for j in range(tile_list[i].size()):
 				var current_hex = tile_list[i][j]
 				if not inverse_allocate:
-					if j % 2 == 0:
-						freuqnecy_group_index = frequency_group_y_start_index + 1
-					else:
-						freuqnecy_group_index = frequency_group_y_start_index
+					freuqnecy_group_index = frequency_group_y_start_index + j % 2
 				else:
-					if j % 2 == 1:
-						freuqnecy_group_index = frequency_group_y_start_index + 1
-					else:
-						freuqnecy_group_index = frequency_group_y_start_index
+					freuqnecy_group_index = frequency_group_y_start_index + 1 - j % 2
 				# assign group to station
 				current_hex.frequency_group = frequency_group[freuqnecy_group_index]
 				# change tile color
@@ -306,6 +305,7 @@ func initialize_freq_pattern(tile_list ,n_freq):
 						current_hex.set_channel_number(int(self.total_channel_number / n_freq))
 					else:
 						current_hex.set_channel_number(int(self.total_channel_number / n_freq)+self.total_channel_number%n_freq)
+			frequency_group_y_start_index = frequency_group_y_start_index + 2
 	else:
 		print("Frequency allocation not allowed.")
 		
@@ -433,6 +433,6 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	#print(self.decay)
-	#print(self.decay, self.building_decay)
-	pass
+	for i in range(len(self.hex_list)):
+		for j in range(len(self.hex_list[i])):
+			self.hex_list[i][j].signal_direction = eval_station_direction(self.hex_list, user_controller.user_list, i, j)

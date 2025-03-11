@@ -61,7 +61,8 @@ func _draw() -> void:
 							hex.current_signal_alpha = 255
 							hex.current_signal_radius = 0
 					elif user_controller.user_list[i][j]["connected"].size() > 0:
-						direction = tile_controller.eval_station_direction(tile_controller.hex_list, user_controller.user_list,i,j)
+						#direction = tile_controller.eval_station_direction(tile_controller.hex_list, user_controller.user_list,i,j)
+						direction = hex.signal_direction
 						global_dir_line1 = station_global_transform * (station_direction_indicator_length_ratio*hex.arc_len*direction.rotated(angle_size/2.))
 						global_dir_line2 = station_global_transform * (station_direction_indicator_length_ratio*hex.arc_len*direction.rotated(-angle_size/2.))
 
