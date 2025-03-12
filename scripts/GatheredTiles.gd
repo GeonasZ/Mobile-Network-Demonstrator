@@ -50,7 +50,7 @@ func on_mouse_left_click_on_background(event):
 	if mouse_panel.analysis_panel_open:
 		return
 	mouse_left_click_on_background.emit(event)
-	if mouse_controller.current_hex.is_center_on_focus():
+	if mouse_controller.current_hex.is_center_on_focus() and not mouse_panel.backgorund_watching_mode:
 		mouse_panel.track_station(mouse_controller.current_hex)
 	elif user_controller.user_prefab != null and not user_controller.user_list.is_empty():
 		user_controller.add_user(event.position)
