@@ -116,7 +116,8 @@ func button_left_click_function(event):
 	else:
 		function_panel.set_all_button_mode(Mode.NONE)
 		user_controller.all_user_leave_engineer_mode()
-		station_config_panel.disappear()
+		if station_config_panel.visible:
+			station_config_panel.disappear()
 		mouse_panel.track_mouse()
 		self.label.set_text("Enter Engineer Mode")
 			

@@ -8,6 +8,7 @@ extends Control
 @onready var path_layer = $"../PathLayer"
 @onready var config_panel = $"../ConfigPanel"
 @onready var station_config_panel = $"../StationConfigPanel"
+@onready var enginner_button = $"../FunctionPanel/EngineerButton"
 
 signal mouse_left_click_on_background()
 signal mouse_right_click_on_background()
@@ -59,7 +60,11 @@ func on_mouse_right_click_on_background(event):
 	# if analysis panel open, do not react to right click
 	if mouse_panel.analysis_panel_open:
 		return
+	# if station config panel open, dont react either, 
+	# the panel itself would react to the right click
 	elif station_config_panel.visible:
+		return
+	elif enginner_button.button_mode == enginner_button.Mode.ENGINEER:
 		return
 		
 	if mouse_panel.tracking_mode == mouse_panel.TrackingMode.MOUSE:
@@ -67,6 +72,11 @@ func on_mouse_right_click_on_background(event):
 		function_panel.on_mouse_right_click_on_background(event)
 	else:
 		mouse_panel.track_mouse()
+
+func leave_immersive_mode():
+	if mouse_panel.backgorund_watching_mode:
+		mouse_panel.on_mouse_right_click_on_background(null)
+		function_panel.on_mouse_right_click_on_background(null)
 
 func _gui_input(event):
 	if event is InputEventMouseButton:
