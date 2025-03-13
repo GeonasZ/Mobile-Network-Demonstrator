@@ -1604,7 +1604,7 @@ size_flags_vertical = 0
 layout_mode = 2
 size_flags_horizontal = 2
 theme = SubResource("Theme_7tp5v")
-text = "Decay Constant in Building"
+text = "Decay Exponent in Building"
 
 [node name="PlaceHolder" type="Control" parent="ConfigPanel/ContentFrame/GridContainer/BuildingDecayEdit"]
 custom_minimum_size = Vector2(10, 0)

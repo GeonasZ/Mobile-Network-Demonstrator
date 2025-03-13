@@ -27,13 +27,13 @@ func set_text(text):
 func set_exp_decay_model():
 	self.tick_button_label.text = "Exponential"
 	self.model = DecayModel.EXPONENT
-	decay_constant_edit_label.text = "Decay Exponent"
+	decay_constant_edit_label.text = "Decay Exponent outside Building"
 	building_decay_edit.visible = true
 	
 func set_inverse_decay_model():
 	self.tick_button_label.text = "Inverse Squared"
 	self.model = DecayModel.INVERSE_SQUARE
-	decay_constant_edit_label.text = "Decay Constant"
+	decay_constant_edit_label.text = "Universal Decay Constant"
 	building_decay_edit.visible = false
 	
 func set_button_size(size):
