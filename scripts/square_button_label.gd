@@ -53,6 +53,11 @@ func apply_config(tile_length,user_height,n_channel,n_user,block_width, decay, b
 	
 	if path_controller.block_width != block_width:
 		path_controller.set_block_width(block_width)
+	
+	if user_controller.user_height != user_height:
+		user_controller.user_height = user_height
+		user_controller.redraw_all_users()
+		
 	tile_controller.set_decay(decay)
 	tile_controller.set_building_decay(building_decay)
 	tile_controller.set_decay_model(decay_model_edit.model)

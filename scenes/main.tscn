@@ -2332,7 +2332,6 @@ libraries = {
 }
 
 [node name="AnalysisPanel" type="Control" parent="."]
-visible = false
 z_index = 2
 material = SubResource("ShaderMaterial_vqwtm")
 anchors_preset = 0

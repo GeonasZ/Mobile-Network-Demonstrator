@@ -81,6 +81,15 @@ func add_user(pos,out_of_dead_zone=false, force=false):
 		current_user.move_out_spawn_deadzone()
 	return current_user
 
+func redraw_all_users():
+	for row in user_list:
+		for tile in row:
+			for user in tile["connected"]:
+				user.redraw_with_height(self.user_height)
+			for user in tile["disconnected"]:
+				user.redraw_with_height(self.user_height)
+			
+
 func random_add_user(n_user:int,out_of_dead_zone=false):
 	var user_pos
 	for i in range(n_user):
