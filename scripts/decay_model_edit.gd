@@ -5,6 +5,7 @@ extends HBoxContainer
 @onready var tick_button_label = $Button/Label
 @onready var tile_controller = $"../../../../Controllers/TileController"
 @onready var building_decay_edit = $"../BuildingDecayEdit"
+@onready var decay_constant_edit_label = $"../DecayEdit/Label"
 
 enum DecayModel {EXPONENT,INVERSE_SQUARE}
 
@@ -26,11 +27,13 @@ func set_text(text):
 func set_exp_decay_model():
 	self.tick_button_label.text = "Exponential"
 	self.model = DecayModel.EXPONENT
+	decay_constant_edit_label.text = "Decay Exponent"
 	building_decay_edit.visible = true
 	
 func set_inverse_decay_model():
 	self.tick_button_label.text = "Inverse Squared"
 	self.model = DecayModel.INVERSE_SQUARE
+	decay_constant_edit_label.text = "Decay Constant"
 	building_decay_edit.visible = false
 	
 func set_button_size(size):
