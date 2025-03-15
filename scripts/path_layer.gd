@@ -2,8 +2,7 @@ extends Node2D
 
 @onready var ui_controller = $"../Controllers/UIStyleController"
 
-var background_color
-
+var shading_color
 var lake
 var map_visible = true
 var do_map_shading = true
@@ -96,7 +95,7 @@ func draw_block_stored_lake(block, border_width):
 func _draw() -> void:
 	# draw the background of blocks
 	if self.do_map_shading:
-		draw_rect(Rect2(Vector2(0,0),Vector2(1920,1080)),background_color,true)
+		draw_rect(Rect2(Vector2(0,0),Vector2(1920,1080)),shading_color,true)
 	if not map_visible:
 		return
 	# draw all children
@@ -313,7 +312,7 @@ func _draw() -> void:
 		
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	self.background_color = ui_controller.map_shading_color
+	self.shading_color = ui_controller.map_shading_color
 	self.do_map_shading = ui_controller.default_map_shading
 
 func redraw():

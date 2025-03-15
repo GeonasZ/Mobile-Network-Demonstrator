@@ -98,20 +98,23 @@ func ui_config_option_fill_values():
 
 func init_ui_config_panel():
 	var tile_color_list = ui_controller.default_tile_color_list
-	var building_color = ui_controller.default_building_color
-	var building_wall_color = ui_controller.default_building_wall_color
-	var lawn_color = ui_controller.default_lawn_color
-	var lawn_edge_color = ui_controller.default_lawn_edge_color
-	var lake_color = ui_controller.default_lake_color
-	var lake_border_color = ui_controller.default_lake_border_color
-	var cell_border_color = ui_controller.default_cell_border_color
+	#var building_color = ui_controller.default_building_color
+	#var building_wall_color = ui_controller.default_building_wall_color
+	#var lawn_color = ui_controller.default_lawn_color
+	#var lawn_edge_color = ui_controller.default_lawn_edge_color
+	#var lake_color = ui_controller.default_lake_color
+	#var lake_border_color = ui_controller.default_lake_border_color
+	#var cell_border_color = ui_controller.default_cell_border_color
+	#var map_shading_color = ui_controller.map_shading_color
 	
 	# make a list consisting of all other ui color features apart from 
 	# the cell colors
-	var other_ui_color_option_list = [ui_controller.UISubject.BUILDING_COLOR,
+	var other_ui_color_option_list = [
+	ui_controller.UISubject.MAP_SHADING_COLOR, ui_controller.UISubject.BUILDING_COLOR,
 	ui_controller.UISubject.BUILDING_BORDER, ui_controller.UISubject.LAWN_BORDER,
 	ui_controller.UISubject.LAWN_COLOR, ui_controller.UISubject.LAKE_COLOR, 
-	ui_controller.UISubject.LAKE_BORDER, ui_controller.UISubject.CELL_BORDER]
+	ui_controller.UISubject.LAKE_BORDER, ui_controller.UISubject.CELL_BORDER, 
+	]
 	
 	# instantiate two placeholders first
 	for i in range(2):
@@ -131,18 +134,6 @@ func init_ui_config_panel():
 	option.set_subject(ui_controller.UISubject.MAP_SHADING)
 	option.set_option_name("Map Shading: ")
 	id += 1
-	
-	# instanciate the options regarding to the cell color
-	for j in range(len(tile_color_list)):
-		option = ui_color_option_prefab.instantiate()
-		grid_container.add_child(option)
-		option.initialize(tile_controller, ui_controller)
-		self.option_list.append(option)
-		option.set_subject(ui_controller.UISubject.CELL_COLOR)
-		option.set_id(id)
-		option.set_id_in_group(j)
-		option.set_option_name("Cell Color %d: " % (j+1))
-		id += 1
 		
 	# instanciate the options regarding to other ui features
 	for j in range(len(other_ui_color_option_list)):
@@ -167,9 +158,24 @@ func init_ui_config_panel():
 				option.set_option_name("Lake Border Color: ")
 			ui_controller.UISubject.CELL_BORDER:
 				option.set_option_name("Cell Border Color: ")
+			ui_controller.UISubject.MAP_SHADING_COLOR:
+				option.set_option_name("Map Shading Color: ")
 			_:
 				print("UIConfigPanel<init_ui_config_panel>: Invalid UI Color Type.")
 		id += 1
+		
+	# instanciate the options regarding to the cell color
+	for j in range(len(tile_color_list)):
+		option = ui_color_option_prefab.instantiate()
+		grid_container.add_child(option)
+		option.initialize(tile_controller, ui_controller)
+		self.option_list.append(option)
+		option.set_subject(ui_controller.UISubject.CELL_COLOR)
+		option.set_id(id)
+		option.set_id_in_group(j)
+		option.set_option_name("Cell Color %d: " % (j+1))
+		id += 1
+		
 		
 	# instantiate two placeholders at the end
 	for i in range(2):
@@ -263,7 +269,7 @@ func _process(delta: float) -> void:
 		if self.target_pos.distance_to(self.position) < 10:
 			self.target_pos = null
 		
-func _on_gathered_tiles_mouse_right_click_on_background(event) -> void:
-	if self.visible:
-		self.disappear()
-		mouse_panel.track_mouse()
+#func _on_gathered_tiles_mouse_right_click_on_background(event) -> void:
+	#if self.visible:
+		#self.disappear()
+		#mouse_panel.track_mouse()

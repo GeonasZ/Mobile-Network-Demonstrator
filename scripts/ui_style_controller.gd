@@ -6,7 +6,7 @@ extends Control
 @onready var path_layer = $"../../PathLayer"
 
 enum UISubject {CELL_COLOR,CELL_BORDER,LAWN_COLOR,LAWN_BORDER,
-				LAKE_COLOR,LAKE_BORDER, BUILDING_COLOR, BUILDING_BORDER, MAP_SHADING}
+				LAKE_COLOR,LAKE_BORDER, BUILDING_COLOR, BUILDING_BORDER, MAP_SHADING, MAP_SHADING_COLOR}
 				
 # default color style
 var default_tile_color_dict = {"blue":Color8(173,216,230),"violet":Color8(198,164,232), 
@@ -39,7 +39,8 @@ var ui_style_history = [{UISubject.CELL_COLOR:default_tile_color_list,
 UISubject.CELL_BORDER:default_cell_border_color, UISubject.LAWN_COLOR:default_lawn_color,
 UISubject.LAWN_BORDER:default_lawn_edge_color,UISubject.LAKE_COLOR:default_lake_color,
 UISubject.LAKE_BORDER:default_lake_border_color,UISubject.BUILDING_COLOR:default_building_color,
-UISubject.BUILDING_BORDER:default_building_wall_color, UISubject.MAP_SHADING:default_map_shading}]
+UISubject.BUILDING_BORDER:default_building_wall_color, UISubject.MAP_SHADING:default_map_shading,
+UISubject.MAP_SHADING_COLOR:map_shading_color}]
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -59,6 +60,7 @@ func update_all_ui_style():
 	# update all path blocks
 	path_controller.update_all_path_block_color_style()
 	# update map shading
+	path_layer.shading_color = self.ui_style_history[-1][UISubject.MAP_SHADING_COLOR]
 	path_layer.do_map_shading = self.ui_style_history[-1][UISubject.MAP_SHADING]
 	path_layer.redraw()
 	

@@ -7,6 +7,7 @@ extends Control
 @onready var anime_player = $AnimationPlayer
 @onready var gathered_tiles = $"../GatheredTiles"
 @onready var function_panel = $"../FunctionPanel"
+@onready var ui_config_panel = $"../UIConfigPanel"
 
 enum XMotion {MOVE_LEFT, MOVE_RIGHT}
 enum YMotion {MOVE_UP,MOVE_DOWN,MOVE_LEVEL}
@@ -104,6 +105,9 @@ func _ready():
 	keep_invisible = true
 	
 func on_mouse_right_click_on_background(event):
+	if ui_config_panel.visible:
+		return
+	
 	if event is InputEventMouseButton and event.button_mask == MOUSE_BUTTON_MASK_RIGHT and event.pressed == true:
 		if self.keep_invisible and not self.analysis_panel_open and not self.station_config_panel_open and self.backgorund_watching_mode:
 			self.backgorund_watching_mode = false
