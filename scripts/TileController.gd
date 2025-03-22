@@ -121,7 +121,7 @@ func eval_station_direction(tile_list, user_list, index_i, index_j):
 		for i in range(users.size()):
 			var current_user_num = 1
 			var current_max_pos_angle_diff = 0
-			var current_max_neg_angle_diff = 0
+			#var current_max_neg_angle_diff = 0
 			var user_diff_angle = 0
 			var current_dir_with_max_pos_diff = users[i].direction_to_station
 			#var current_dir_with_max_neg_diff = users[i].direction_to_station
