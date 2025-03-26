@@ -32,6 +32,6 @@ This demonstrator visualizes **signal propagation and user behavior** in a simul
 - Real-time user movement on the path grid.
 - Color-coded path blocks indicating traversable and blocked states.
 - Smart redirection around walls and impassable zones.
-- Dynamic interaction between user position and system logic (e.g., XMem confidence fallback, reroute behavior).
+- Dynamic interaction between user position and system logic.
 
 > 📡 This demonstrator serves as an interactive tool to validate mobile network navigation strategies and user behavior in constrained environments. It lays the groundwork for integrating signal propagation models, agent-based simulations, and real-world robotic control in future work.

@@ -12,33 +12,12 @@ extends GridContainer
 @onready var current_signal_label = $CurrentSignalPower
 @onready var current_sir_label = $CurrentSIR
 @onready var plot_frame = $"../PlotFrame"
+@onready var note = $"../ResultsPanelNote"
 
 var element_list = []
 var length
 var width
 var slash_len = 50
-
-#func _draw():
-	#draw_set_transform(Vector2(length/2,width/2))
-	#draw_line(Vector2(-length/2+slash_len, -width/2),Vector2(length/2-slash_len, -width/2), Color(0,0,0), 5, true)
-	#draw_line(Vector2(length/2-slash_len, -width/2), Vector2(length/2, -width/2+slash_len), Color(0,0,0), 5, true)
-	#draw_line(Vector2(length/2, -width/2+slash_len),Vector2(length/2, width/2 - slash_len), Color(0,0,0), 5, true)
-	#draw_line(Vector2(length/2, width/2 - slash_len), Vector2(length/2 - slash_len, width/2), Color(0,0,0), 5, true)
-	#draw_line(Vector2(length/2 - slash_len, width/2), Vector2(-length/2 + slash_len, width/2), Color(0,0,0), 5, true)
-	#draw_line(Vector2(-length/2 + slash_len, width/2), Vector2(-length/2, width/2 - slash_len), Color(0,0,0), 5, true)
-	#draw_line(Vector2(-length/2, width/2 - slash_len), Vector2(-length/2, -width/2 + slash_len), Color(0,0,0), 5, true)
-	#draw_line(Vector2(-length/2, -width/2 + slash_len), Vector2(-length/2 + slash_len, -width/2), Color(0,0,0), 5, true)
-	#draw_polygon([Vector2(-length/2 + slash_len, -width/2),
-					#Vector2(length/2 - slash_len, -width/2),
-					#Vector2(length/2, -width/2 + slash_len),
-					#Vector2(length/2, width/2 - slash_len),
-					#Vector2(length/2 - slash_len, width/2),
-					#Vector2(-length/2 + slash_len, width/2),
-					#Vector2(-length/2, width/2 - slash_len),
-					#Vector2(-length/2, -width/2 + slash_len)],
-					#[Color8(255,255,255),Color8(255,255,255),Color8(255,255,255),Color8(255,255,255),
-					#Color8(255,255,255),Color8(255,255,255),Color8(255,255,255),Color8(255,255,255)])
-
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -49,11 +28,15 @@ func _ready() -> void:
 	self.init_size()
 	set_all_elements_length(Vector2(self.length/self.columns,self.width/2))
 	self._display_null_data()
-	
+
 func init_size():
-	self.size = Vector2(analysis_panel.length*0.68,analysis_panel.width/4.)
+	self.size = Vector2(analysis_panel.length*0.7,analysis_panel.width*0.18)
 	self.length = self.size.x
 	self.width = self.size.y
+	
+func init_note():
+	note.size = Vector2(self.length,self.width*0.5)
+	note.position = self.position+Vector2(0,self.size.y)
 
 func set_all_elements_length(size:Vector2):
 	for element in element_list:
@@ -105,7 +88,7 @@ func extract_user_data(user,n_displayed_data=-1):
 			# ensure sir is not Inf
 			if sir_hist[i] != INF:
 				# sum sir up
-				sir_sum += sir_hist[i]
+				sir_sum += log(sir_hist[i])
 				n_valid_sir += 1
 				# look for the max and min of sir
 				if sir_max is String or sir_hist[i] > sir_max:
@@ -113,13 +96,18 @@ func extract_user_data(user,n_displayed_data=-1):
 				elif sir_min is String or sir_hist[i] < sir_min:
 					sir_min = sir_hist[i]
 	var mean_sir = sir_sum/n_valid_sir if n_valid_sir > 0 else "N/A"
+	if mean_sir is float or mean_sir is int:
+		mean_sir = exp(mean_sir)
 
 	return [signal_sum/len(index_range),
 			mean_sir, signal_max,
 			sir_max, signal_min, sir_min]
 
 func dBm(num:float):
-	return 10*log(num/0.001)
+	return 10*log(num/0.001)/log(10)
+	
+func dB(num:float):
+	return 10*log(num)/log(10)
 
 func truncate_double(num, n_digits=3):
 	return int(num * pow(10,n_digits))/pow(10,n_digits)
@@ -149,7 +137,7 @@ func make_displayed_content(input,do_dBm_transfer=true,zero_as_inf=false)->Strin
 			if do_dBm_transfer:
 				displayed_content = str(truncate_double(dBm(input))) +" dBm"
 			else:
-				displayed_content = str(truncate_double(input)) +" dB"
+				displayed_content = str(truncate_double(dB(input))) +" dB"
 		else:
 			if do_dBm_transfer:
 				displayed_content = "Inf dBm"

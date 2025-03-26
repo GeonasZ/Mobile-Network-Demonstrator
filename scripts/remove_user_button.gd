@@ -73,10 +73,10 @@ func button_click_function():
 			user_controller.remove_user(current_user)
 		else:
 			break
-	if self.is_mouse_in_original_rect():
-		if not mouse_panel.is_tracking_station():
-			mouse_panel.disappear_with_anime()
-			is_mouse_in_box = true
+	#if self.is_mouse_in_original_rect():
+		#if not mouse_panel.is_tracking_station():
+			#mouse_panel.disappear_with_anime()
+			#is_mouse_in_box = true
 			
 func _input(event: InputEvent) -> void:
 	if not self.visible or not function_panel.visible:

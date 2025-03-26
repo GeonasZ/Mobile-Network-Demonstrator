@@ -1,4 +1,4 @@
-[gd_scene load_steps=167 format=3 uid="uid://dp7br0wc03w8r"]
+[gd_scene load_steps=169 format=3 uid="uid://dp7br0wc03w8r"]
 
 [ext_resource type="Script" path="res://scripts/UserController.gd" id="1_18gww"]
 [ext_resource type="Script" path="res://scripts/TileController.gd" id="1_fg5v7"]
@@ -80,6 +80,7 @@
 [ext_resource type="Script" path="res://scripts/analysis_panel_analysis_button.gd" id="60_dcd47"]
 [ext_resource type="Script" path="res://scripts/ui_style_button.gd" id="60_oocks"]
 [ext_resource type="Script" path="res://scripts/ui_config_panel.gd" id="76_g0ii2"]
+[ext_resource type="FontFile" uid="uid://da2osvdetix74" path="res://fonts/HanSan/SimplifiedCN/SourceHanSansCN-Normal.otf" id="76_oehtp"]
 [ext_resource type="Script" path="res://scripts/ui_config_panel_scroll_container.gd" id="78_fkqif"]
 [ext_resource type="Script" path="res://scripts/ui_config_confirm_button.gd" id="79_dxic1"]
 [ext_resource type="Script" path="res://scripts/ui_config_undo_button.gd" id="80_ao6gy"]
@@ -745,6 +746,13 @@ Label/colors/font_color = Color(0, 0, 0, 1)
 Label/font_sizes/font_size = 40
 Label/fonts/font = ExtResource("11_i26m1")
 Label/styles/normal = null
+
+[sub_resource type="Theme" id="Theme_17nlm"]
+RichTextLabel/colors/default_color = Color(0, 0, 0, 1)
+RichTextLabel/font_sizes/bold_font_size = 22
+RichTextLabel/font_sizes/normal_font_size = 22
+RichTextLabel/fonts/bold_font = ExtResource("11_i26m1")
+RichTextLabel/fonts/normal_font = ExtResource("76_oehtp")
 
 [sub_resource type="Animation" id="Animation_aubb7"]
 resource_name = "panel_appear"
@@ -2574,6 +2582,14 @@ theme = SubResource("Theme_3l4ea")
 text = "Start Analysis"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="ResultsPanelNote" type="RichTextLabel" parent="AnalysisPanel"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+theme = SubResource("Theme_17nlm")
+bbcode_enabled = true
+text = "[center][b]Note: Signal Power is averaged arithmetically in the linear domain, while SIR is reported as a geometric mean.[/b][/center]"
 
 [node name="InstructionPanel" type="Polygon2D" parent="."]
 z_index = 2

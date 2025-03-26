@@ -56,6 +56,7 @@ func _ready() -> void:
 	user_select_panel.position = Vector2(self.slash_len,self.width-1.65*self.slash_len+0.15*self.slash_len)
 	n_plot_data_panel.position = Vector2(self.slash_len,self.width-3.3*self.slash_len+0.15*self.slash_len)
 	results_panel.position = Vector2(self.length*0.285,self.width-4.95*self.slash_len+0.15*self.slash_len)
+	results_panel.init_note()
 	plot_select_panel.position = Vector2(self.slash_len,self.width-5.2*self.slash_len+0.15*self.slash_len)
 	n_plot_data_edit.initialize(plot_frame.n_displayed_data)
 	

@@ -22,6 +22,9 @@ var line_width = 3
 
 func dBm(num:float):
 	return 10*log(num/0.001)/log(10)
+	
+func dB(num:float):
+	return 10*log(num)/log(10)
 
 func make_indicative_y_values():
 	# make an indicative axis if max or min value is not accessable
@@ -99,10 +102,10 @@ func _draw() -> void:
 
 		for i in indexes_to_be_ploted:
 			if data_list[i] is not String:
-				if data_list[i] != INF and (max_dB == null or (data_list[i] > max_dB)):
-					max_dB = data_list[i]
-				if data_list[i] != INF and (min_dB == null or (data_list[i] < min_dB)):
-					min_dB = data_list[i]
+				if data_list[i] != INF and (max_dB == null or (dB(data_list[i]) > max_dB)):
+					max_dB = dB(data_list[i])
+				if data_list[i] != INF and (min_dB == null or (dB(data_list[i]) < min_dB)):
+					min_dB = dB(data_list[i])
 		max_data = max_dB
 		min_data = min_dB
 		plot_dBm_y = false
@@ -123,7 +126,12 @@ func _draw() -> void:
 	if max_data != null and min_data != null:
 		var element_data_diff = diff/(y_axis.n_labels-1)
 		for i in range(len(y_axis.y_axis_label_list)):
-			y_axis.y_axis_label_list[i].text = self._make_displayed_content(element_data_diff*i + min_data)
+			if self.current_display_mode == DisplayMode.SIGNAL:
+				y_axis.y_axis_label_list[i].text = self._make_displayed_content(element_data_diff*i + min_data)
+			elif self.current_display_mode == DisplayMode.SIR:
+				y_axis.y_axis_label_list[i].text = self._make_displayed_content(element_data_diff*i + min_data, false)
+			else:
+				print("plot_frame<_draw>: Unkown DisplatMode.")
 	else:
 		make_indicative_y_values()
 	var j = 0
@@ -134,7 +142,7 @@ func _draw() -> void:
 			if plot_dBm_y:
 				current_data_point = Vector2((self.size.x-2*self.x_padding-2*axis_indicative_line_len)/(self.n_displayed_data-1)*j+self.x_padding+2*axis_indicative_line_len,-((dBm(data_list[i])-min_data)/diff*(self.size.y-2*self.y_padding)+self.y_padding))
 			else:
-				current_data_point = Vector2((self.size.x-2*self.x_padding-2*axis_indicative_line_len)/(self.n_displayed_data-1)*j+self.x_padding+2*axis_indicative_line_len,-((data_list[i]-min_data)/diff*(self.size.y-2*self.y_padding)+self.y_padding))
+				current_data_point = Vector2((self.size.x-2*self.x_padding-2*axis_indicative_line_len)/(self.n_displayed_data-1)*j+self.x_padding+2*axis_indicative_line_len,-((dB(data_list[i])-min_data)/diff*(self.size.y-2*self.y_padding)+self.y_padding))
 				
 			draw_circle(current_data_point,self.dot_radius,Color8(0,0,0),true)
 			if j > 0 and (data_list[i-1] is not String):

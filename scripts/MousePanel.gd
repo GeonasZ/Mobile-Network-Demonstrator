@@ -277,6 +277,12 @@ func list2str(input_list, seperator=", "):
 		
 		return output
 
+func dBm(num:float):
+	return 10*log(num/0.001)/log(10)
+	
+func dB(num:float):
+	return 10*log(num)/log(10)
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	
@@ -375,8 +381,11 @@ func _process(delta):
 			"Connected to Channel:  "+str(displayed_user[-1].connection_status())
 		# if user is connected to station, show sir
 		if displayed_user[-1].connected_channel != null:
-			info_label.text += "\nSignal Power: " + (str(truncate_double(10*log(signal_power/1e-3)/log(10))) + " dBm" if signal_power > 0 else "0 W")
-			info_label.text += "\nSIR:  "+str(eval_sir(signal_power,interference_power))
+			info_label.text += "\nSignal Power: " + (str(truncate_double(dBm(signal_power))) + " dBm" if signal_power > 0 else "0 W")
+			if sir is float:
+				info_label.text += "\nSIR:  " + str(truncate_double(dB(sir))) + " dB"
+			else:
+				info_label.text += "\nSIR:  N/A"
 		else:
 			info_label.text += "\nSignal Power: Not Connected"
 			info_label.text += "\nSIR:  N/A"
@@ -405,8 +414,11 @@ func _process(delta):
 			
 		# if user is connected to station, show sir
 		if tracked_user.connected_channel != null:
-			info_label.text += "\nSignal Power: " + (str(truncate_double(10*log(signal_power/1e-3)/log(10))) + " dBm" if signal_power > 0 else "0 W")
-			info_label.text += "\nSIR:  "+str(eval_sir(signal_power,interference_power))
+			info_label.text += "\nSignal Power: " + (str(truncate_double(dBm(signal_power))) + " dBm" if signal_power > 0 else "0 W")
+			if sir is float:
+				info_label.text += "\nSIR:  "+str(truncate_double(dB(sir))) + " dB"
+			else:
+				info_label.text += "\nSIR:  N/A"
 		else:
 			info_label.text += "\nSignal Power: Not Connected"
 			info_label.text += "\nSIR:  N/A"
