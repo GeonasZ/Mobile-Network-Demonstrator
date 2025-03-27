@@ -8,6 +8,9 @@ extends Control
 @onready var tile_controller = $"../../Controllers/TileController"
 @onready var button_char = $Char
 @onready var function_panel = $".."
+@onready var instr_panel = $"../../InstructionPanel"
+@onready var config_panel = $"../../ConfigPanel"
+
 
 enum Mode {NONE, OBSERVER, ENGINEER}
 var button_mode = Mode.NONE
@@ -30,7 +33,6 @@ func _draw():
 	draw_arc(Vector2(button_radius,button_radius), button_radius, 0, TAU, 50, Color8(50,50,50), 7, true)
 
 func appear():
-	self.scale = Vector2(0,0)
 	self.on_work = false
 	self.visible = true
 	self.animator.play("button_appear")
@@ -66,7 +68,7 @@ func set_button_mode(mode):
 	# hide if either observer or engineer mode is on
 	if mode != self.button_mode and (mode == Mode.OBSERVER or mode == Mode.ENGINEER):
 		self.disappear()
-	elif mode != self.button_mode and mode == Mode.NONE and not self.visible:
+	elif mode != self.button_mode and mode == Mode.NONE:
 		self.appear()
 	self.button_mode = mode
 
@@ -76,7 +78,7 @@ func _ready():
 	self.scale = Vector2(1,1)
 	self.label.visible = false
 	self.on_work = true
-	self.position = Vector2(1820 - button_radius, 700 - button_radius)
+	self.position = Vector2(1820 - button_radius, 820 - button_radius)
 	self.size = Vector2(2*button_radius, 2*button_radius)
 	self.pivot_offset = self.size/2
 	self.large_font = preload("res://fonts/pre_set_theme/button_large_font.tres")
@@ -89,13 +91,31 @@ func _ready():
 	else:
 		is_mouse_in_box = false
 
-func button_click_function():
-	if not ui_config_panel.on_work:
+func button_click_function(event):
+	if instr_panel.visible:
+		return
+	elif self.button_mode == Mode.OBSERVER:
+		return
+	elif self.button_mode == Mode.ENGINEER:
+		return
+	elif self.analysis_on:
+		return
+	elif ui_config_panel.visible:
+		return
+	elif config_panel.visible:
 		return
 	
-	if not ui_config_panel.visible:
-		ui_config_panel.appear()
-		function_panel.all_button_smart_disappear()
+	if (event is InputEventKey and event.keycode == KEY_P) or (event is InputEventMouseButton and event.button_mask == MOUSE_BUTTON_MASK_LEFT) and event.is_pressed():
+		if user_controller.user_paused == true:
+			user_controller.resume_all_user()
+			user_controller.user_paused = false
+			self.label.set_text("Pause Users")
+			self.button_char.set_text("P")
+		elif user_controller.user_paused == false:
+			user_controller.pause_all_user()
+			user_controller.user_paused = true
+			self.label.set_text("Resume Users")
+			self.button_char.set_text("R")
 
 func _input(event: InputEvent) -> void:
 	if not self.visible or not function_panel.visible:
@@ -104,9 +124,8 @@ func _input(event: InputEvent) -> void:
 		return
 	if not self.can_be_controlled_by_key:
 		return
-		
-	if event is InputEventKey and event.keycode == KEY_F and event.is_pressed():
-		button_click_function()
+	if event is InputEventKey and event.keycode == KEY_P and event.is_pressed():
+		button_click_function(event)
 	
 func _gui_input(event: InputEvent) -> void:
 	
@@ -114,7 +133,7 @@ func _gui_input(event: InputEvent) -> void:
 		return
 	
 	if event is InputEventMouseButton and event.button_mask == MOUSE_BUTTON_MASK_LEFT:
-		button_click_function()
+		button_click_function(event)
 			
 
 func appear_with_disappearing_instr_panel():
@@ -157,13 +176,5 @@ func _process(delta):
 			label.disappear_with_anime()
 			self.scale = Vector2(1,1)
 			self.scale = Vector2(1,1)
-	## change the content displayed on the button when mouse in
-	#if self.visible and self.is_mouse_in_original_rect():
-		#if self.current_pattern == -1:
-			#self.current_pattern = tile_controller.get_current_freq_pattern()
-		#self.button_char.text = "N = " + str(self.current_pattern)
-		#self.button_char.theme = self.small_font
-	#else:
-		#self.button_char.text = "F"
-		#self.button_char.theme = self.large_font
+
 		

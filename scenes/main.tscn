@@ -1,4 +1,4 @@
-[gd_scene load_steps=169 format=3 uid="uid://dp7br0wc03w8r"]
+[gd_scene load_steps=170 format=3 uid="uid://dp7br0wc03w8r"]
 
 [ext_resource type="Script" path="res://scripts/UserController.gd" id="1_18gww"]
 [ext_resource type="Script" path="res://scripts/TileController.gd" id="1_fg5v7"]
@@ -79,6 +79,7 @@
 [ext_resource type="Script" path="res://scripts/plot_select_button.gd" id="57_pr2yt"]
 [ext_resource type="Script" path="res://scripts/analysis_panel_analysis_button.gd" id="60_dcd47"]
 [ext_resource type="Script" path="res://scripts/ui_style_button.gd" id="60_oocks"]
+[ext_resource type="Script" path="res://scripts/pause_button.gd" id="65_o0nqq"]
 [ext_resource type="Script" path="res://scripts/ui_config_panel.gd" id="76_g0ii2"]
 [ext_resource type="FontFile" uid="uid://da2osvdetix74" path="res://fonts/HanSan/SimplifiedCN/SourceHanSansCN-Normal.otf" id="76_oehtp"]
 [ext_resource type="Script" path="res://scripts/ui_config_panel_scroll_container.gd" id="78_fkqif"]
@@ -2335,6 +2336,56 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="FunctionPanel/UIStyleButton/FunctionLabel"]
+libraries = {
+"": SubResource("AnimationLibrary_i6iwl")
+}
+
+[node name="PauseButton" type="Control" parent="FunctionPanel"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+scale = Vector2(1e-05, 1e-05)
+script = ExtResource("65_o0nqq")
+
+[node name="Char" type="Label" parent="FunctionPanel/PauseButton"]
+layout_mode = 0
+offset_right = 47.0
+offset_bottom = 88.0
+pivot_offset = Vector2(0, 40)
+theme = ExtResource("13_22qid")
+text = "P"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("13_wkp48")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="FunctionPanel/PauseButton"]
+libraries = {
+"": SubResource("AnimationLibrary_it6wr")
+}
+
+[node name="FunctionLabel" type="Control" parent="FunctionPanel/PauseButton"]
+anchors_preset = 0
+offset_left = -20.0
+offset_top = 48.0
+offset_right = 20.0
+offset_bottom = 88.0
+scale = Vector2(1e-05, 1e-05)
+script = ExtResource("6_0kpw6")
+
+[node name="Label" type="Label" parent="FunctionPanel/PauseButton/FunctionLabel"]
+layout_mode = 0
+offset_left = 1.696e+08
+offset_top = 1.43e+07
+offset_right = 1.696e+08
+offset_bottom = 1.43001e+07
+theme = ExtResource("11_8l076")
+theme_override_font_sizes/font_size = 26
+text = "Pause Users"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="FunctionPanel/PauseButton/FunctionLabel"]
 libraries = {
 "": SubResource("AnimationLibrary_i6iwl")
 }

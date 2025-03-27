@@ -6,7 +6,7 @@ extends LineEdit
 var legal_characters = ["0","1","2","3","4","5","6","7","8","9"]
 
 var previous_text = ""
-var max_value = 1000
+var max_value = 2000
 var min_value = 0
 
 # Called when the node enters the scene tree for the first time.

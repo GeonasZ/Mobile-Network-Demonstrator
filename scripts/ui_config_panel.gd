@@ -75,7 +75,8 @@ func disappear():
 	mouse_panel.appear_with_anime()
 	self.visible = false
 	self.on_work = true
-	user_controller.resume_all_user()
+	if not user_controller.user_paused:
+		user_controller.resume_all_user()
 
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.is_pressed() and not on_drag:

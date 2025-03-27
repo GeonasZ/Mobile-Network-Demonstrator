@@ -382,7 +382,7 @@ func initialize_tile_background(ref_point:Vector2, tile_length:int=0):
 		y_index += 1
 	
 ## return [least_distance_hex, least_distance, i_with_least_distance, j_with_least_distance]
-func get_current_hex(pos):
+func get_current_hex(pos, with_global_pos=true):
 	var least_distance = -1
 	var least_distance_hex = null
 	var i_with_least_distance = -1
@@ -390,7 +390,7 @@ func get_current_hex(pos):
 	for i in range(hex_list.size()):
 		for j in range(hex_list[i].size()):
 			# evalute the distance from mouse to the station
-			var current_dis = (hex_list[i][j].global_position).distance_to(pos)
+			var current_dis = (hex_list[i][j].global_position).distance_to(pos) if with_global_pos else (hex_list[i][j].position).distance_to(pos)
 			if least_distance == -1 or current_dis < least_distance:
 				least_distance = current_dis
 				least_distance_hex = hex_list[i][j]

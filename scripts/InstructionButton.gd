@@ -32,6 +32,11 @@ func is_mouse_in_original_rect():
 	return self.original_rect.has_point(get_viewport().get_mouse_position())
 
 func set_button_mode(mode):
+	# hide if either observer or engineer mode is on
+	if mode != self.button_mode and (mode == Mode.OBSERVER or mode == Mode.ENGINEER):
+		self.disappear()
+	elif mode != self.button_mode and mode == Mode.NONE:
+		self.appear()
 	self.button_mode = mode
 
 # Called when the node enters the scene tree for the first time.
@@ -113,8 +118,6 @@ func _process(delta):
 	# hide if analysis on, show if analysis off
 	if self.analysis_on and self.visible:
 		self.disappear()
-	elif self.button_mode == self.Mode.OBSERVER and not self.analysis_on and not self.visible and not function_panel.analysis_panel_open:
-		self.appear()
 	# mouse in button animes
 	if self.is_mouse_in_original_rect() and not mouse_panel.backgorund_watching_mode:
 		# trigger only at the frame cursor enters button

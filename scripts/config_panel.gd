@@ -68,7 +68,8 @@ func close_config_with_anime():
 	if self.on_work:
 		is_panel_open = false
 		on_work = false
-		user_controller.resume_all_user()
+		if not user_controller.user_paused:
+			user_controller.resume_all_user()
 		anime_player.play("config_disappear")
 		await anime_player.animation_finished
 		gathered_tiles.back_to_position_after_zoom()

@@ -194,6 +194,7 @@ func in_spawn_dead_zone():
 
 func move_out_spawn_deadzone():
 	if self.in_spawn_dead_zone():
+		
 		self.position += self.displacement_from_station/self.distance_from_station*(self.spawn_deadzone_ratio*station.arc_len-self.distance_from_station)
 
 
@@ -324,8 +325,6 @@ func path_move(delta):
 	# learn from penalty
 	self.velocity += self.penalty_lr * self.eval_motion_penalty()
 	
-	
-	
 func set_boundary_color_red():
 	boundary.rect_color = Color8(255,0,0)
 	
@@ -334,17 +333,6 @@ func set_boundary_color_default():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	#if not under_analysis and previous_under_analysis:
-		#boundary.width = 5
-		#set_boundary_color_default()
-		#boundary.queue_redraw()
-		#self.previous_under_analysis = under_analysis
-	#elif under_analysis and not previous_under_analysis:
-		#boundary.width = 3
-		#set_boundary_color_red()
-		#boundary.queue_redraw()
-		#self.previous_under_analysis = under_analysis
-	#
 	# try to move a step if not paused
 	if (not observer_mode or under_analysis) and not engineer_mode and not motion_pause:
 		if path_layer.map_visible:

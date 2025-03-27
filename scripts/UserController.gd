@@ -10,6 +10,8 @@ extends Control
 @onready var function_panel = $"../../FunctionPanel"
 @onready var path_layer = $"../../PathLayer"
 @onready var ui_config_panel = $"../../UIConfigPanel"
+@onready var instr_panel = $"../../InstructionPanel"
+@onready var config_panel = $"../../ConfigPanel"
 const sqrt3 = 1.732
 var user_prefab = null
 # initialize in tile controller when hex_list gets initialized
@@ -17,6 +19,13 @@ var user_list = []
 var linear_user_list = []
 var current_available_user_id = 0
 var show_popup = false
+
+# only count for manually selected user pause
+# will not affect observer mode, engineer mode, 
+# instruction panel, etc.
+var user_paused = false
+
+var resume_pause_when_leaving_obs_mode = false
 
 var analysis_sampling_interval = 0.2
 
@@ -52,7 +61,7 @@ func add_user(pos,out_of_dead_zone=false, force=false):
 	current_user.id = current_available_user_id
 	current_available_user_id += 1
 	# allocate the user into a hex
-	var temp = tile_controller.get_current_hex(pos)
+	var temp = tile_controller.get_current_hex(pos,false)
 	var i = temp[2]
 	var j = temp[3]
 	current_user.index_i_in_user_list = i
@@ -76,6 +85,8 @@ func add_user(pos,out_of_dead_zone=false, force=false):
 		current_user.enter_observer_mode()
 	if engineer_button.button_mode == engineer_button.Mode.ENGINEER:
 		current_user.enter_engineer_mode()
+	if self.user_paused:
+		current_user.pause_motion()
 	current_user.redraw_with_height(self.user_height)
 	if out_of_dead_zone:
 		current_user.move_out_spawn_deadzone()
@@ -119,6 +130,8 @@ func remove_user(user,index_in_linear_user_list=null):
 			mouse_panel._on_mouse_leave_user(user)
 			break
 	user.queue_free()
+	if not self.linear_user_list:
+		current_available_user_id = 0
 
 ## remove a user from the linear user list by their id
 func remove_user_from_linear_user_list(user_id):
@@ -330,20 +343,29 @@ func eval_user_sir(user, inf_thresd=1e4):
 	return [signal_power, interference_power, sir]
 
 func all_user_enter_observer_mode():
-		for row in user_list:
-			for tile in row:
-				for user in tile["connected"]:
-					user.enter_observer_mode()
-				for user in tile["disconnected"]:
-					user.enter_observer_mode()
+	if self.user_paused:
+		resume_all_user()
+		self.user_paused = false
+		self.resume_pause_when_leaving_obs_mode = true
+	
+	for row in user_list:
+		for tile in row:
+			for user in tile["connected"]:
+				user.enter_observer_mode()
+			for user in tile["disconnected"]:
+				user.enter_observer_mode()
 
 func all_user_leave_observer_mode():
-		for row in user_list:
-			for tile in row:
-				for user in tile["connected"]:
-					user.leave_observer_mode()
-				for user in tile["disconnected"]:
-					user.leave_observer_mode()
+	for row in user_list:
+		for tile in row:
+			for user in tile["connected"]:
+				user.leave_observer_mode()
+			for user in tile["disconnected"]:
+				user.leave_observer_mode()
+	if self.resume_pause_when_leaving_obs_mode:
+		self.pause_all_user()
+		self.user_paused = true
+		self.resume_pause_when_leaving_obs_mode = false
 
 func all_user_enter_engineer_mode():
 		for row in user_list:
