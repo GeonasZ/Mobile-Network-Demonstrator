@@ -39,6 +39,11 @@ func _ready() -> void:
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	pass
+	#for button in self.registered_buttons:
+		##if button == add_user_button or button == remove_user_button or button == analysis_mode_button or button == analysis_panel_button:
+		#if button == hide_map_button or button == generate_map_button or button == antenna_config_button:
+			#button.label.visible = true 
+			#button.label.anime_player.speed_scale = 0.01
 
 func all_button_smart_appear():
 	for button in self.registered_buttons:

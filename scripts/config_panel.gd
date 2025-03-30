@@ -77,5 +77,4 @@ func close_config_with_anime():
 		self.visible = false
 		on_work = true
 		function_panel.enable_all_keyboard_input()
-		
 	
